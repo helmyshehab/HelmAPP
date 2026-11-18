@@ -54,3 +54,53 @@ test('rejects invented rating without platform', () => {
   });
   assert.equal(result.ok, false);
 });
+
+test('rejects accommodation details on cafe category', () => {
+  const result = validateCatalogImport({
+    formatVersion: 'helm.catalog.import.v1',
+    places: [
+      {
+        ...validPlace,
+        category: 'cafe',
+        subcategory: 'cafe',
+        accommodation: { accommodationType: 'hotel' },
+      },
+    ],
+  });
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((e) => e.path.includes('accommodation')));
+});
+
+test('rejects duplicate destination externalKey and slug', () => {
+  const dest = {
+    externalKey: 'id:bali',
+    slug: 'bali',
+    nameEn: 'Bali',
+    nameAr: 'بالي',
+    countryCode: 'ID',
+    updateIfExists: false,
+  };
+  const result = validateCatalogImport({
+    formatVersion: 'helm.catalog.import.v1',
+    destinations: [dest, { ...dest, slug: 'bali-2' }],
+  });
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((e) => e.path.includes('externalKey')));
+});
+
+test('accepts destination with required externalKey', () => {
+  const result = validateCatalogImport({
+    formatVersion: 'helm.catalog.import.v1',
+    destinations: [
+      {
+        externalKey: 'id:bali',
+        slug: 'bali',
+        nameEn: 'Bali',
+        nameAr: 'بالي',
+        countryCode: 'ID',
+        updateIfExists: false,
+      },
+    ],
+  });
+  assert.equal(result.ok, true);
+});

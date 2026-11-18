@@ -419,9 +419,23 @@ export interface components {
             importRunId: string;
             placesInPayload?: number;
             destinationsInPayload?: number;
+            destinationsWouldCreate?: number;
+            destinationsWouldUpdate?: number;
+            destinationsWouldSkip?: number;
+            placesWouldCreate?: number;
+            placesWouldUpdate?: number;
+            placesWouldSkip?: number;
+            destinationsCreated?: number;
+            destinationsUpdated?: number;
+            destinationsSkipped?: number;
+            placesCreated?: number;
+            placesUpdated?: number;
+            placesSkipped?: number;
+            /** @description Aggregate destinations+places would-create (dry-run) */
             wouldCreate?: number;
             wouldUpdate?: number;
             wouldSkip?: number;
+            /** @description Aggregate destinations+places created */
             created?: number;
             updated?: number;
             skipped?: number;

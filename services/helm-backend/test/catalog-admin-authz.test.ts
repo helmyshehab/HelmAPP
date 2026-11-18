@@ -29,7 +29,7 @@ test('customer cannot create catalog places', async () => {
     },
   };
   const audit = { record: async () => undefined };
-  const admin = new CatalogAdminService(repo as never, audit as never);
+  const admin = new CatalogAdminService(repo as never, audit as never, null);
   await expectForbidden(() =>
     admin.createPlace(principal(['customer']), {
       destinationId: '11111111-1111-1111-1111-111111111111',
@@ -54,7 +54,7 @@ test('operator cannot publish', async () => {
     },
   };
   const audit = { record: async () => undefined };
-  const admin = new CatalogAdminService(repo as never, audit as never);
+  const admin = new CatalogAdminService(repo as never, audit as never, null);
   await expectForbidden(() =>
     admin.transitionPlace(principal(['operator']), 'a2222222-2222-2222-2222-222222222222', 'published'),
   );
@@ -67,7 +67,7 @@ test('fail-closed when rolesSource is not database', async () => {
     },
   };
   const audit = { record: async () => undefined };
-  const admin = new CatalogAdminService(repo as never, audit as never);
+  const admin = new CatalogAdminService(repo as never, audit as never, null);
   await expectForbidden(() =>
     admin.createPlace(principal(['administrator'], 'fallback'), {
       destinationId: '11111111-1111-1111-1111-111111111111',
@@ -79,43 +79,15 @@ test('fail-closed when rolesSource is not database', async () => {
   );
 });
 
-test('dry-run import never writes places', async () => {
-  const calls: string[] = [];
-  const repo = {
-    findDestinationBySlug: async () => ({ id: '11111111-1111-1111-1111-111111111111', slug: 'istanbul' }),
-    findPlaceByExternalKey: async () => null,
-    upsertImportedPlace: async () => {
-      calls.push('upsert');
-      return { id: 'x', action: 'created' as const };
-    },
-    insertImportRun: async () => {
-      calls.push('import_run');
-      return { id: 'd1111111-1111-1111-1111-111111111111' };
-    },
-  };
+test('operator cannot apply import (admin only)', async () => {
+  const repo = {};
   const audit = { record: async () => undefined };
-  const admin = new CatalogAdminService(repo as never, audit as never);
-  const result = await admin.importCatalog(
-    principal(['operator']),
-    {
-      formatVersion: 'helm.catalog.import.v1',
-      places: [
-        {
-          externalKey: 'test:cafe-1',
-          destinationSlug: 'istanbul',
-          category: 'cafe',
-          subcategory: 'cafe',
-          slug: 'test-cafe-1',
-          nameEn: 'Test Cafe',
-          nameAr: 'مقهى',
-          updateIfExists: false,
-        },
-      ],
-    },
-    { dryRun: true },
+  const admin = new CatalogAdminService(repo as never, audit as never, null);
+  await expectForbidden(() =>
+    admin.importCatalog(
+      principal(['operator']),
+      { formatVersion: 'helm.catalog.import.v1', places: [] },
+      { dryRun: false },
+    ),
   );
-  assert.equal(result.dryRun, true);
-  assert.equal(calls.includes('upsert'), false);
-  assert.equal(calls.includes('import_run'), true);
-  assert.equal((result as { wouldCreate?: number }).wouldCreate, 1);
 });

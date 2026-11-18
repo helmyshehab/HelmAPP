@@ -123,5 +123,48 @@ begin
       if sqlerrm like '%invalid lifecycle%' then null; else raise; end if;
   end;
 
+  -- Administrator can tag published places
+  insert into catalog.place_tags (place_id, tag_id)
+  values (published_place, 'b3333333-3333-3333-3333-333333333333')
+  on conflict do nothing;
+
+  insert into catalog.entity_sources (
+    entity_type, entity_id, source_id, verification_status, notes
+  ) values (
+    'place', published_place, 'c1111111-1111-1111-1111-111111111101', 'unverified',
+    'admin provenance ok'
+  )
+  on conflict (entity_type, entity_id, source_id) do nothing;
+
+  -- ========== Operator curation boundaries (tags / provenance) ==========
+  perform set_config('request.jwt.claim.sub', '66666666-6666-6666-6666-666666666666', true);
+
+  begin
+    insert into catalog.place_tags (place_id, tag_id)
+    values (published_place, 'b2222222-2222-2222-2222-222222222222');
+    raise exception 'operator tagged published place';
+  exception
+    when others then
+      if sqlerrm like '%row-level security%' or sqlerrm like '%policy%' then null; else raise; end if;
+  end;
+
+  begin
+    insert into catalog.entity_sources (
+      entity_type, entity_id, source_id, verification_status, notes
+    ) values (
+      'place', published_place, 'c1111111-1111-1111-1111-111111111101', 'unverified',
+      'operator should not attach to published'
+    );
+    raise exception 'operator linked provenance to published place';
+  exception
+    when others then
+      if sqlerrm like '%row-level security%' or sqlerrm like '%policy%' then null; else raise; end if;
+  end;
+
+  -- Operator may tag a draft place
+  insert into catalog.place_tags (place_id, tag_id)
+  values (draft_place, 'b3333333-3333-3333-3333-333333333333')
+  on conflict do nothing;
+
   raise notice 'RLS_STEP5_OK';
 end $$;

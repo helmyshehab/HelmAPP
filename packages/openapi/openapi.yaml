@@ -771,14 +771,40 @@ components:
           type: integer
         destinationsInPayload:
           type: integer
+        destinationsWouldCreate:
+          type: integer
+        destinationsWouldUpdate:
+          type: integer
+        destinationsWouldSkip:
+          type: integer
+        placesWouldCreate:
+          type: integer
+        placesWouldUpdate:
+          type: integer
+        placesWouldSkip:
+          type: integer
+        destinationsCreated:
+          type: integer
+        destinationsUpdated:
+          type: integer
+        destinationsSkipped:
+          type: integer
+        placesCreated:
+          type: integer
+        placesUpdated:
+          type: integer
+        placesSkipped:
+          type: integer
         wouldCreate:
           type: integer
+          description: Aggregate destinations+places would-create (dry-run)
         wouldUpdate:
           type: integer
         wouldSkip:
           type: integer
         created:
           type: integer
+          description: Aggregate destinations+places created
         updated:
           type: integer
         skipped:

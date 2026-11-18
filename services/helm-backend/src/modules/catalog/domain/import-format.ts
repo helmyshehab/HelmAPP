@@ -1,9 +1,26 @@
 import { z } from 'zod';
-import { PLACE_CATEGORIES } from './categories';
+import { PLACE_CATEGORIES, type PlaceCategory } from './categories';
+
+const sourceSchema = z.object({
+  sourceType: z.enum([
+    'official_website',
+    'hotel_website',
+    'booking_platform',
+    'maps_listing',
+    'manual_research',
+    'direct_confirmation',
+    'partner_feed',
+    'other',
+  ]),
+  name: z.string().min(1).max(200),
+  url: z.string().url().optional(),
+  notes: z.string().max(1000).optional(),
+  collectedAt: z.string().date().optional(),
+});
 
 /**
  * Canonical curated catalog JSON import format (Step 5).
- * Deterministic IDs via externalKey / optional uuid. Dry-run validates only.
+ * Deterministic IDs via externalKey. Dry-run validates only.
  */
 export const catalogImportSchema = z.object({
   formatVersion: z.literal('helm.catalog.import.v1'),
@@ -12,7 +29,7 @@ export const catalogImportSchema = z.object({
     .array(
       z.object({
         id: z.string().uuid().optional(),
-        externalKey: z.string().min(1).max(200).optional(),
+        externalKey: z.string().min(1).max(200),
         slug: z.string().min(1).max(120),
         nameEn: z.string().min(1).max(200),
         nameAr: z.string().min(1).max(200),
@@ -20,31 +37,14 @@ export const catalogImportSchema = z.object({
         citySlug: z.string().min(1).max(120).optional(),
         summaryEn: z.string().max(2000).optional(),
         summaryAr: z.string().max(2000).optional(),
+        shortDescriptionEn: z.string().max(500).optional(),
+        shortDescriptionAr: z.string().max(500).optional(),
         latitude: z.number().min(-90).max(90).optional(),
         longitude: z.number().min(-180).max(180).optional(),
         timezone: z.string().max(80).optional(),
         tags: z.array(z.string().min(1).max(64)).max(40).optional(),
-        sources: z
-          .array(
-            z.object({
-              sourceType: z.enum([
-                'official_website',
-                'hotel_website',
-                'booking_platform',
-                'maps_listing',
-                'manual_research',
-                'direct_confirmation',
-                'partner_feed',
-                'other',
-              ]),
-              name: z.string().min(1).max(200),
-              url: z.string().url().optional(),
-              notes: z.string().max(1000).optional(),
-              collectedAt: z.string().date().optional(),
-            }),
-          )
-          .max(20)
-          .optional(),
+        updateIfExists: z.boolean().default(false),
+        sources: z.array(sourceSchema).max(20).optional(),
       }),
     )
     .max(500)
@@ -137,27 +137,7 @@ export const catalogImportSchema = z.object({
             serviceNotes: z.string().max(1000).optional(),
           })
           .optional(),
-        sources: z
-          .array(
-            z.object({
-              sourceType: z.enum([
-                'official_website',
-                'hotel_website',
-                'booking_platform',
-                'maps_listing',
-                'manual_research',
-                'direct_confirmation',
-                'partner_feed',
-                'other',
-              ]),
-              name: z.string().min(1).max(200),
-              url: z.string().url().optional(),
-              notes: z.string().max(1000).optional(),
-              collectedAt: z.string().date().optional(),
-            }),
-          )
-          .max(20)
-          .optional(),
+        sources: z.array(sourceSchema).max(20).optional(),
         rating: z
           .object({
             value: z.number().min(0).max(10),
@@ -174,11 +154,67 @@ export const catalogImportSchema = z.object({
 });
 
 export type CatalogImportPayload = z.infer<typeof catalogImportSchema>;
+export type CatalogImportPlace = CatalogImportPayload['places'][number];
+export type CatalogImportDestination = CatalogImportPayload['destinations'][number];
 
 export type ImportValidationIssue = {
   path: string;
   message: string;
 };
+
+const DINING_CATEGORIES: readonly PlaceCategory[] = [
+  'restaurant',
+  'cafe',
+  'bar',
+  'beach_club',
+];
+
+/** Reject incompatible category/detail combinations (never silent ignore). */
+export function validatePlaceDetailCompatibility(
+  place: CatalogImportPlace,
+  pathPrefix: string,
+): ImportValidationIssue[] {
+  const errors: ImportValidationIssue[] = [];
+  const cat = place.category;
+
+  if (place.accommodation && cat !== 'accommodation') {
+    errors.push({
+      path: `${pathPrefix}.accommodation`,
+      message: `accommodation details are only valid for category accommodation (got ${cat})`,
+    });
+  }
+  if (place.dining && !DINING_CATEGORIES.includes(cat)) {
+    errors.push({
+      path: `${pathPrefix}.dining`,
+      message: `dining details are only valid for food/drink categories (got ${cat})`,
+    });
+  }
+  if (place.attraction && cat !== 'attraction') {
+    errors.push({
+      path: `${pathPrefix}.attraction`,
+      message: `attraction details are only valid for category attraction (got ${cat})`,
+    });
+  }
+  if (place.activity && cat !== 'activity') {
+    errors.push({
+      path: `${pathPrefix}.activity`,
+      message: `activity details are only valid for category activity (got ${cat})`,
+    });
+  }
+  if (place.nightlife && cat !== 'nightlife') {
+    errors.push({
+      path: `${pathPrefix}.nightlife`,
+      message: `nightlife details are only valid for category nightlife (got ${cat})`,
+    });
+  }
+  if (place.transport && cat !== 'transport') {
+    errors.push({
+      path: `${pathPrefix}.transport`,
+      message: `transport details are only valid for category transport (got ${cat})`,
+    });
+  }
+  return errors;
+}
 
 export function validateCatalogImport(input: unknown): {
   ok: boolean;
@@ -197,15 +233,36 @@ export function validateCatalogImport(input: unknown): {
   }
 
   const errors: ImportValidationIssue[] = [];
-  const externalKeys = new Set<string>();
+  const placeKeys = new Set<string>();
+  const destKeys = new Set<string>();
+  const destSlugs = new Set<string>();
+
+  for (const [idx, dest] of parsed.data.destinations.entries()) {
+    if (destKeys.has(dest.externalKey)) {
+      errors.push({
+        path: `destinations.${idx}.externalKey`,
+        message: `Duplicate destination externalKey in payload: ${dest.externalKey}`,
+      });
+    }
+    destKeys.add(dest.externalKey);
+    if (destSlugs.has(dest.slug)) {
+      errors.push({
+        path: `destinations.${idx}.slug`,
+        message: `Duplicate destination slug in payload: ${dest.slug}`,
+      });
+    }
+    destSlugs.add(dest.slug);
+  }
+
   for (const [idx, place] of parsed.data.places.entries()) {
-    if (externalKeys.has(place.externalKey)) {
+    if (placeKeys.has(place.externalKey)) {
       errors.push({
         path: `places.${idx}.externalKey`,
         message: `Duplicate externalKey in payload: ${place.externalKey}`,
       });
     }
-    externalKeys.add(place.externalKey);
+    placeKeys.add(place.externalKey);
+    errors.push(...validatePlaceDetailCompatibility(place, `places.${idx}`));
   }
 
   if (errors.length > 0) {

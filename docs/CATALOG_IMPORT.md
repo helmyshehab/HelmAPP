@@ -7,9 +7,13 @@ Curated destination datasets (Bali, Thailand, etc.) import into the **same** cat
 ## Rules
 
 - Validate before mutating (`dryRun: true`).
-- Places are keyed by `externalKey` for deterministic deduplication.
+- Destinations and places require `externalKey` for deterministic deduplication.
+- Destination `slug` conflicts with a different `externalKey` are rejected.
+- Country codes and optional `citySlug` must resolve to existing `geo` rows.
+- Category-specific blocks (`accommodation`, `dining`, …) must match the place `category` or the import is rejected.
 - Existing records are **not** overwritten unless `updateIfExists: true`.
 - Imports create entries as `draft` — never auto-verified or published.
+- Each destination/place write is transactional (row + details + tags + ratings + provenance).
 - Record provenance via `sources[]`.
 - Do not invent ratings, prices, or verification claims.
 
