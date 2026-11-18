@@ -27,10 +27,34 @@ export type DestinationListFilters = {
   country?: string;
   featured?: boolean;
   q?: string;
+  lifecycleStatus?: LifecycleStatus;
+  parentId?: string;
+  topLevelOnly?: boolean;
   limit: number;
   offset: number;
   publicOnly: boolean;
 };
+
+const DESTINATION_ADMIN_COLUMNS = sql`
+  d.id, d.slug, d.name_en as "nameEn", d.name_ar as "nameAr",
+  d.short_description_en as "shortDescriptionEn",
+  d.short_description_ar as "shortDescriptionAr",
+  d.summary_en as "summaryEn", d.summary_ar as "summaryAr",
+  d.description_en as "descriptionEn", d.description_ar as "descriptionAr",
+  d.country_code as "countryCode", d.city_id as "cityId",
+  d.parent_id as "parentId",
+  d.timezone, d.latitude, d.longitude,
+  d.address_text as "addressText", d.website_url as "websiteUrl",
+  d.is_featured as "isFeatured", d.external_key as "externalKey",
+  d.lifecycle_status as "lifecycleStatus",
+  d.verified_by as "verifiedBy", d.verified_at as "verifiedAt",
+  d.approved_by as "approvedBy", d.approved_at as "approvedAt",
+  d.rejected_by as "rejectedBy", d.rejected_at as "rejectedAt",
+  d.rejection_reason as "rejectionReason",
+  d.archived_at as "archivedAt",
+  d.published_at as "publishedAt",
+  d.created_at as "createdAt", d.updated_at as "updatedAt"
+`;
 
 @Injectable()
 export class CatalogRepository {
@@ -47,41 +71,41 @@ export class CatalogRepository {
     const db = this.requireDb();
     const limit = Math.min(Math.max(filters.limit, 1), 100);
     const offset = Math.max(filters.offset, 0);
+    const lifecycle = filters.lifecycleStatus ?? null;
+    const parentId = filters.parentId ?? null;
+    const topLevelOnly = filters.topLevelOnly === true;
+    const where = sql`
+      (${filters.publicOnly} = false or d.lifecycle_status = 'published')
+      and (${filters.country ?? null}::text is null or d.country_code = ${filters.country ?? null})
+      and (${filters.featured ?? null}::boolean is null or d.is_featured = ${filters.featured ?? null})
+      and (${lifecycle}::text is null or d.lifecycle_status = ${lifecycle}::catalog.lifecycle_status)
+      and (${parentId}::uuid is null or d.parent_id = ${parentId}::uuid)
+      and (${topLevelOnly} = false or d.parent_id is null)
+      and (
+        ${filters.q ?? null}::text is null
+        or d.name_en ilike '%' || ${filters.q ?? null} || '%'
+        or d.name_ar ilike '%' || ${filters.q ?? null} || '%'
+        or d.slug ilike '%' || ${filters.q ?? null} || '%'
+      )
+    `;
     const rows = await db.execute(sql`
       select
         d.id, d.slug, d.name_en as "nameEn", d.name_ar as "nameAr",
         d.summary_en as "summaryEn", d.summary_ar as "summaryAr",
         d.country_code as "countryCode", d.city_id as "cityId",
+        d.parent_id as "parentId",
         d.timezone, d.latitude, d.longitude, d.is_featured as "isFeatured",
         d.tags, d.lifecycle_status as "lifecycleStatus",
         d.published_at as "publishedAt", d.updated_at as "updatedAt"
       from catalog.destinations d
-      where
-        (${filters.publicOnly} = false or d.lifecycle_status = 'published')
-        and (${filters.country ?? null}::text is null or d.country_code = ${filters.country ?? null})
-        and (${filters.featured ?? null}::boolean is null or d.is_featured = ${filters.featured ?? null})
-        and (
-          ${filters.q ?? null}::text is null
-          or d.name_en ilike '%' || ${filters.q ?? null} || '%'
-          or d.name_ar ilike '%' || ${filters.q ?? null} || '%'
-          or d.slug ilike '%' || ${filters.q ?? null} || '%'
-        )
+      where ${where}
       order by d.is_featured desc, d.slug asc
       limit ${limit} offset ${offset}
     `);
     const countRes = await db.execute(sql`
       select count(*)::int as c
       from catalog.destinations d
-      where
-        (${filters.publicOnly} = false or d.lifecycle_status = 'published')
-        and (${filters.country ?? null}::text is null or d.country_code = ${filters.country ?? null})
-        and (${filters.featured ?? null}::boolean is null or d.is_featured = ${filters.featured ?? null})
-        and (
-          ${filters.q ?? null}::text is null
-          or d.name_en ilike '%' || ${filters.q ?? null} || '%'
-          or d.name_ar ilike '%' || ${filters.q ?? null} || '%'
-          or d.slug ilike '%' || ${filters.q ?? null} || '%'
-        )
+      where ${where}
     `);
     const total = Number((countRes as unknown as { c: number }[])[0]?.c ?? 0);
     return { items: rows as unknown as Record<string, unknown>[], total, limit, offset };
@@ -651,5 +675,515 @@ export class CatalogRepository {
       )
       on conflict (entity_type, entity_id, source_id) do nothing
     `);
+  }
+
+  async getDestinationById(id: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select ${DESTINATION_ADMIN_COLUMNS}
+      from catalog.destinations d
+      where d.id = ${id}::uuid
+      limit 1
+    `);
+    return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+  }
+
+  async getDestinationLifecycle(id: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select id, slug, lifecycle_status as "lifecycleStatus"
+      from catalog.destinations
+      where id = ${id}::uuid
+      limit 1
+    `);
+    return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+  }
+
+  async countryExists(code: string, activeOnly = true): Promise<boolean> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select 1 as ok
+      from geo.countries
+      where code = ${code.toUpperCase()}
+        and (${activeOnly} = false or is_active = true)
+      limit 1
+    `);
+    return (rows as unknown as unknown[]).length > 0;
+  }
+
+  async getCity(id: string): Promise<{ id: string; countryCode: string } | null> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select id, country_code as "countryCode"
+      from geo.cities
+      where id = ${id}::uuid
+      limit 1
+    `);
+    const row = (rows as unknown as { id: string; countryCode: string }[])[0];
+    return row ?? null;
+  }
+
+  /**
+   * Application-level parent-cycle check. Walking from `parentId` up the ancestor
+   * chain: reject self-parent and any path that reaches `destinationId`.
+   * Database trigger protection is deferred to Step 6.3.
+   */
+  async wouldCreateParentCycle(
+    destinationId: string | null,
+    parentId: string,
+  ): Promise<boolean> {
+    if (destinationId && destinationId === parentId) return true;
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      with recursive ancestors as (
+        select id, parent_id, 1 as depth
+        from catalog.destinations
+        where id = ${parentId}::uuid
+        union all
+        select d.id, d.parent_id, a.depth + 1
+        from catalog.destinations d
+        join ancestors a on d.id = a.parent_id
+        where a.depth < 64
+      )
+      select
+        exists(select 1 from catalog.destinations where id = ${parentId}::uuid) as "parentExists",
+        exists(
+          select 1 from ancestors
+          where ${destinationId ?? null}::uuid is not null
+            and id = ${destinationId ?? null}::uuid
+        ) as "hitsSelf",
+        exists(
+          select 1 from ancestors a
+          join ancestors b on a.id = b.id and a.depth < b.depth
+        ) as "hasLoop"
+    `);
+    const row = (rows as unknown as {
+      parentExists: boolean;
+      hitsSelf: boolean;
+      hasLoop: boolean;
+    }[])[0];
+    if (!row?.parentExists) {
+      throw AppException.validation('Parent destination not found');
+    }
+    return Boolean(row.hitsSelf || row.hasLoop);
+  }
+
+  async createDestination(input: {
+    slug: string;
+    nameEn: string;
+    nameAr: string;
+    countryCode: string;
+    cityId?: string | null;
+    parentId?: string | null;
+    shortDescriptionEn?: string | null;
+    shortDescriptionAr?: string | null;
+    summaryEn?: string | null;
+    summaryAr?: string | null;
+    descriptionEn?: string | null;
+    descriptionAr?: string | null;
+    timezone?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    addressText?: string | null;
+    websiteUrl?: string | null;
+    isFeatured?: boolean;
+    externalKey?: string | null;
+  }) {
+    const db = this.requireDb();
+    try {
+      const rows = await db.execute(sql`
+        insert into catalog.destinations (
+          slug, name_en, name_ar, country_code, city_id, parent_id,
+          short_description_en, short_description_ar,
+          summary_en, summary_ar, description_en, description_ar,
+          timezone, latitude, longitude, address_text, website_url,
+          is_featured, external_key, lifecycle_status
+        ) values (
+          ${input.slug},
+          ${input.nameEn},
+          ${input.nameAr},
+          ${input.countryCode.toUpperCase()},
+          ${input.cityId ?? null}::uuid,
+          ${input.parentId ?? null}::uuid,
+          ${input.shortDescriptionEn ?? null},
+          ${input.shortDescriptionAr ?? null},
+          ${input.summaryEn ?? null},
+          ${input.summaryAr ?? null},
+          ${input.descriptionEn ?? null},
+          ${input.descriptionAr ?? null},
+          ${input.timezone ?? null},
+          ${input.latitude ?? null},
+          ${input.longitude ?? null},
+          ${input.addressText ?? null},
+          ${input.websiteUrl ?? null},
+          ${input.isFeatured ?? false},
+          ${input.externalKey ?? null},
+          'draft'
+        )
+        returning id
+      `);
+      const created = (rows as unknown as { id: string }[])[0];
+      if (!created?.id) throw AppException.validation('Failed to create destination');
+      return this.getDestinationById(String(created.id));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes('destinations_slug') || message.toLowerCase().includes('unique')) {
+        throw AppException.validation(`Destination slug already exists: ${input.slug}`);
+      }
+      throw err;
+    }
+  }
+
+  async updateDestination(
+    id: string,
+    patch: {
+      slug?: string;
+      nameEn?: string;
+      nameAr?: string;
+      shortDescriptionEn?: string | null;
+      shortDescriptionAr?: string | null;
+      summaryEn?: string | null;
+      summaryAr?: string | null;
+      descriptionEn?: string | null;
+      descriptionAr?: string | null;
+      countryCode?: string;
+      cityId?: string | null;
+      parentId?: string | null;
+      timezone?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+      addressText?: string | null;
+      websiteUrl?: string | null;
+      isFeatured?: boolean;
+      externalKey?: string | null;
+    },
+  ) {
+    const db = this.requireDb();
+    const current = await this.getDestinationById(id);
+    if (!current) return null;
+
+    const next = {
+      slug: patch.slug ?? String(current.slug),
+      nameEn: patch.nameEn ?? String(current.nameEn),
+      nameAr: patch.nameAr ?? String(current.nameAr),
+      shortDescriptionEn:
+        patch.shortDescriptionEn !== undefined
+          ? patch.shortDescriptionEn
+          : (current.shortDescriptionEn as string | null),
+      shortDescriptionAr:
+        patch.shortDescriptionAr !== undefined
+          ? patch.shortDescriptionAr
+          : (current.shortDescriptionAr as string | null),
+      summaryEn:
+        patch.summaryEn !== undefined ? patch.summaryEn : (current.summaryEn as string | null),
+      summaryAr:
+        patch.summaryAr !== undefined ? patch.summaryAr : (current.summaryAr as string | null),
+      descriptionEn:
+        patch.descriptionEn !== undefined
+          ? patch.descriptionEn
+          : (current.descriptionEn as string | null),
+      descriptionAr:
+        patch.descriptionAr !== undefined
+          ? patch.descriptionAr
+          : (current.descriptionAr as string | null),
+      countryCode: (patch.countryCode ?? String(current.countryCode)).toUpperCase(),
+      cityId: patch.cityId !== undefined ? patch.cityId : (current.cityId as string | null),
+      parentId: patch.parentId !== undefined ? patch.parentId : (current.parentId as string | null),
+      timezone: patch.timezone !== undefined ? patch.timezone : (current.timezone as string | null),
+      latitude:
+        patch.latitude !== undefined ? patch.latitude : (current.latitude as number | null),
+      longitude:
+        patch.longitude !== undefined ? patch.longitude : (current.longitude as number | null),
+      addressText:
+        patch.addressText !== undefined
+          ? patch.addressText
+          : (current.addressText as string | null),
+      websiteUrl:
+        patch.websiteUrl !== undefined ? patch.websiteUrl : (current.websiteUrl as string | null),
+      isFeatured:
+        patch.isFeatured !== undefined ? patch.isFeatured : Boolean(current.isFeatured),
+      externalKey:
+        patch.externalKey !== undefined
+          ? patch.externalKey
+          : (current.externalKey as string | null),
+    };
+
+    try {
+      await db.execute(sql`
+        update catalog.destinations set
+          slug = ${next.slug},
+          name_en = ${next.nameEn},
+          name_ar = ${next.nameAr},
+          short_description_en = ${next.shortDescriptionEn},
+          short_description_ar = ${next.shortDescriptionAr},
+          summary_en = ${next.summaryEn},
+          summary_ar = ${next.summaryAr},
+          description_en = ${next.descriptionEn},
+          description_ar = ${next.descriptionAr},
+          country_code = ${next.countryCode},
+          city_id = ${next.cityId}::uuid,
+          parent_id = ${next.parentId}::uuid,
+          timezone = ${next.timezone},
+          latitude = ${next.latitude},
+          longitude = ${next.longitude},
+          address_text = ${next.addressText},
+          website_url = ${next.websiteUrl},
+          is_featured = ${next.isFeatured},
+          external_key = ${next.externalKey}
+        where id = ${id}::uuid
+      `);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes('destinations_slug') || message.toLowerCase().includes('unique')) {
+        throw AppException.validation(`Destination slug already exists: ${next.slug}`);
+      }
+      throw err;
+    }
+    return this.getDestinationById(id);
+  }
+
+  async transitionDestination(input: {
+    id: string;
+    to: LifecycleStatus;
+    actorId: string;
+    rejectionReason?: string;
+  }) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      update catalog.destinations set
+        lifecycle_status = ${input.to}::catalog.lifecycle_status,
+        verified_by = case when ${input.to} = 'verified' then ${input.actorId}::uuid else verified_by end,
+        verified_at = case when ${input.to} = 'verified' then now() else verified_at end,
+        approved_by = case when ${input.to} = 'approved' then ${input.actorId}::uuid else approved_by end,
+        approved_at = case when ${input.to} = 'approved' then now() else approved_at end,
+        rejected_by = case when ${input.to} = 'rejected' then ${input.actorId}::uuid else rejected_by end,
+        rejected_at = case when ${input.to} = 'rejected' then now() else rejected_at end,
+        rejection_reason = case
+          when ${input.to} = 'rejected' then ${input.rejectionReason ?? null}
+          else rejection_reason
+        end,
+        archived_at = case when ${input.to} = 'archived' then now() else archived_at end,
+        published_at = case
+          when ${input.to} = 'published' then coalesce(published_at, now())
+          else published_at
+        end
+      where id = ${input.id}::uuid
+      returning id
+    `);
+    const updated = (rows as unknown as { id: string }[])[0];
+    if (!updated?.id) return null;
+    return this.getDestinationById(String(updated.id));
+  }
+
+  async listDestinationTags(destinationId: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select t.id, t.slug, t.name_en as "nameEn", t.name_ar as "nameAr"
+      from catalog.destination_tags dt
+      join catalog.tags t on t.id = dt.tag_id
+      where dt.destination_id = ${destinationId}::uuid
+      order by t.slug asc
+    `);
+    return rows as unknown as { id: string; slug: string; nameEn: string; nameAr: string }[];
+  }
+
+  async listDestinationTagsForMany(destinationIds: string[]) {
+    if (destinationIds.length === 0) {
+      return new Map<string, { id: string; slug: string; nameEn: string; nameAr: string }[]>();
+    }
+    const db = this.requireDb();
+    const idList = sql.join(
+      destinationIds.map((id) => sql`${id}::uuid`),
+      sql`,`,
+    );
+    const rows = await db.execute(sql`
+      select
+        dt.destination_id as "destinationId",
+        t.id, t.slug, t.name_en as "nameEn", t.name_ar as "nameAr"
+      from catalog.destination_tags dt
+      join catalog.tags t on t.id = dt.tag_id
+      where dt.destination_id in (${idList})
+      order by t.slug asc
+    `);
+    const map = new Map<string, { id: string; slug: string; nameEn: string; nameAr: string }[]>();
+    for (const row of rows as unknown as {
+      destinationId: string;
+      id: string;
+      slug: string;
+      nameEn: string;
+      nameAr: string;
+    }[]) {
+      const key = String(row.destinationId);
+      const list = map.get(key) ?? [];
+      list.push({ id: row.id, slug: row.slug, nameEn: row.nameEn, nameAr: row.nameAr });
+      map.set(key, list);
+    }
+    return map;
+  }
+
+  async listDestinationSources(destinationId: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        s.id, s.source_type::text as "sourceType", s.name, s.url,
+        s.reference_code as "referenceCode", s.notes,
+        es.collected_at as "collectedAt",
+        es.verification_status as "verificationStatus",
+        es.confidence
+      from catalog.entity_sources es
+      join catalog.sources s on s.id = es.source_id
+      where es.entity_type = 'destination'
+        and es.entity_id = ${destinationId}::uuid
+      order by s.name asc
+    `);
+    return rows as unknown as Record<string, unknown>[];
+  }
+
+  async listDestinationMedia(destinationId: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        m.id, m.storage_bucket as "storageBucket", m.storage_path as "storagePath",
+        m.alt_text_en as "altTextEn", m.alt_text_ar as "altTextAr",
+        m.attribution, dm.sort_order as "sortOrder", dm.is_cover as "isCover"
+      from catalog.destination_media dm
+      join catalog.media_assets m on m.id = dm.media_id
+      where dm.destination_id = ${destinationId}::uuid
+        and dm.is_active = true
+        and m.is_active = true
+      order by dm.is_cover desc, dm.sort_order asc, m.created_at asc
+    `);
+    return rows as unknown as Record<string, unknown>[];
+  }
+
+  /**
+   * Explicit tag set replacement (D10). Empty array clears all tags.
+   * Also syncs legacy destinations.tags text[] for consistency.
+   */
+  async replaceDestinationTags(destinationId: string, tagSlugs: string[]): Promise<void> {
+    const db = this.requireDb();
+    const uniqueSlugs = [...new Set(tagSlugs.map((s) => s.trim()).filter(Boolean))];
+
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`
+        delete from catalog.destination_tags
+        where destination_id = ${destinationId}::uuid
+      `);
+
+      const resolvedIds: string[] = [];
+      for (const slug of uniqueSlugs) {
+        const existing = await tx.execute(sql`
+          select id, is_active as "isActive"
+          from catalog.tags
+          where slug = ${slug}
+          limit 1
+        `);
+        const found = (existing as unknown as { id: string; isActive: boolean }[])[0];
+        if (!found) {
+          throw AppException.validation(`Unknown tag slug: ${slug}`);
+        }
+        if (!found.isActive) {
+          throw AppException.validation(`Tag is inactive: ${slug}`);
+        }
+        resolvedIds.push(String(found.id));
+        await tx.execute(sql`
+          insert into catalog.destination_tags (destination_id, tag_id)
+          values (${destinationId}::uuid, ${String(found.id)}::uuid)
+          on conflict do nothing
+        `);
+      }
+
+      const tagsArray =
+        uniqueSlugs.length === 0
+          ? sql`'{}'::text[]`
+          : sql`ARRAY[${sql.join(
+              uniqueSlugs.map((v) => sql`${v}`),
+              sql`,`,
+            )}]::text[]`;
+      await tx.execute(sql`
+        update catalog.destinations
+        set tags = ${tagsArray}
+        where id = ${destinationId}::uuid
+      `);
+      void resolvedIds;
+    });
+  }
+
+  async listCountries(filters: {
+    active?: boolean;
+    q?: string;
+    limit: number;
+    offset: number;
+  }) {
+    const db = this.requireDb();
+    const limit = Math.min(Math.max(filters.limit, 1), 100);
+    const offset = Math.max(filters.offset, 0);
+    const active = filters.active;
+    const where = sql`
+      (${active === undefined ? null : active}::boolean is null or is_active = ${active === undefined ? null : active})
+      and (
+        ${filters.q ?? null}::text is null
+        or name_en ilike '%' || ${filters.q ?? null} || '%'
+        or name_ar ilike '%' || ${filters.q ?? null} || '%'
+        or code ilike '%' || ${filters.q ?? null} || '%'
+      )
+    `;
+    const rows = await db.execute(sql`
+      select
+        code, name_en as "nameEn", name_ar as "nameAr",
+        default_currency as "defaultCurrency", phone_code as "phoneCode",
+        is_active as "isActive"
+      from geo.countries
+      where ${where}
+      order by name_en asc, code asc
+      limit ${limit} offset ${offset}
+    `);
+    const countRes = await db.execute(sql`
+      select count(*)::int as c from geo.countries where ${where}
+    `);
+    const total = Number((countRes as unknown as { c: number }[])[0]?.c ?? 0);
+    return { items: rows as unknown as Record<string, unknown>[], total, limit, offset };
+  }
+
+  async listCities(filters: {
+    country?: string;
+    q?: string;
+    limit: number;
+    offset: number;
+  }) {
+    const db = this.requireDb();
+    const limit = Math.min(Math.max(filters.limit, 1), 100);
+    const offset = Math.max(filters.offset, 0);
+    const country = filters.country?.toUpperCase() ?? null;
+    if (country) {
+      const exists = await this.countryExists(country, false);
+      if (!exists) {
+        throw AppException.validation(`Unknown country code: ${country}`);
+      }
+    }
+    const where = sql`
+      (${country}::text is null or country_code = ${country})
+      and (
+        ${filters.q ?? null}::text is null
+        or name_en ilike '%' || ${filters.q ?? null} || '%'
+        or name_ar ilike '%' || ${filters.q ?? null} || '%'
+        or slug ilike '%' || ${filters.q ?? null} || '%'
+      )
+    `;
+    const rows = await db.execute(sql`
+      select
+        id, country_code as "countryCode", region_id as "regionId",
+        slug, name_en as "nameEn", name_ar as "nameAr",
+        timezone, latitude, longitude, is_active as "isActive"
+      from geo.cities
+      where ${where}
+      order by name_en asc, slug asc
+      limit ${limit} offset ${offset}
+    `);
+    const countRes = await db.execute(sql`
+      select count(*)::int as c from geo.cities where ${where}
+    `);
+    const total = Number((countRes as unknown as { c: number }[])[0]?.c ?? 0);
+    return { items: rows as unknown as Record<string, unknown>[], total, limit, offset };
   }
 }
