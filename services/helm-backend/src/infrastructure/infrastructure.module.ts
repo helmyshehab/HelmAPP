@@ -1,6 +1,9 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
 import { APP_ENV, loadEnv, type AppEnv } from './config/env';
+import { createDrizzleClient, DRIZZLE } from './adapters/drizzle/drizzle.client';
+import { DrizzleRolesAdapter } from './adapters/drizzle/drizzle-roles.adapter';
+import { MemoryRolesAdapter } from './adapters/memory/memory-roles.adapter';
 import { MockAiAdapter } from './adapters/mock/mock-ai.adapter';
 import { MockAuthAdapter } from './adapters/mock/mock-auth.adapter';
 import { MockFlightAdapter } from './adapters/mock/mock-flight.adapter';
@@ -18,10 +21,12 @@ import {
   PAYMENT_PORT,
   STORAGE_PORT,
 } from './ports';
+import { ROLES_PORT } from './ports/roles.port';
 
 /**
  * Wires infrastructure adapters. Domain modules depend on ports only.
  * Mock auth is registered only when AUTH_PROVIDER=mock (never in production — loadEnv forbids it).
+ * RolesPort prefers Drizzle/Postgres when DATABASE_URL is set.
  */
 @Global()
 @Module({})
@@ -29,6 +34,7 @@ export class InfrastructureModule {
   static forRoot(source: NodeJS.ProcessEnv = process.env): DynamicModule {
     const env = loadEnv(source);
     const useMockAuth = env.AUTH_PROVIDER === 'mock';
+    const useDbRoles = Boolean(env.DATABASE_URL);
 
     const authProviders = useMockAuth
       ? [
@@ -40,6 +46,21 @@ export class InfrastructureModule {
           { provide: AUTH_PORT, useExisting: SupabaseJwtAuthAdapter },
         ];
 
+    const rolesProviders = useDbRoles
+      ? [
+          {
+            provide: DRIZZLE,
+            useFactory: (appEnv: AppEnv) => createDrizzleClient(appEnv.DATABASE_URL!),
+            inject: [APP_ENV],
+          },
+          DrizzleRolesAdapter,
+          { provide: ROLES_PORT, useExisting: DrizzleRolesAdapter },
+        ]
+      : [
+          MemoryRolesAdapter,
+          { provide: ROLES_PORT, useExisting: MemoryRolesAdapter },
+        ];
+
     return {
       module: InfrastructureModule,
       imports: [ConfigModule],
@@ -49,6 +70,7 @@ export class InfrastructureModule {
           useValue: env,
         },
         ...authProviders,
+        ...rolesProviders,
         SystemClockAdapter,
         MockStorageAdapter,
         MockPaymentAdapter,
@@ -66,6 +88,7 @@ export class InfrastructureModule {
         ConfigModule,
         APP_ENV,
         AUTH_PORT,
+        ROLES_PORT,
         CLOCK_PORT,
         STORAGE_PORT,
         PAYMENT_PORT,
@@ -73,6 +96,7 @@ export class InfrastructureModule {
         FLIGHT_PORT,
         NOTIFY_PORT,
         ...(useMockAuth ? [MockAuthAdapter] : []),
+        ...(useDbRoles ? [DRIZZLE] : [MemoryRolesAdapter]),
       ],
     };
   }

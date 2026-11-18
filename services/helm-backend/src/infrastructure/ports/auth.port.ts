@@ -11,6 +11,8 @@ export type AuthPrincipal = {
   userId: string;
   email?: string;
   roles: AppRole[];
+  /** Where roles were resolved from — JWT claims are never authoritative for staff. */
+  rolesSource: 'database' | 'fallback';
   tokenUse?: string;
 };
 

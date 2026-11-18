@@ -5,11 +5,12 @@ export type MeResponse = {
   userId: string;
   email?: string;
   roles: AuthPrincipal['roles'];
+  rolesSource: AuthPrincipal['rolesSource'];
 };
 
 /**
  * Application use case — map authenticated principal to /v1/me DTO.
- * No catalog/booking/payment logic.
+ * Roles are database-backed when rolesSource=database.
  */
 @Injectable()
 export class GetMeUseCase {
@@ -18,6 +19,7 @@ export class GetMeUseCase {
       userId: principal.userId,
       email: principal.email,
       roles: principal.roles,
+      rolesSource: principal.rolesSource,
     };
   }
 }

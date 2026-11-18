@@ -29,7 +29,7 @@ const env: AppEnv = {
   NOTIFY_PROVIDER: 'console',
 };
 
-test('mock auth issues and verifies JWT with roles', async () => {
+test('mock auth issues and verifies JWT identity (roles deferred to DB)', async () => {
   const auth = new MockAuthAdapter(env);
   const token = await auth.issueAccessToken({
     userId: '11111111-1111-1111-1111-111111111111',
@@ -39,8 +39,9 @@ test('mock auth issues and verifies JWT with roles', async () => {
   const principal = await auth.verifyAccessToken(token);
   assert.equal(principal.userId, '11111111-1111-1111-1111-111111111111');
   assert.equal(principal.email, 'ops@helm.local');
-  assert.ok(principal.roles.includes('operator'));
-  assert.ok(principal.roles.includes('customer'));
+  // Adapter returns identity only — staff roles come from identity.user_roles.
+  assert.deepEqual(principal.roles, ['customer']);
+  assert.equal(principal.rolesSource, 'fallback');
 });
 
 test('mock auth rejects garbage token', async () => {
@@ -96,7 +97,7 @@ test('mock auth rejects wrong signature', async () => {
   await assert.rejects(() => auth.verifyAccessToken(token), /Invalid|Unauthorized/);
 });
 
-test('supabase adapter ignores user_metadata roles (no privilege escalation)', async () => {
+test('supabase adapter never trusts JWT role claims for authorization', async () => {
   const supabaseEnv: AppEnv = {
     ...env,
     AUTH_PROVIDER: 'supabase_jwt',
@@ -108,7 +109,7 @@ test('supabase adapter ignores user_metadata roles (no privilege escalation)', a
     email: 'attacker@example.com',
     role: 'authenticated',
     user_metadata: { roles: ['super-administrator', 'administrator'] },
-    app_metadata: { roles: ['customer'] },
+    app_metadata: { roles: ['super-administrator'] },
   })
     .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
     .setIssuer('http://127.0.0.1:54321/auth/v1')
@@ -119,7 +120,7 @@ test('supabase adapter ignores user_metadata roles (no privilege escalation)', a
 
   const principal = await auth.verifyAccessToken(token);
   assert.deepEqual(principal.roles, ['customer']);
-  assert.equal(principal.roles.includes('administrator'), false);
+  assert.equal(principal.rolesSource, 'fallback');
 });
 
 test('supabase adapter rejects wrong issuer', async () => {
@@ -178,11 +179,13 @@ test('get me use case maps principal', () => {
     userId: 'u1',
     email: 'a@b.c',
     roles: ['customer', 'administrator'],
+    rolesSource: 'database',
   });
   assert.deepEqual(me, {
     userId: 'u1',
     email: 'a@b.c',
     roles: ['customer', 'administrator'],
+    rolesSource: 'database',
   });
 });
 
@@ -200,7 +203,7 @@ test('roles guard forbids customer from administrator route', () => {
     getHandler: () => ({}),
     getClass: () => ({}),
     switchToHttp: () => ({
-      getRequest: () => ({ user: { userId: 'u', roles: ['customer'] } }),
+      getRequest: () => ({ user: { userId: 'u', roles: ['customer'], rolesSource: 'database' } }),
     }),
   };
   assert.throws(() => guard.canActivate(ctx as never), (err: unknown) => {
@@ -219,8 +222,64 @@ test('roles guard allows matching role', () => {
     getHandler: () => ({}),
     getClass: () => ({}),
     switchToHttp: () => ({
-      getRequest: () => ({ user: { userId: 'u', roles: ['customer', 'operator'] } }),
+      getRequest: () => ({ user: { userId: 'u', roles: ['customer', 'operator'], rolesSource: 'database' } }),
     }),
   };
   assert.equal(guard.canActivate(ctx as never), true);
+});
+
+test('roles guard fails closed when staff required but rolesSource=fallback', () => {
+  const reflector = {
+    getAllAndOverride: () => ['administrator'],
+  } as unknown as Reflector;
+  const guard = new RolesGuard(reflector);
+  const ctx = {
+    getHandler: () => ({}),
+    getClass: () => ({}),
+    switchToHttp: () => ({
+      getRequest: () => ({
+        user: { userId: 'u', roles: ['customer'], rolesSource: 'fallback' },
+      }),
+    }),
+  };
+  assert.throws(() => guard.canActivate(ctx as never), (err: unknown) => {
+    assert.ok(err instanceof AppException);
+    assert.equal(err.code, 'FORBIDDEN');
+    return true;
+  });
+});
+
+test('principal resolver prefers database roles over JWT claims', async () => {
+  const { PrincipalResolver } = await import('../src/common/auth/principal-resolver.service.ts');
+  const { MemoryRolesAdapter } = await import('../src/infrastructure/adapters/memory/memory-roles.adapter.ts');
+  const auth = new MockAuthAdapter(env);
+  const roles = new MemoryRolesAdapter();
+  roles.seed('11111111-1111-1111-1111-111111111111', ['operator']);
+  const resolver = new PrincipalResolver(auth, roles);
+  const token = await auth.issueAccessToken({
+    userId: '11111111-1111-1111-1111-111111111111',
+    roles: ['administrator'], // JWT claim must be ignored for staff
+  });
+  const principal = await resolver.resolveFromAccessToken(token);
+  assert.equal(principal.rolesSource, 'database');
+  assert.ok(principal.roles.includes('operator'));
+  assert.equal(principal.roles.includes('administrator'), false);
+});
+
+test('principal resolver falls back to customer when roles port fails', async () => {
+  const { PrincipalResolver } = await import('../src/common/auth/principal-resolver.service.ts');
+  const auth = new MockAuthAdapter(env);
+  const roles = {
+    listActiveRoles: async () => {
+      throw new Error('db down');
+    },
+  };
+  const resolver = new PrincipalResolver(auth, roles as never);
+  const token = await auth.issueAccessToken({
+    userId: '11111111-1111-1111-1111-111111111111',
+    roles: ['administrator'],
+  });
+  const principal = await resolver.resolveFromAccessToken(token);
+  assert.equal(principal.rolesSource, 'fallback');
+  assert.deepEqual(principal.roles, ['customer']);
 });

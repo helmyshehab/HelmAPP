@@ -16,7 +16,8 @@ NestJS **TypeScript modular monolith** for Helm حلم.
 | Zod request validation pipe | Yes |
 | AuthPort + mock / Supabase JWT adapters | Yes — no Supabase SDK in domain |
 | Mock auth in production | **Hard-fail** (`NODE_ENV=production` + `AUTH_PROVIDER=mock`) |
-| Roles source | JWT `app_metadata.roles` only (never `user_metadata`) |
+| Roles source | **`identity.user_roles` (database)** via `PrincipalResolver` — JWT claims ignored for staff |
+| Fail closed | Staff `@Roles` denied when `rolesSource=fallback` (DB unavailable) |
 | RBAC roles | `customer`, `operator`, `administrator`, `super-administrator` |
 | Provider mocks | Payment / AI / Flight / Notify / Storage |
 | Product booking/AI/payments | **Not implemented** (later phases) |

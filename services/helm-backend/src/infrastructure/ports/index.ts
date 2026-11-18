@@ -1,4 +1,5 @@
 export * from './auth.port';
+export * from './roles.port';
 export * from './clock.port';
 export * from './storage.port';
 export * from './payment.port';

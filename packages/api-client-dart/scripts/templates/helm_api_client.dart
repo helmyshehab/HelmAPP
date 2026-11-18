@@ -55,15 +55,17 @@ class MetaResponse {
 }
 
 class MeResponse {
-  MeResponse({required this.userId, required this.roles, this.email});
+  MeResponse({required this.userId, required this.roles, required this.rolesSource, this.email});
   final String userId;
   final String? email;
   final List<String> roles;
+  final String rolesSource;
 
   factory MeResponse.fromJson(Map<String, dynamic> json) => MeResponse(
         userId: json['userId'] as String,
         email: json['email'] as String?,
         roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
+        rolesSource: json['rolesSource'] as String? ?? 'fallback',
       );
 }
 
