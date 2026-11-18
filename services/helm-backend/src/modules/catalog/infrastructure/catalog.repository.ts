@@ -726,7 +726,8 @@ export class CatalogRepository {
   /**
    * Application-level parent-cycle check. Walking from `parentId` up the ancestor
    * chain: reject self-parent and any path that reaches `destinationId`.
-   * Database trigger protection is deferred to Step 6.3.
+   * Database trigger `catalog.enforce_destination_parent_acyclic` (Step 6.3)
+   * remains the final integrity authority under concurrent writers.
    */
   async wouldCreateParentCycle(
     destinationId: string | null,
