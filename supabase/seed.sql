@@ -55,10 +55,11 @@ values
 on conflict (country_code, slug) do nothing;
 
 -- Demo destinations (preserved from Step 2)
+-- Insert as draft — creation must never auto-verify/publish (Step 5 lifecycle).
 insert into catalog.destinations (
   id, slug, name_en, name_ar, summary_en, summary_ar, country_code,
   city_id, timezone, latitude, longitude,
-  verification_status, publish_status, tags, published_at, is_featured
+  lifecycle_status, tags, is_featured
 ) values (
   '11111111-1111-1111-1111-111111111111',
   'istanbul',
@@ -71,10 +72,8 @@ insert into catalog.destinations (
   'Europe/Istanbul',
   41.008200,
   28.978400,
-  'verified',
-  'published',
+  'draft',
   array['culture','food','city'],
-  now(),
   true
 ) on conflict (slug) do update set
   city_id = excluded.city_id,
@@ -86,7 +85,7 @@ insert into catalog.destinations (
 insert into catalog.destinations (
   id, slug, name_en, name_ar, summary_en, summary_ar, country_code,
   city_id, timezone, latitude, longitude,
-  verification_status, publish_status, tags, published_at
+  lifecycle_status, tags
 ) values (
   '22222222-2222-2222-2222-222222222222',
   'tbilisi',
@@ -99,10 +98,8 @@ insert into catalog.destinations (
   'Asia/Tbilisi',
   41.715100,
   44.827100,
-  'verified',
-  'published',
-  array['culture','food','value'],
-  now()
+  'draft',
+  array['culture','food','value']
 ) on conflict (slug) do update set
   city_id = excluded.city_id,
   timezone = excluded.timezone,
@@ -111,17 +108,45 @@ insert into catalog.destinations (
 
 -- Unpublished draft destination (must NOT be visible to customers via RLS)
 insert into catalog.destinations (
-  id, slug, name_en, name_ar, country_code,
-  verification_status, publish_status
+  id, slug, name_en, name_ar, country_code, lifecycle_status
 ) values (
   '99999999-9999-9999-9999-999999999999',
   'draft-future-destination',
   'Draft Future Destination',
   'وجهة مسودة',
   'TR',
-  'draft',
-  'unpublished'
+  'draft'
 ) on conflict (slug) do nothing;
+
+-- Promote curated demo destinations through explicit lifecycle (idempotent)
+do $$
+declare
+  s catalog.lifecycle_status;
+  target uuid;
+begin
+  foreach target in array array[
+    '11111111-1111-1111-1111-111111111111'::uuid,
+    '22222222-2222-2222-2222-222222222222'::uuid
+  ]
+  loop
+    select lifecycle_status into s from catalog.destinations where id = target;
+    if s = 'draft' then
+      update catalog.destinations set lifecycle_status = 'pending_verification' where id = target;
+      s := 'pending_verification';
+    end if;
+    if s = 'pending_verification' then
+      update catalog.destinations set lifecycle_status = 'verified', verified_at = now() where id = target;
+      s := 'verified';
+    end if;
+    if s = 'verified' then
+      update catalog.destinations set lifecycle_status = 'approved', approved_at = now() where id = target;
+      s := 'approved';
+    end if;
+    if s = 'approved' then
+      update catalog.destinations set lifecycle_status = 'published', published_at = coalesce(published_at, now()) where id = target;
+    end if;
+  end loop;
+end $$;
 
 insert into markets.market_destinations (market_code, destination_id, is_featured, is_active)
 values
@@ -165,21 +190,109 @@ on conflict (id) do nothing;
 
 -- Catalog places foundation (no invented ratings)
 insert into catalog.places (
-  id, destination_id, city_id, category, slug, name_en, name_ar,
-  description_en, verification_status, publish_status, published_at
+  id, destination_id, city_id, category, subcategory, slug, name_en, name_ar,
+  short_description_en, description_en, lifecycle_status, external_key
 ) values (
   'a1111111-1111-1111-1111-111111111111',
   '11111111-1111-1111-1111-111111111111',
   'c1111111-1111-1111-1111-111111111111',
   'attraction',
+  'landmark',
   'hagia-sophia-exterior',
   'Hagia Sophia (exterior context)',
   'آيا صوفيا (سياق خارجي)',
+  'Historic landmark reference for catalog discovery.',
   'Structural landmark reference for catalog foundation — not a live ticket product.',
-  'verified',
-  'published',
-  now()
+  'draft',
+  'seed:istanbul:hagia-sophia-exterior'
 ) on conflict (destination_id, category, slug) do nothing;
+
+insert into catalog.place_attraction_details (
+  place_id, attraction_type, typical_duration_minutes, booking_required, suitable_for
+) values (
+  'a1111111-1111-1111-1111-111111111111',
+  'landmark',
+  90,
+  false,
+  array['families','solo','couples']
+) on conflict (place_id) do nothing;
+
+-- Draft place (must remain invisible to customers)
+insert into catalog.places (
+  id, destination_id, city_id, category, subcategory, slug, name_en, name_ar,
+  lifecycle_status, external_key
+) values (
+  'a2222222-2222-2222-2222-222222222222',
+  '11111111-1111-1111-1111-111111111111',
+  'c1111111-1111-1111-1111-111111111111',
+  'cafe',
+  'cafe',
+  'draft-unverified-cafe',
+  'Draft Unverified Cafe',
+  'مقهى مسودة',
+  'draft',
+  'seed:istanbul:draft-unverified-cafe'
+) on conflict (destination_id, category, slug) do nothing;
+
+-- Promote curated place through lifecycle
+do $$
+declare
+  s catalog.lifecycle_status;
+  target uuid := 'a1111111-1111-1111-1111-111111111111';
+begin
+  select lifecycle_status into s from catalog.places where id = target;
+  if s is null then
+    return;
+  end if;
+  if s = 'draft' then
+    update catalog.places set lifecycle_status = 'pending_verification' where id = target;
+    s := 'pending_verification';
+  end if;
+  if s = 'pending_verification' then
+    update catalog.places set lifecycle_status = 'verified', verified_at = now() where id = target;
+    s := 'verified';
+  end if;
+  if s = 'verified' then
+    update catalog.places set lifecycle_status = 'approved', approved_at = now() where id = target;
+    s := 'approved';
+  end if;
+  if s = 'approved' then
+    update catalog.places set lifecycle_status = 'published', published_at = coalesce(published_at, now()) where id = target;
+  end if;
+end $$;
+
+-- Tags
+insert into catalog.tags (id, slug, name_en, name_ar, category) values
+  ('b1111111-1111-1111-1111-111111111111', 'historic', 'Historic', 'تاريخي', 'attraction'),
+  ('b2222222-2222-2222-2222-222222222222', 'family-friendly', 'Family friendly', 'مناسب للعائلات', null),
+  ('b3333333-3333-3333-3333-333333333333', 'waterfront', 'Waterfront', 'على الواجهة المائية', null)
+on conflict (slug) do nothing;
+
+insert into catalog.place_tags (place_id, tag_id) values
+  ('a1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111'),
+  ('a1111111-1111-1111-1111-111111111111', 'b2222222-2222-2222-2222-222222222222')
+on conflict do nothing;
+
+-- Provenance example (staff-only via RLS)
+insert into catalog.sources (id, source_type, name, url, notes) values (
+  'c1111111-1111-1111-1111-111111111101',
+  'manual_research',
+  'Helm curated destination notes',
+  null,
+  'Local seed provenance — not an external scrape.'
+) on conflict (id) do nothing;
+
+insert into catalog.entity_sources (
+  entity_type, entity_id, source_id, collected_at, verification_status, confidence, notes
+) values (
+  'place',
+  'a1111111-1111-1111-1111-111111111111',
+  'c1111111-1111-1111-1111-111111111101',
+  current_date,
+  'verified',
+  80,
+  'Seed reference only.'
+) on conflict (entity_type, entity_id, source_id) do nothing;
 
 insert into packages.packages (
   id, destination_id, slug, title_en, title_ar, duration_days, publish_status, market_code

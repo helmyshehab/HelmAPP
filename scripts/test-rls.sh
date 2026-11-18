@@ -13,6 +13,7 @@ psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<SQL
 begin;
 set local role helm_authenticated;
 \i $ROOT/supabase/tests/rls_step4.sql
+\i $ROOT/supabase/tests/rls_step5.sql
 rollback;
 SQL
 

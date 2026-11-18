@@ -20,6 +20,9 @@ NestJS **TypeScript modular monolith** for Helm حلم.
 | Fail closed | Staff `@Roles` denied when `rolesSource=fallback` (DB unavailable) |
 | RBAC roles | `customer`, `operator`, `administrator`, `super-administrator` |
 | Provider mocks | Payment / AI / Flight / Notify / Storage |
+| Public catalog discovery | Yes — `/v1/destinations`, `/v1/catalog/places|categories|tags` (published only) |
+| Admin catalog curation | Yes — create/transition/import under `/v1/admin/catalog/*` |
+| Catalog lifecycle | draft → pending_verification → verified → approved → published (+ rejected/archived) |
 | Product booking/AI/payments | **Not implemented** (later phases) |
 
 ## Layout

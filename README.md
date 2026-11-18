@@ -2,7 +2,7 @@
 
 Monorepo for **Helm حلم** (GitHub: `helmyshehab/HelmAPP`). Egypt-outbound travel MVP foundation: Flutter mobile, Next.js web + admin, NestJS modular monolith, OpenAPI `/v1`, Supabase Auth/Postgres/Storage.
 
-> **Platform foundation in progress.** Steps 2–3 are on `main`. Step 4 expands database/identity (markets, geo, catalog places, pricing provenance, DB roles + RLS). No booking/AI/payments product features yet.
+> **Platform foundation in progress.** Steps 2–4 are on `main`. Step 5 adds travel catalog lifecycle, discovery APIs, admin curation/import, media/provenance, and RLS. No booking/AI/payments product features yet.
 
 ## Layout
 
@@ -19,7 +19,7 @@ packages/
   api-client-dart/      Generated Dart client — DO NOT EDIT
 supabase/               Versioned migrations, RLS, seed, config
 docker/                 Local Postgres Compose fallback
-docs/                   LOCAL_DEVELOPMENT + DEPENDENCIES_AND_COSTS
+docs/                   LOCAL_DEVELOPMENT, CATALOG_IMPORT, DEPENDENCIES_AND_COSTS
 ```
 
 ## Three gates (enforced)

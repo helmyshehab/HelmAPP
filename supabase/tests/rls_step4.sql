@@ -126,18 +126,30 @@ begin
     end if;
   end;
 
+  -- Step 5: operators may insert draft places, but not published ones
   begin
     insert into catalog.places (
-      destination_id, category, slug, name_en, name_ar, verification_status, publish_status
+      destination_id, category, slug, name_en, name_ar, lifecycle_status
     ) values (
       '11111111-1111-1111-1111-111111111111',
-      'cafe', 'evil-cafe', 'Evil', 'شر', 'verified', 'published'
+      'cafe', 'evil-cafe-published', 'Evil', 'شر', 'published'
     );
-    raise exception 'operator inserted place';
+    raise exception 'operator inserted published place';
   exception
     when others then
-      if sqlerrm like '%row-level security%' or sqlerrm like '%policy%' then null; else raise; end if;
+      if sqlerrm like '%row-level security%'
+         or sqlerrm like '%policy%'
+         or sqlerrm like '%cannot create entry%'
+         or sqlerrm like '%check_violation%' then null; else raise; end if;
   end;
+
+  insert into catalog.places (
+    destination_id, category, slug, name_en, name_ar, lifecycle_status
+  ) values (
+    '11111111-1111-1111-1111-111111111111',
+    'cafe', 'operator-draft-cafe', 'Operator Draft Cafe', 'مسودة', 'draft'
+  )
+  on conflict (destination_id, category, slug) do nothing;
 
   begin
     insert into identity.user_roles (user_id, role)

@@ -8,7 +8,18 @@ if (!spec.includes("openapi:")) {
   console.error("openapi.yaml missing openapi version");
   process.exit(1);
 }
-for (const path of ["/v1/health", "/v1/ready", "/v1/meta", "/v1/me"]) {
+for (const path of [
+  "/v1/health",
+  "/v1/ready",
+  "/v1/meta",
+  "/v1/me",
+  "/v1/destinations",
+  "/v1/catalog/places",
+  "/v1/catalog/categories",
+  "/v1/catalog/tags",
+  "/v1/admin/catalog/places",
+  "/v1/admin/catalog/import",
+]) {
   if (!spec.includes(path)) {
     console.error(`openapi.yaml must define ${path}`);
     process.exit(1);
