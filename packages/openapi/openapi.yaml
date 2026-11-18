@@ -3,8 +3,8 @@ info:
   title: Helm حلم API
   description: |
     Single source of truth for Helm حلم `/v1`.
-    Step 3: platform foundation (health/ready/meta/me + authz). Product endpoints land in later phases.
-  version: 0.2.0
+    Step 5: travel catalog discovery + admin lifecycle/import (no booking/AI yet).
+  version: 0.3.0
   contact:
     name: Helmy Shehab
 servers:
@@ -77,6 +77,257 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/destinations:
+    get:
+      operationId: listDestinations
+      summary: List published destinations
+      tags: [catalog]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CountryFilter"
+        - $ref: "#/components/parameters/FeaturedFilter"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Paginated published destinations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/destinations/{slug}:
+    get:
+      operationId: getDestination
+      summary: Get a published destination by slug
+      tags: [catalog]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Published destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationPublic"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/catalog/places:
+    get:
+      operationId: listCatalogPlaces
+      summary: Search published catalog places
+      tags: [catalog]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CountryFilter"
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: area
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            $ref: "#/components/schemas/PlaceCategory"
+        - name: subcategory
+          in: query
+          schema:
+            type: string
+        - name: minRating
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 10
+        - name: priceLevel
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 4
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/FeaturedFilter"
+        - $ref: "#/components/parameters/SearchQuery"
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [name, rating, updated]
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Paginated published places
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/catalog/places/{slug}:
+    get:
+      operationId: getCatalogPlace
+      summary: Get a published place by slug
+      tags: [catalog]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Published place with public media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacePublic"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/catalog/categories:
+    get:
+      operationId: listCatalogCategories
+      summary: Catalog category taxonomy
+      tags: [catalog]
+      security: []
+      responses:
+        "200":
+          description: Category groups and subcategories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryListResponse"
+  /v1/catalog/tags:
+    get:
+      operationId: listCatalogTags
+      summary: Active catalog tags
+      tags: [catalog]
+      security: []
+      responses:
+        "200":
+          description: Active tags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagListResponse"
+  /v1/admin/catalog/places:
+    get:
+      operationId: adminListCatalogPlaces
+      summary: Staff list of catalog places (includes unpublished)
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Staff place list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: adminCreateCatalogPlace
+      summary: Create a draft catalog place
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePlaceRequest"
+      responses:
+        "201":
+          description: Draft place created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdminSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/admin/catalog/places/{id}/transition:
+    post:
+      operationId: adminTransitionCatalogPlace
+      summary: Transition place lifecycle (verify/approve/publish/reject/archive)
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LifecycleTransitionRequest"
+      responses:
+        "200":
+          description: Updated place lifecycle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdminSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/import:
+    post:
+      operationId: adminImportCatalog
+      summary: Validate or apply curated JSON catalog import
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CatalogImportRequest"
+      responses:
+        "200":
+          description: Import preview or apply result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogImportResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 components:
   securitySchemes:
     bearerAuth:
@@ -84,6 +335,72 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Supabase Auth access token (or local mock JWT)
+  parameters:
+    Slug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+    CountryFilter:
+      name: country
+      in: query
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 2
+    FeaturedFilter:
+      name: featured
+      in: query
+      schema:
+        type: string
+        enum: ["true", "false"]
+    SearchQuery:
+      name: q
+      in: query
+      schema:
+        type: string
+        maxLength: 120
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Offset:
+      name: offset
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Unauthorized:
+      description: Missing or invalid access token
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
   schemas:
     HealthResponse:
       type: object
@@ -154,6 +471,327 @@ components:
     AppRole:
       type: string
       enum: [customer, operator, administrator, super-administrator]
+    LifecycleStatus:
+      type: string
+      enum:
+        - draft
+        - pending_verification
+        - verified
+        - approved
+        - published
+        - rejected
+        - archived
+    PlaceCategory:
+      type: string
+      enum:
+        - accommodation
+        - restaurant
+        - cafe
+        - bar
+        - beach_club
+        - attraction
+        - activity
+        - nightlife
+        - transport
+    DestinationPublic:
+      type: object
+      required: [id, slug, nameEn, nameAr, countryCode, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        summaryEn:
+          type: string
+        summaryAr:
+          type: string
+        countryCode:
+          type: string
+        cityId:
+          type: string
+          format: uuid
+        timezone:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        isFeatured:
+          type: boolean
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [published]
+        publishedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    DestinationListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DestinationPublic"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    PlacePublic:
+      type: object
+      required: [id, slug, nameEn, nameAr, category, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        category:
+          $ref: "#/components/schemas/PlaceCategory"
+        subcategory:
+          type: string
+        shortDescriptionEn:
+          type: string
+        shortDescriptionAr:
+          type: string
+        descriptionEn:
+          type: string
+        descriptionAr:
+          type: string
+        destinationId:
+          type: string
+          format: uuid
+        destinationSlug:
+          type: string
+        countryCode:
+          type: string
+        cityId:
+          type: string
+          format: uuid
+        areaId:
+          type: string
+          format: uuid
+        latitude:
+          type: number
+        longitude:
+          type: number
+        addressText:
+          type: string
+        websiteUrl:
+          type: string
+        priceLevel:
+          type: integer
+        ratingValue:
+          type: number
+        ratingScale:
+          type: number
+        ratingSource:
+          type: string
+        reviewCount:
+          type: integer
+        ratingObservedAt:
+          type: string
+          format: date-time
+        isFeatured:
+          type: boolean
+        status:
+          type: string
+          enum: [published]
+        media:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicMediaRef"
+        updatedAt:
+          type: string
+          format: date-time
+    PlaceListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlacePublic"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    PublicMediaRef:
+      type: object
+      required: [id, storageBucket, storagePath]
+      properties:
+        id:
+          type: string
+          format: uuid
+        storageBucket:
+          type: string
+        storagePath:
+          type: string
+        altTextEn:
+          type: string
+        altTextAr:
+          type: string
+        attribution:
+          type: string
+        sortOrder:
+          type: integer
+        isCover:
+          type: boolean
+    CategoryListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [id, labelEn, labelAr, categories, subcategories]
+            properties:
+              id:
+                type: string
+              labelEn:
+                type: string
+              labelAr:
+                type: string
+              categories:
+                type: array
+                items:
+                  type: string
+              subcategories:
+                type: array
+                items:
+                  type: string
+    TagListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [id, slug, nameEn, nameAr]
+            properties:
+              id:
+                type: string
+                format: uuid
+              slug:
+                type: string
+              nameEn:
+                type: string
+              nameAr:
+                type: string
+              category:
+                type: string
+                nullable: true
+              isActive:
+                type: boolean
+    CreatePlaceRequest:
+      type: object
+      required: [destinationId, category, slug, nameEn, nameAr]
+      properties:
+        destinationId:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/PlaceCategory"
+        subcategory:
+          type: string
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        shortDescriptionEn:
+          type: string
+        descriptionEn:
+          type: string
+        externalKey:
+          type: string
+    PlaceAdminSummary:
+      type: object
+      required: [id, slug, lifecycleStatus]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        lifecycleStatus:
+          $ref: "#/components/schemas/LifecycleStatus"
+    LifecycleTransitionRequest:
+      type: object
+      required: [to]
+      properties:
+        to:
+          $ref: "#/components/schemas/LifecycleStatus"
+        rejectionReason:
+          type: string
+          description: Required when transitioning to rejected
+    CatalogImportRequest:
+      type: object
+      required: [payload]
+      properties:
+        dryRun:
+          type: boolean
+          default: true
+        payload:
+          type: object
+          description: Canonical helm.catalog.import.v1 document
+          additionalProperties: true
+    CatalogImportResult:
+      type: object
+      required: [dryRun, importRunId]
+      properties:
+        dryRun:
+          type: boolean
+        importRunId:
+          type: string
+          format: uuid
+        placesInPayload:
+          type: integer
+        destinationsInPayload:
+          type: integer
+        wouldCreate:
+          type: integer
+        wouldUpdate:
+          type: integer
+        wouldSkip:
+          type: integer
+        created:
+          type: integer
+        updated:
+          type: integer
+        skipped:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              message:
+                type: string
     Problem:
       type: object
       description: RFC 7807 problem+json
@@ -177,3 +815,7 @@ tags:
     description: Health, readiness, and service metadata
   - name: identity
     description: Authenticated identity foundation (no product profile CMS yet)
+  - name: catalog
+    description: Public travel catalog discovery (published entries only)
+  - name: catalog-admin
+    description: Staff catalog curation, lifecycle, and curated JSON import

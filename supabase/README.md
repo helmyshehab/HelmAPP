@@ -1,6 +1,6 @@
 # supabase/
 
-Version-controlled Supabase / PostgreSQL project for **Helm حلم** (Gate 2 + Step 4).
+Version-controlled Supabase / PostgreSQL project for **Helm حلم** (Gate 2 + Steps 4–5).
 
 | Path | Purpose |
 |------|---------|
@@ -8,16 +8,17 @@ Version-controlled Supabase / PostgreSQL project for **Helm حلم** (Gate 2 + S
 | `migrations/` | Schema, RLS, triggers, functions (authoritative) |
 | `seed.sql` | Deterministic local demo seed |
 | `tests/rls_step4.sql` | RLS harness for customer/admin contexts |
+| `tests/rls_step5.sql` | Catalog lifecycle, provenance, media RLS harness |
 
-## Schemas (Step 4)
+## Schemas (Steps 4–5)
 
 | Schema | Responsibility |
 |--------|----------------|
 | `identity` | Accounts, profiles, DB-managed roles |
 | `geo` | Countries, regions, cities, areas |
 | `markets` | Market configs (e.g. `EG_OUTBOUND`) + destination links |
-| `catalog` | Destinations, POIs, places foundation |
-| `pricing` | Currencies + provenance-aware price records |
+| `catalog` | Destinations, places + lifecycle, category details, tags, media refs, sources, import runs |
+| `pricing` | Currencies + provenance-aware price records (reused for place prices) |
 | `packages` / `commerce` / `fulfillment` / `ai` / `ops` / `verification` | Existing stubs / audit |
 
 ## Apply locally

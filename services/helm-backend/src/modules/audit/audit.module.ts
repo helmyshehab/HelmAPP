@@ -1,11 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
+import { AuditService } from './audit.service';
 
-/**
- * AuditModule — domain boundary stub (Step 2).
- * No product feature implementation yet.
- */
+@Global()
 @Module({
-  providers: [],
-  exports: [],
+  providers: [AuditService],
+  exports: [AuditService],
 })
 export class AuditModule {}

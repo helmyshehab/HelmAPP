@@ -1,0 +1,52 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "curated-multi-market-sample-v1",
+  "destinations": [],
+  "places": [
+    {
+      "externalKey": "tr:istanbul:sample-boutique-hotel",
+      "destinationSlug": "istanbul",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "sample-boutique-hotel",
+      "nameEn": "Sample Boutique Hotel",
+      "nameAr": "فندق بوتيك تجريبي",
+      "shortDescriptionEn": "Curated sample accommodation — draft import only.",
+      "priceLevel": 3,
+      "updateIfExists": false,
+      "accommodation": {
+        "accommodationType": "boutique_hotel",
+        "amenities": ["wifi", "breakfast"]
+      },
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated hotel notes",
+          "collectedAt": "2026-11-18",
+          "notes": "Sample only — not a live rate."
+        }
+      ]
+    },
+    {
+      "externalKey": "ge:tbilisi:sample-wine-bar",
+      "destinationSlug": "tbilisi",
+      "category": "bar",
+      "subcategory": "bar",
+      "slug": "sample-wine-bar",
+      "nameEn": "Sample Wine Bar",
+      "nameAr": "بار نبيذ تجريبي",
+      "updateIfExists": false,
+      "dining": {
+        "cuisineTypes": ["georgian", "wine"],
+        "mealTypes": ["dinner"]
+      },
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated dining notes",
+          "collectedAt": "2026-11-18"
+        }
+      ]
+    }
+  ]
+}

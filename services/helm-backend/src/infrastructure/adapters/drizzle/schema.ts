@@ -64,6 +64,28 @@ export const userRoles = identitySchema.table('user_roles', {
   revokeReason: text('revoke_reason'),
 });
 
+export const lifecycleStatusEnum = catalogSchema.enum('lifecycle_status', [
+  'draft',
+  'pending_verification',
+  'verified',
+  'approved',
+  'published',
+  'rejected',
+  'archived',
+]);
+
+export const placeCategoryEnum = catalogSchema.enum('place_category', [
+  'accommodation',
+  'restaurant',
+  'cafe',
+  'bar',
+  'beach_club',
+  'attraction',
+  'activity',
+  'nightlife',
+  'transport',
+]);
+
 export const destinations = catalogSchema.table('destinations', {
   id: uuid('id').primaryKey(),
   slug: text('slug').notNull(),
@@ -71,11 +93,66 @@ export const destinations = catalogSchema.table('destinations', {
   nameAr: text('name_ar').notNull(),
   countryCode: char('country_code', { length: 2 }).notNull(),
   cityId: uuid('city_id'),
+  parentId: uuid('parent_id'),
   publishStatus: text('publish_status').notNull(),
   verificationStatus: text('verification_status').notNull(),
+  lifecycleStatus: lifecycleStatusEnum('lifecycle_status').notNull(),
   isFeatured: boolean('is_featured').default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const places = catalogSchema.table('places', {
+  id: uuid('id').primaryKey(),
+  destinationId: uuid('destination_id').notNull(),
+  cityId: uuid('city_id'),
+  areaId: uuid('area_id'),
+  category: placeCategoryEnum('category').notNull(),
+  subcategory: text('subcategory').notNull(),
+  slug: text('slug').notNull(),
+  nameEn: text('name_en').notNull(),
+  nameAr: text('name_ar').notNull(),
+  shortDescriptionEn: text('short_description_en'),
+  descriptionEn: text('description_en'),
+  latitude: numeric('latitude', { precision: 9, scale: 6 }),
+  longitude: numeric('longitude', { precision: 9, scale: 6 }),
+  addressText: text('address_text'),
+  websiteUrl: text('website_url'),
+  priceLevel: numeric('price_level'),
+  ratingValue: numeric('rating_value', { precision: 3, scale: 2 }),
+  ratingSource: text('rating_source'),
+  reviewCount: numeric('review_count'),
+  isFeatured: boolean('is_featured').default(false),
+  lifecycleStatus: lifecycleStatusEnum('lifecycle_status').notNull(),
+  publishStatus: text('publish_status').notNull(),
+  verificationStatus: text('verification_status').notNull(),
+  externalKey: text('external_key'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const tags = catalogSchema.table('tags', {
+  id: uuid('id').primaryKey(),
+  slug: text('slug').notNull(),
+  nameEn: text('name_en').notNull(),
+  nameAr: text('name_ar').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+});
+
+export const mediaAssets = catalogSchema.table('media_assets', {
+  id: uuid('id').primaryKey(),
+  storageBucket: text('storage_bucket').notNull(),
+  storagePath: text('storage_path').notNull(),
+  isPublic: boolean('is_public').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+});
+
+export const importRuns = catalogSchema.table('import_runs', {
+  id: uuid('id').primaryKey(),
+  actorUserId: uuid('actor_user_id'),
+  dryRun: boolean('dry_run').notNull(),
+  status: text('status').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const priceRecords = pricingSchema.table('price_records', {
