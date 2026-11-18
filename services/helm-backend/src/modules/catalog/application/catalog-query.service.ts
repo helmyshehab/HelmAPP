@@ -126,4 +126,37 @@ export class CatalogQueryService {
     const items = await this.repo.listTags(true);
     return { items };
   }
+
+  async listCountries(query: {
+    active?: boolean;
+    q?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    // Default to active-only when clients omit the filter (picker UX).
+    const active = query.active === undefined ? true : query.active;
+    return this.repo.listCountries({
+      active,
+      q: query.q,
+      limit: query.limit ?? 20,
+      offset: query.offset ?? 0,
+    });
+  }
+
+  async listCities(query: {
+    country?: string;
+    q?: string;
+    limit?: number;
+    offset?: number;
+  }) {
+    if (query.country && !/^[A-Za-z]{2}$/.test(query.country)) {
+      throw AppException.validation('country must be ISO-3166 alpha-2');
+    }
+    return this.repo.listCities({
+      country: query.country,
+      q: query.q,
+      limit: query.limit ?? 20,
+      offset: query.offset ?? 0,
+    });
+  }
 }

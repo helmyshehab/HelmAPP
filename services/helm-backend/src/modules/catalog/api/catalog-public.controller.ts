@@ -34,6 +34,23 @@ const listPlacesQuery = z.object({
   offset: z.coerce.number().int().min(0).optional(),
 });
 
+const listCountriesQuery = z.object({
+  active: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === 'true')),
+  q: z.string().max(120).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+});
+
+const listCitiesQuery = z.object({
+  country: z.string().length(2).optional(),
+  q: z.string().max(120).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+});
+
 @Public()
 @Controller()
 export class CatalogPublicController {
@@ -72,5 +89,20 @@ export class CatalogPublicController {
   @Get('catalog/tags')
   listTags() {
     return this.queries.listTags();
+  }
+
+  @Get('geo/countries')
+  listCountries(
+    @Query(new ZodValidationPipe(listCountriesQuery))
+    query: z.infer<typeof listCountriesQuery>,
+  ) {
+    return this.queries.listCountries(query);
+  }
+
+  @Get('geo/cities')
+  listCities(
+    @Query(new ZodValidationPipe(listCitiesQuery)) query: z.infer<typeof listCitiesQuery>,
+  ) {
+    return this.queries.listCities(query);
   }
 }

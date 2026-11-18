@@ -74,4 +74,13 @@ export class AppException extends HttpException {
       detail,
     });
   }
+
+  static conflict(detail = 'Resource state conflict') {
+    return new AppException({
+      status: HttpStatus.CONFLICT,
+      code: 'CONFLICT',
+      title: 'Conflict',
+      detail,
+    });
+  }
 }

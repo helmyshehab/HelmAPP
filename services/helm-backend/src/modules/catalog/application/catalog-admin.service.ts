@@ -137,6 +137,307 @@ export class CatalogAdminService {
     });
   }
 
+  async listStaffDestinations(query: {
+    q?: string;
+    country?: string;
+    featured?: boolean;
+    lifecycleStatus?: LifecycleStatus;
+    parentId?: string;
+    topLevelOnly?: boolean;
+    limit?: number;
+    offset?: number;
+  }) {
+    const result = await this.repo.listDestinations({
+      q: query.q,
+      country: query.country?.toUpperCase(),
+      featured: query.featured,
+      lifecycleStatus: query.lifecycleStatus,
+      parentId: query.parentId,
+      topLevelOnly: query.topLevelOnly,
+      limit: query.limit ?? 20,
+      offset: query.offset ?? 0,
+      publicOnly: false,
+    });
+    const ids = result.items.map((row) => String(row.id));
+    const tagsById = await this.repo.listDestinationTagsForMany(ids);
+    const items = result.items.map((row) => ({
+      ...row,
+      tags: tagsById.get(String(row.id)) ?? [],
+      sources: [],
+      media: [],
+    }));
+    return { ...result, items };
+  }
+
+  async getStaffDestination(id: string) {
+    return this.hydrateDestination(id);
+  }
+
+  async createDestination(
+    actor: AuthPrincipal,
+    input: {
+      slug: string;
+      nameEn: string;
+      nameAr: string;
+      countryCode: string;
+      cityId?: string | null;
+      parentId?: string | null;
+      shortDescriptionEn?: string;
+      shortDescriptionAr?: string;
+      summaryEn?: string;
+      summaryAr?: string;
+      descriptionEn?: string;
+      descriptionAr?: string;
+      timezone?: string;
+      latitude?: number | null;
+      longitude?: number | null;
+      addressText?: string;
+      websiteUrl?: string;
+      isFeatured?: boolean;
+      externalKey?: string;
+      tagSlugs?: string[];
+    },
+  ) {
+    this.assertStaff(actor);
+    await this.validateGeoAndParent({
+      countryCode: input.countryCode,
+      cityId: input.cityId,
+      parentId: input.parentId,
+      destinationId: null,
+    });
+
+    // Insert + optional initial tags are one transaction (no partial destination on tag failure).
+    const created = await this.repo.createDestination(
+      {
+        slug: input.slug,
+        nameEn: input.nameEn,
+        nameAr: input.nameAr,
+        countryCode: input.countryCode,
+        cityId: input.cityId,
+        parentId: input.parentId,
+        shortDescriptionEn: input.shortDescriptionEn,
+        shortDescriptionAr: input.shortDescriptionAr,
+        summaryEn: input.summaryEn,
+        summaryAr: input.summaryAr,
+        descriptionEn: input.descriptionEn,
+        descriptionAr: input.descriptionAr,
+        timezone: input.timezone,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        addressText: input.addressText,
+        websiteUrl: input.websiteUrl,
+        isFeatured: input.isFeatured,
+        externalKey: input.externalKey,
+      },
+      input.tagSlugs,
+    );
+    if (!created?.id) {
+      throw AppException.validation('Failed to create catalog destination');
+    }
+    const id = String(created.id);
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.create',
+      entityType: 'destination',
+      entityId: id,
+      after: {
+        slug: created.slug,
+        lifecycleStatus: created.lifecycleStatus ?? 'draft',
+        tagSlugs: input.tagSlugs ?? [],
+      },
+    });
+    return this.hydrateDestination(id);
+  }
+
+  async updateDestination(
+    actor: AuthPrincipal,
+    id: string,
+    input: {
+      slug?: string;
+      nameEn?: string;
+      nameAr?: string;
+      shortDescriptionEn?: string | null;
+      shortDescriptionAr?: string | null;
+      summaryEn?: string | null;
+      summaryAr?: string | null;
+      descriptionEn?: string | null;
+      descriptionAr?: string | null;
+      countryCode?: string;
+      cityId?: string | null;
+      parentId?: string | null;
+      timezone?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+      addressText?: string | null;
+      websiteUrl?: string | null;
+      isFeatured?: boolean;
+      externalKey?: string | null;
+    },
+  ) {
+    this.assertStaff(actor);
+    const current = await this.repo.getDestinationById(id);
+    if (!current) throw AppException.notFound('Destination not found');
+    const status = current.lifecycleStatus as LifecycleStatus;
+
+    if (!this.isAdmin(actor) && !isCreatableStatus(status)) {
+      throw AppException.forbidden(
+        'Operators may update only draft, pending_verification, or rejected destinations',
+      );
+    }
+
+    if (Object.prototype.hasOwnProperty.call(input, 'slug') && status === 'published') {
+      throw AppException.validation(
+        'Published destination slug cannot be changed via PATCH; use the audited redirect/alias operation',
+      );
+    }
+
+    const nextCountry = input.countryCode ?? String(current.countryCode);
+    const nextCityId =
+      input.cityId !== undefined ? input.cityId : (current.cityId as string | null);
+    const nextParentId =
+      input.parentId !== undefined ? input.parentId : (current.parentId as string | null);
+
+    if (
+      input.countryCode !== undefined ||
+      input.cityId !== undefined ||
+      input.parentId !== undefined
+    ) {
+      await this.validateGeoAndParent({
+        countryCode: nextCountry,
+        cityId: nextCityId,
+        parentId: nextParentId,
+        destinationId: id,
+      });
+    }
+
+    const updated = await this.repo.updateDestination(id, input);
+    if (!updated) throw AppException.notFound('Destination not found');
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.update',
+      entityType: 'destination',
+      entityId: id,
+      before: { slug: current.slug, lifecycleStatus: current.lifecycleStatus },
+      after: { slug: updated.slug, lifecycleStatus: updated.lifecycleStatus },
+    });
+    return this.hydrateDestination(id);
+  }
+
+  async transitionDestination(
+    actor: AuthPrincipal,
+    destinationId: string,
+    to: LifecycleStatus,
+    rejectionReason?: string,
+  ) {
+    this.assertStaff(actor);
+    const current = await this.repo.getDestinationLifecycle(destinationId);
+    if (!current) throw AppException.notFound('Destination not found');
+    const from = current.lifecycleStatus as LifecycleStatus;
+    try {
+      assertTransition(from, to);
+    } catch (err) {
+      throw AppException.validation(err instanceof Error ? err.message : 'Invalid transition');
+    }
+
+    if (ADMIN_ONLY_TARGETS.includes(to)) {
+      this.assertAdmin(actor);
+    }
+    if (!this.isAdmin(actor) && !isCreatableStatus(to) && to !== 'pending_verification') {
+      throw AppException.forbidden('Operators cannot perform this lifecycle action');
+    }
+    if (to === 'rejected' && !rejectionReason?.trim()) {
+      throw AppException.validation('rejectionReason is required when rejecting');
+    }
+
+    const updated = await this.repo.transitionDestination({
+      id: destinationId,
+      from,
+      to,
+      actorId: actor.userId,
+      rejectionReason,
+    });
+    if (!updated) {
+      const stillThere = await this.repo.getDestinationLifecycle(destinationId);
+      if (!stillThere) throw AppException.notFound('Destination not found');
+      throw AppException.conflict(
+        `Destination lifecycle changed concurrently (expected ${from}, found ${String(stillThere.lifecycleStatus)})`,
+      );
+    }
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: `catalog.destination.${to}`,
+      entityType: 'destination',
+      entityId: destinationId,
+      before: { lifecycleStatus: from },
+      after: { lifecycleStatus: to },
+      reason: rejectionReason,
+    });
+    return this.hydrateDestination(destinationId);
+  }
+
+  async replaceDestinationTags(actor: AuthPrincipal, id: string, tagSlugs: string[]) {
+    this.assertStaff(actor);
+    const current = await this.repo.getDestinationById(id);
+    if (!current) throw AppException.notFound('Destination not found');
+    const status = current.lifecycleStatus as LifecycleStatus;
+    if (!this.isAdmin(actor) && !isCreatableStatus(status)) {
+      throw AppException.forbidden(
+        'Operators may edit tags only on draft, pending_verification, or rejected destinations',
+      );
+    }
+
+    await this.repo.replaceDestinationTags(id, tagSlugs);
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.tags.replace',
+      entityType: 'destination',
+      entityId: id,
+      after: { tagSlugs },
+    });
+    return this.hydrateDestination(id);
+  }
+
+  private async hydrateDestination(id: string) {
+    const row = await this.repo.getDestinationById(id);
+    if (!row) throw AppException.notFound('Destination not found');
+    const [tags, sources, media] = await Promise.all([
+      this.repo.listDestinationTags(id),
+      this.repo.listDestinationSources(id),
+      this.repo.listDestinationMedia(id),
+    ]);
+    return { ...row, tags, sources, media };
+  }
+
+  private async validateGeoAndParent(input: {
+    countryCode: string;
+    cityId?: string | null;
+    parentId?: string | null;
+    destinationId: string | null;
+  }) {
+    const countryOk = await this.repo.countryExists(input.countryCode, true);
+    if (!countryOk) {
+      throw AppException.validation(`Unknown or inactive country code: ${input.countryCode}`);
+    }
+    if (input.cityId) {
+      const city = await this.repo.getCity(input.cityId);
+      if (!city) throw AppException.validation('City not found');
+      if (city.countryCode.toUpperCase() !== input.countryCode.toUpperCase()) {
+        throw AppException.validation('City does not belong to the specified country');
+      }
+    }
+    if (input.parentId) {
+      if (input.destinationId && input.parentId === input.destinationId) {
+        throw AppException.validation('Destination cannot be its own parent');
+      }
+      const cycle = await this.repo.wouldCreateParentCycle(input.destinationId, input.parentId);
+      if (cycle) {
+        throw AppException.validation('Parent destination would create a hierarchy cycle');
+      }
+    }
+  }
+
   async importCatalog(
     actor: AuthPrincipal,
     payload: unknown,
