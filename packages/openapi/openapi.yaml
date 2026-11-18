@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: Helm حلم API
+  description: |
+    Single source of truth for Helm حلم `/v1`.
+    Step 2 stub: health/meta only. Product endpoints land in later phases.
+  version: 0.1.0
+  contact:
+    name: Helmy Shehab
+servers:
+  - url: http://127.0.0.1:8080
+    description: Local helm-backend
+paths:
+  /v1/health:
+    get:
+      operationId: getHealth
+      summary: Liveness / readiness probe
+      tags: [meta]
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /v1/meta:
+    get:
+      operationId: getMeta
+      summary: Service metadata
+      tags: [meta]
+      responses:
+        "200":
+          description: Build / API metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaResponse"
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+          example: helm-backend
+        timestamp:
+          type: string
+          format: date-time
+    MetaResponse:
+      type: object
+      required: [name, version, apiVersion]
+      properties:
+        name:
+          type: string
+          example: Helm حلم
+        version:
+          type: string
+          example: 0.0.1
+        apiVersion:
+          type: string
+          example: v1
+    Problem:
+      type: object
+      description: RFC 7807 problem+json
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+        request_id:
+          type: string
+tags:
+  - name: meta
+    description: Health and service metadata (Step 2 stub)

@@ -1,0 +1,25 @@
+{
+  "name": "@helm/api-client-ts",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Generated TypeScript client for Helm حلم /v1 — DO NOT EDIT generated sources",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "codegen": "node ./scripts/codegen.mjs",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "node ./scripts/codegen.mjs --check-header"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

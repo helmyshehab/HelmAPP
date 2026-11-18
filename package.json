@@ -1,0 +1,22 @@
+{
+  "name": "helm-platform",
+  "private": true,
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=22 <23",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "codegen": "pnpm --filter @helm/openapi codegen && pnpm --filter @helm/api-client-ts codegen && pnpm --filter @helm/api-client-dart codegen",
+    "codegen:check": "pnpm codegen && git diff --exit-code -- packages/api-client-ts packages/api-client-dart || (echo 'Generated clients are dirty. Do not hand-edit; regenerate from OpenAPI.' && exit 1)",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "2.11.13",
+    "typescript": "5.9.3"
+  }
+}

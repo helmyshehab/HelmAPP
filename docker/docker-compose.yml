@@ -1,0 +1,36 @@
+# Helm حلم — local infrastructure (free / open-source)
+# Preferred path: Supabase CLI (`supabase start`) which manages Auth + DB + Storage.
+# This Compose file provides a plain Postgres fallback for migration apply / CI-like checks.
+
+name: helm-platform
+
+services:
+  postgres:
+    image: postgres:15.14
+    container_name: helm-postgres
+    restart: unless-stopped
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - helm_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional local mail catcher for NOTIFY_PROVIDER=console alternatives later
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: helm-mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    profiles: ["notify"]
+
+volumes:
+  helm_pg_data:
