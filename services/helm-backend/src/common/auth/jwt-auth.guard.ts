@@ -5,16 +5,16 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AUTH_PORT, type AuthPort } from '../../infrastructure/ports/auth.port';
 import { AppException } from '../errors/app.exception';
-import { IS_PUBLIC_KEY } from './public.decorator';
 import type { AuthedRequest } from './current-user.decorator';
+import { PrincipalResolver } from './principal-resolver.service';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     @Inject(Reflector) private readonly reflector: Reflector,
-    @Inject(AUTH_PORT) private readonly auth: AuthPort,
+    @Inject(PrincipalResolver) private readonly principals: PrincipalResolver,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -33,7 +33,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!token) {
       throw AppException.unauthorized('Missing Bearer access token');
     }
-    req.user = await this.auth.verifyAccessToken(token);
+    req.user = await this.principals.resolveFromAccessToken(token);
     return true;
   }
 }

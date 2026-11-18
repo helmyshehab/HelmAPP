@@ -2,7 +2,7 @@
 
 Monorepo for **Helm حلم** (GitHub: `helmyshehab/HelmAPP`). Egypt-outbound travel MVP foundation: Flutter mobile, Next.js web + admin, NestJS modular monolith, OpenAPI `/v1`, Supabase Auth/Postgres/Storage.
 
-> **Platform foundation in progress.** Step 2 scaffold is on `main`. Step 3 adds NestJS backend foundation (authz, logging, errors, readiness). No travel product features yet.
+> **Platform foundation in progress.** Steps 2–3 are on `main`. Step 4 expands database/identity (markets, geo, catalog places, pricing provenance, DB roles + RLS). No booking/AI/payments product features yet.
 
 ## Layout
 

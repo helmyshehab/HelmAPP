@@ -112,6 +112,11 @@ export interface components {
             /** Format: email */
             email?: string;
             roles: components["schemas"]["AppRole"][];
+            /**
+             * @description database = identity.user_roles; fallback = fail-closed customer-only
+             * @enum {string}
+             */
+            rolesSource: "database" | "fallback";
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";

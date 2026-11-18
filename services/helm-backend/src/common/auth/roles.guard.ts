@@ -5,6 +5,12 @@ import { AppException } from '../errors/app.exception';
 import type { AuthedRequest } from './current-user.decorator';
 import { ROLES_KEY } from './roles.decorator';
 
+const STAFF_ROLES: readonly AppRole[] = [
+  'operator',
+  'administrator',
+  'super-administrator',
+];
+
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(@Inject(Reflector) private readonly reflector: Reflector) {}
@@ -17,7 +23,18 @@ export class RolesGuard implements CanActivate {
     if (!required || required.length === 0) return true;
 
     const req = context.switchToHttp().getRequest<AuthedRequest>();
-    const roles = req.user?.roles ?? [];
+    const user = req.user;
+    if (!user) {
+      throw AppException.unauthorized('Authentication required');
+    }
+
+    const needsStaff = required.some((role) => STAFF_ROLES.includes(role));
+    if (needsStaff && user.rolesSource !== 'database') {
+      // Fail closed: cannot privilege-check without DB-backed roles.
+      throw AppException.forbidden('Authorization roles unavailable');
+    }
+
+    const roles = user.roles ?? [];
     const allowed = required.some((role) => roles.includes(role));
     if (!allowed) {
       throw AppException.forbidden(`Requires one of roles: ${required.join(', ')}`);

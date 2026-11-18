@@ -2,7 +2,6 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignJWT, jwtVerify } from 'jose';
 import { APP_ENV, type AppEnv } from '../../config/env';
 import {
-  APP_ROLES,
   type AppRole,
   type AuthPort,
   type AuthPrincipal,
@@ -10,10 +9,6 @@ import {
 
 const encoder = new TextEncoder();
 export const MOCK_JWT_ISSUER = 'helm://mock-auth';
-
-function isAppRole(value: unknown): value is AppRole {
-  return typeof value === 'string' && (APP_ROLES as readonly string[]).includes(value);
-}
 
 /**
  * MOCK AuthPort for local/CI — issues and verifies HS256 JWTs with SUPABASE_JWT_SECRET.
@@ -65,17 +60,12 @@ export class MockAuthAdapter implements AuthPort {
       if (!userId) {
         throw new UnauthorizedException('Token missing subject');
       }
-      // Trust only app_metadata (not user_metadata — client-writable in Supabase).
-      const meta = (payload.app_metadata ?? {}) as { roles?: unknown };
-      const rolesRaw = Array.isArray(meta.roles) ? meta.roles : ['customer'];
-      const roles = rolesRaw.filter(isAppRole);
-      if (!roles.includes('customer')) {
-        roles.push('customer');
-      }
+      // Identity only — staff authorization comes from identity.user_roles via PrincipalResolver.
       return {
         userId,
         email: typeof payload.email === 'string' ? payload.email : undefined,
-        roles,
+        roles: ['customer'],
+        rolesSource: 'fallback',
         tokenUse: typeof payload.role === 'string' ? payload.role : undefined,
       };
     } catch (err) {

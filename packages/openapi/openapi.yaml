@@ -135,7 +135,7 @@ components:
           example: v1
     MeResponse:
       type: object
-      required: [userId, roles]
+      required: [userId, roles, rolesSource]
       properties:
         userId:
           type: string
@@ -147,6 +147,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AppRole"
+        rolesSource:
+          type: string
+          description: database = identity.user_roles; fallback = fail-closed customer-only
+          enum: [database, fallback]
     AppRole:
       type: string
       enum: [customer, operator, administrator, super-administrator]

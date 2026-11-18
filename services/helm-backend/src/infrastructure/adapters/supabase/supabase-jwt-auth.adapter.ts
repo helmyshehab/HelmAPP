@@ -1,18 +1,9 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyOptions } from 'jose';
 import { APP_ENV, resolveJwtIssuer, type AppEnv } from '../../config/env';
-import {
-  APP_ROLES,
-  type AppRole,
-  type AuthPort,
-  type AuthPrincipal,
-} from '../../ports/auth.port';
+import { type AuthPort, type AuthPrincipal } from '../../ports/auth.port';
 
 const encoder = new TextEncoder();
-
-function isAppRole(value: unknown): value is AppRole {
-  return typeof value === 'string' && (APP_ROLES as readonly string[]).includes(value);
-}
 
 /**
  * Supabase JWT AuthPort — verifies access tokens via JWKS (hosted/local Supabase)
@@ -63,15 +54,12 @@ export class SupabaseJwtAuthAdapter implements AuthPort {
         throw new UnauthorizedException('Token missing subject');
       }
 
-      const appMeta = (payload.app_metadata ?? {}) as { roles?: unknown };
-      const rolesRaw = Array.isArray(appMeta.roles) ? appMeta.roles : ['customer'];
-      const roles = rolesRaw.filter(isAppRole);
-      if (!roles.includes('customer')) roles.push('customer');
-
+      // Identity only — staff authorization comes from identity.user_roles via PrincipalResolver.
       return {
         userId,
         email: typeof payload.email === 'string' ? payload.email : undefined,
-        roles,
+        roles: ['customer'],
+        rolesSource: 'fallback',
         tokenUse: typeof payload.role === 'string' ? payload.role : undefined,
       };
     } catch (err) {

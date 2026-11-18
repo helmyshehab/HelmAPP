@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/auth/jwt-auth.guard';
+import { PrincipalResolver } from './common/auth/principal-resolver.service';
 import { RolesGuard } from './common/auth/roles.guard';
 import { ProblemDetailsFilter } from './common/errors/problem.filter';
 import { RequestIdMiddleware } from './common/http/request-id.middleware';
@@ -37,6 +38,7 @@ import { TripBuilderModule } from './modules/trip_builder/trip_builder.module';
   ],
   providers: [
     StructuredLogger,
+    PrincipalResolver,
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
