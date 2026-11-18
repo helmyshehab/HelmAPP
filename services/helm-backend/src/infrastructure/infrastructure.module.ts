@@ -1,6 +1,6 @@
-import { Global, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
-import { APP_ENV, type AppEnv } from './config/env';
+import { APP_ENV, loadEnv, type AppEnv } from './config/env';
 import { MockAiAdapter } from './adapters/mock/mock-ai.adapter';
 import { MockAuthAdapter } from './adapters/mock/mock-auth.adapter';
 import { MockFlightAdapter } from './adapters/mock/mock-flight.adapter';
@@ -21,46 +21,62 @@ import {
 
 /**
  * Wires infrastructure adapters. Domain modules depend on ports only.
- * Default local path uses MOCK auth + provider adapters (no paid APIs).
+ * Mock auth is registered only when AUTH_PROVIDER=mock (never in production — loadEnv forbids it).
  */
 @Global()
-@Module({
-  imports: [ConfigModule],
-  providers: [
-    MockAuthAdapter,
-    SupabaseJwtAuthAdapter,
-    SystemClockAdapter,
-    MockStorageAdapter,
-    MockPaymentAdapter,
-    MockAiAdapter,
-    MockFlightAdapter,
-    MockNotifyAdapter,
-    {
-      provide: AUTH_PORT,
-      inject: [APP_ENV, MockAuthAdapter, SupabaseJwtAuthAdapter],
-      useFactory: (
-        env: AppEnv,
-        mockAuth: MockAuthAdapter,
-        supabaseAuth: SupabaseJwtAuthAdapter,
-      ) => (env.AUTH_PROVIDER === 'supabase_jwt' ? supabaseAuth : mockAuth),
-    },
-    { provide: CLOCK_PORT, useExisting: SystemClockAdapter },
-    { provide: STORAGE_PORT, useExisting: MockStorageAdapter },
-    { provide: PAYMENT_PORT, useExisting: MockPaymentAdapter },
-    { provide: AI_PORT, useExisting: MockAiAdapter },
-    { provide: FLIGHT_PORT, useExisting: MockFlightAdapter },
-    { provide: NOTIFY_PORT, useExisting: MockNotifyAdapter },
-  ],
-  exports: [
-    ConfigModule,
-    AUTH_PORT,
-    CLOCK_PORT,
-    STORAGE_PORT,
-    PAYMENT_PORT,
-    AI_PORT,
-    FLIGHT_PORT,
-    NOTIFY_PORT,
-    MockAuthAdapter,
-  ],
-})
-export class InfrastructureModule {}
+@Module({})
+export class InfrastructureModule {
+  static forRoot(source: NodeJS.ProcessEnv = process.env): DynamicModule {
+    const env = loadEnv(source);
+    const useMockAuth = env.AUTH_PROVIDER === 'mock';
+
+    const authProviders = useMockAuth
+      ? [
+          MockAuthAdapter,
+          { provide: AUTH_PORT, useExisting: MockAuthAdapter },
+        ]
+      : [
+          SupabaseJwtAuthAdapter,
+          { provide: AUTH_PORT, useExisting: SupabaseJwtAuthAdapter },
+        ];
+
+    return {
+      module: InfrastructureModule,
+      imports: [ConfigModule],
+      providers: [
+        {
+          provide: APP_ENV,
+          useValue: env,
+        },
+        ...authProviders,
+        SystemClockAdapter,
+        MockStorageAdapter,
+        MockPaymentAdapter,
+        MockAiAdapter,
+        MockFlightAdapter,
+        MockNotifyAdapter,
+        { provide: CLOCK_PORT, useExisting: SystemClockAdapter },
+        { provide: STORAGE_PORT, useExisting: MockStorageAdapter },
+        { provide: PAYMENT_PORT, useExisting: MockPaymentAdapter },
+        { provide: AI_PORT, useExisting: MockAiAdapter },
+        { provide: FLIGHT_PORT, useExisting: MockFlightAdapter },
+        { provide: NOTIFY_PORT, useExisting: MockNotifyAdapter },
+      ],
+      exports: [
+        ConfigModule,
+        APP_ENV,
+        AUTH_PORT,
+        CLOCK_PORT,
+        STORAGE_PORT,
+        PAYMENT_PORT,
+        AI_PORT,
+        FLIGHT_PORT,
+        NOTIFY_PORT,
+        ...(useMockAuth ? [MockAuthAdapter] : []),
+      ],
+    };
+  }
+}
+
+/** @deprecated type helper for tests */
+export type { AppEnv };

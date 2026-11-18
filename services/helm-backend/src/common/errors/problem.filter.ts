@@ -8,6 +8,7 @@ import {
   Optional,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { APP_ENV, type AppEnv } from '../../infrastructure/config/env';
 import { StructuredLogger } from '../logging/structured-logger';
 import { AppException } from './app.exception';
 
@@ -22,7 +23,10 @@ export type ProblemDetails = {
 
 @Catch()
 export class ProblemDetailsFilter implements ExceptionFilter {
-  constructor(@Optional() @Inject(StructuredLogger) private readonly logger?: StructuredLogger) {}
+  constructor(
+    @Optional() @Inject(StructuredLogger) private readonly logger?: StructuredLogger,
+    @Optional() @Inject(APP_ENV) private readonly env?: AppEnv,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -75,7 +79,9 @@ export class ProblemDetailsFilter implements ExceptionFilter {
               ? 'NOT_FOUND'
               : status === HttpStatus.BAD_REQUEST
                 ? 'BAD_REQUEST'
-                : 'INTERNAL_ERROR';
+                : status >= 500
+                  ? 'INTERNAL_ERROR'
+                  : 'BAD_REQUEST';
 
       return {
         type: `https://helm.app/errors/${code.toLowerCase().replace(/_/g, '-')}`,
@@ -87,13 +93,13 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       };
     }
 
-    const detail =
-      exception instanceof Error ? exception.message : 'An unexpected error occurred';
+    const isProd = this.env?.NODE_ENV === 'production';
     this.logger?.error(
       {
         msg: 'unhandled_exception',
-        detail,
-        stack: exception instanceof Error ? exception.stack : undefined,
+        detail: exception instanceof Error ? exception.message : 'unknown',
+        // Stack traces stay server-side and only outside production.
+        ...(isProd || !(exception instanceof Error) ? {} : { stack: exception.stack }),
       },
       undefined,
       'ProblemDetailsFilter',

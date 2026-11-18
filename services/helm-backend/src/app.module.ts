@@ -21,7 +21,7 @@ import { TripBuilderModule } from './modules/trip_builder/trip_builder.module';
 
 @Module({
   imports: [
-    InfrastructureModule,
+    InfrastructureModule.forRoot(),
     MetaModule,
     IdentityModule,
     CatalogModule,

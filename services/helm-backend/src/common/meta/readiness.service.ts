@@ -11,8 +11,12 @@ export type ReadinessResult = {
 };
 
 /**
- * Readiness checks — process is up; optionally verifies DATABASE_URL connectivity.
- * Does not implement product features.
+ * Readiness checks — distinct from liveness.
+ * - Liveness (/health): process is up.
+ * - Readiness (/ready): required dependencies for traffic.
+ *
+ * In production, DATABASE_URL is required at boot; a failed DB ping → unavailable.
+ * Outside production, missing DATABASE_URL is reported as skipped/degraded (not "ok").
  */
 @Injectable()
 export class ReadinessService {
@@ -21,9 +25,9 @@ export class ReadinessService {
   async check(): Promise<ReadinessResult> {
     if (!this.env.DATABASE_URL) {
       return {
-        status: 'ok',
+        status: 'degraded',
         checks: { database: 'skipped' },
-        detail: 'DATABASE_URL not set; readiness skipped DB check',
+        detail: 'DATABASE_URL not set; readiness cannot confirm database',
       };
     }
 
@@ -37,7 +41,12 @@ export class ReadinessService {
       await sql`select 1`;
       return { status: 'ok', checks: { database: 'ok' } };
     } catch (err) {
-      const detail = err instanceof Error ? err.message : 'database check failed';
+      const raw = err instanceof Error ? err.message : 'database check failed';
+      // Never echo connection strings / host details to API clients in production.
+      const detail =
+        this.env.NODE_ENV === 'production'
+          ? 'database check failed'
+          : sanitizeDbError(raw);
       return {
         status: 'unavailable',
         checks: { database: 'failed' },
@@ -49,4 +58,11 @@ export class ReadinessService {
       }
     }
   }
+}
+
+function sanitizeDbError(message: string): string {
+  return message
+    .replace(/postgresql:\/\/[^\s]+/gi, 'postgresql://***')
+    .replace(/password=[^\s&]+/gi, 'password=***')
+    .slice(0, 200);
 }

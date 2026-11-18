@@ -1,14 +1,9 @@
 import { Global, Module } from '@nestjs/common';
-import { APP_ENV, loadEnv } from './env';
 
+/**
+ * Marker module for config exports.
+ * APP_ENV is provided once by InfrastructureModule.forRoot() after loadEnv().
+ */
 @Global()
-@Module({
-  providers: [
-    {
-      provide: APP_ENV,
-      useFactory: () => loadEnv(),
-    },
-  ],
-  exports: [APP_ENV],
-})
+@Module({})
 export class ConfigModule {}

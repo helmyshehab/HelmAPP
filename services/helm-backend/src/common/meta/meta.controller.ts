@@ -1,7 +1,7 @@
-import { Controller, Get, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { APP_ENV, type AppEnv } from '../../infrastructure/config/env';
 import { Public } from '../auth/public.decorator';
-import { AppException } from '../errors/app.exception';
 import { ReadinessService } from './readiness.service';
 
 @Public()
@@ -12,7 +12,7 @@ export class MetaController {
     @Inject(ReadinessService) private readonly readiness: ReadinessService,
   ) {}
 
-  /** Liveness — process is running. */
+  /** Liveness — process is running (no dependency checks). */
   @Get('health')
   getHealth() {
     return {
@@ -22,26 +22,23 @@ export class MetaController {
     };
   }
 
-  /** Readiness — safe for load balancers; 503 when DB configured but unreachable. */
+  /**
+   * Readiness — load balancers should use this, not /health.
+   * Returns ReadyResponse body on both 200 and 503 (OpenAPI contract).
+   */
   @Get('ready')
-  async getReady() {
+  async getReady(@Res({ passthrough: true }) res: Response) {
     const result = await this.readiness.check();
-    const body = {
+    if (result.status === 'unavailable') {
+      res.status(503);
+    }
+    return {
       status: result.status,
       service: 'helm-backend',
       checks: result.checks,
       detail: result.detail,
       timestamp: new Date().toISOString(),
     };
-    if (result.status === 'unavailable') {
-      throw new AppException({
-        status: HttpStatus.SERVICE_UNAVAILABLE,
-        code: 'NOT_READY',
-        title: 'Service unavailable',
-        detail: result.detail ?? 'Readiness checks failed',
-      });
-    }
-    return body;
   }
 
   @Get('meta')
