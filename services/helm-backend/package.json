@@ -1,0 +1,31 @@
+{
+  "name": "@helm/helm-backend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Helm حلم NestJS modular monolith (Step 2 skeleton)",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/health.test.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.11",
+    "@nestjs/core": "11.2.11",
+    "@nestjs/platform-express": "11.2.11",
+    "drizzle-orm": "0.45.4",
+    "postgres": "3.4.7",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.3",
+    "@types/node": "22.18.6",
+    "tsx": "4.20.5",
+    "typescript": "5.9.3"
+  }
+}

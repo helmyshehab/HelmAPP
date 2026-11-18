@@ -1,0 +1,11 @@
+{
+  "name": "@helm/openapi",
+  "version": "0.0.1",
+  "private": true,
+  "description": "OpenAPI 3 single source of truth for Helm حلم /v1",
+  "scripts": {
+    "codegen": "node ./scripts/validate-stub.mjs",
+    "lint": "node ./scripts/validate-stub.mjs"
+  },
+  "files": ["openapi.yaml"]
+}

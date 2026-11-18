@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+.next/
+.turbo/
+*.tsbuildinfo
+coverage/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Flutter
+apps/helm_mobile/.dart_tool/
+apps/helm_mobile/.packages
+apps/helm_mobile/.flutter-plugins
+apps/helm_mobile/.flutter-plugins-dependencies
+apps/helm_mobile/pubspec.lock
+apps/helm_mobile/.pub-cache/
+apps/helm_mobile/build/
+apps/helm_mobile/ios/Pods/
+apps/helm_mobile/ios/.symlinks/
+apps/helm_mobile/android/.gradle/
+apps/helm_mobile/android/local.properties
+
+# Supabase / Docker
+supabase/.branches/
+supabase/.temp/
+docker/volumes/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Generated (tracked intentionally — CI verifies regen cleanliness)
+# packages/api-client-*/src and lib are committed after codegen

@@ -1,0 +1,13 @@
+name: helm_api_client
+description: Generated Dart client for Helm حلم /v1 — DO NOT EDIT generated sources
+publish_to: "none"
+version: 0.0.1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  http: 1.2.2
+
+dev_dependencies:
+  lints: 5.1.1
