@@ -206,40 +206,45 @@ export class CatalogAdminService {
       destinationId: null,
     });
 
-    const created = await this.repo.createDestination({
-      slug: input.slug,
-      nameEn: input.nameEn,
-      nameAr: input.nameAr,
-      countryCode: input.countryCode,
-      cityId: input.cityId,
-      parentId: input.parentId,
-      shortDescriptionEn: input.shortDescriptionEn,
-      shortDescriptionAr: input.shortDescriptionAr,
-      summaryEn: input.summaryEn,
-      summaryAr: input.summaryAr,
-      descriptionEn: input.descriptionEn,
-      descriptionAr: input.descriptionAr,
-      timezone: input.timezone,
-      latitude: input.latitude,
-      longitude: input.longitude,
-      addressText: input.addressText,
-      websiteUrl: input.websiteUrl,
-      isFeatured: input.isFeatured,
-      externalKey: input.externalKey,
-    });
+    // Insert + optional initial tags are one transaction (no partial destination on tag failure).
+    const created = await this.repo.createDestination(
+      {
+        slug: input.slug,
+        nameEn: input.nameEn,
+        nameAr: input.nameAr,
+        countryCode: input.countryCode,
+        cityId: input.cityId,
+        parentId: input.parentId,
+        shortDescriptionEn: input.shortDescriptionEn,
+        shortDescriptionAr: input.shortDescriptionAr,
+        summaryEn: input.summaryEn,
+        summaryAr: input.summaryAr,
+        descriptionEn: input.descriptionEn,
+        descriptionAr: input.descriptionAr,
+        timezone: input.timezone,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        addressText: input.addressText,
+        websiteUrl: input.websiteUrl,
+        isFeatured: input.isFeatured,
+        externalKey: input.externalKey,
+      },
+      input.tagSlugs,
+    );
     if (!created?.id) {
       throw AppException.validation('Failed to create catalog destination');
     }
     const id = String(created.id);
-    if (input.tagSlugs?.length) {
-      await this.repo.replaceDestinationTags(id, input.tagSlugs);
-    }
     await this.audit.record({
       actorUserId: actor.userId,
       action: 'catalog.destination.create',
       entityType: 'destination',
       entityId: id,
-      after: { slug: created.slug, lifecycleStatus: created.lifecycleStatus ?? 'draft' },
+      after: {
+        slug: created.slug,
+        lifecycleStatus: created.lifecycleStatus ?? 'draft',
+        tagSlugs: input.tagSlugs ?? [],
+      },
     });
     return this.hydrateDestination(id);
   }
@@ -347,11 +352,18 @@ export class CatalogAdminService {
 
     const updated = await this.repo.transitionDestination({
       id: destinationId,
+      from,
       to,
       actorId: actor.userId,
       rejectionReason,
     });
-    if (!updated) throw AppException.notFound('Destination not found');
+    if (!updated) {
+      const stillThere = await this.repo.getDestinationLifecycle(destinationId);
+      if (!stillThere) throw AppException.notFound('Destination not found');
+      throw AppException.conflict(
+        `Destination lifecycle changed concurrently (expected ${from}, found ${String(stillThere.lifecycleStatus)})`,
+      );
+    }
 
     await this.audit.record({
       actorUserId: actor.userId,

@@ -264,3 +264,208 @@ test('destination admin CRUD, lifecycle, tags, geo, audit, authz', async (t) => 
     void repo;
   });
 });
+
+test('createDestination + invalid initial tags rolls back destination row', async (t) => {
+  if (!databaseUrl) {
+    t.skip('DATABASE_URL not set');
+    return;
+  }
+
+  await withServices(async ({ admin, db }) => {
+    const runId = `atom${Date.now()}`;
+    const slug = `atomic-fail-${runId}`;
+    await db.execute(sql`
+      insert into geo.countries (code, name_en, is_active)
+      values ('EG', 'Egypt', true)
+      on conflict (code) do update set is_active = true
+    `);
+
+    try {
+      await admin.createDestination(adminActor, {
+        slug,
+        nameEn: 'Atomic Fail',
+        nameAr: 'فشل',
+        countryCode: 'EG',
+        tagSlugs: [`does-not-exist-${runId}`],
+      });
+      assert.fail('invalid tags should fail create');
+    } catch (err) {
+      assert.ok(err instanceof AppException);
+      assert.equal(err.code, 'VALIDATION_FAILED');
+    }
+
+    const leftover = await db.execute(sql`
+      select id from catalog.destinations where slug = ${slug} limit 1
+    `);
+    assert.equal((leftover as unknown as unknown[]).length, 0);
+  });
+});
+
+test('createDestination persists valid initial tags atomically', async (t) => {
+  if (!databaseUrl) {
+    t.skip('DATABASE_URL not set');
+    return;
+  }
+
+  await withServices(async ({ admin, db }) => {
+    const runId = `oktag${Date.now()}`;
+    const slug = `atomic-ok-${runId}`;
+    const tagA = `alpha-${runId}`;
+    const tagB = `beta-${runId}`;
+    await db.execute(sql`
+      insert into geo.countries (code, name_en, is_active)
+      values ('EG', 'Egypt', true)
+      on conflict (code) do update set is_active = true
+    `);
+    await db.execute(sql`
+      insert into catalog.tags (slug, name_en, name_ar, is_active)
+      values (${tagA}, 'Alpha', 'أ', true), (${tagB}, 'Beta', 'ب', true)
+      on conflict (slug) do nothing
+    `);
+
+    const created = await admin.createDestination(adminActor, {
+      slug,
+      nameEn: 'Atomic Ok',
+      nameAr: 'نجاح',
+      countryCode: 'EG',
+      tagSlugs: [tagA, tagB],
+    });
+    assert.equal(created.lifecycleStatus, 'draft');
+    assert.deepEqual(
+      (created.tags as { slug: string }[]).map((x) => x.slug).sort(),
+      [tagA, tagB].sort(),
+    );
+
+    await db.execute(sql`delete from catalog.destinations where id = ${String(created.id)}::uuid`);
+    await db.execute(sql`delete from catalog.tags where slug in (${tagA}, ${tagB})`);
+  });
+});
+
+test('PUT tag replace rolls back on invalid tag and keeps prior tags', async (t) => {
+  if (!databaseUrl) {
+    t.skip('DATABASE_URL not set');
+    return;
+  }
+
+  await withServices(async ({ admin, db }) => {
+    const runId = `repl${Date.now()}`;
+    const slug = `replace-${runId}`;
+    const keep = `keep-${runId}`;
+    const next = `next-${runId}`;
+    await db.execute(sql`
+      insert into geo.countries (code, name_en, is_active)
+      values ('EG', 'Egypt', true)
+      on conflict (code) do update set is_active = true
+    `);
+    await db.execute(sql`
+      insert into catalog.tags (slug, name_en, name_ar, is_active)
+      values (${keep}, 'Keep', 'ك', true), (${next}, 'Next', 'ن', true)
+      on conflict (slug) do nothing
+    `);
+
+    const created = await admin.createDestination(adminActor, {
+      slug,
+      nameEn: 'Replace Target',
+      nameAr: 'استبدال',
+      countryCode: 'EG',
+      tagSlugs: [keep],
+    });
+    const id = String(created.id);
+
+    const replaced = await admin.replaceDestinationTags(adminActor, id, [next]);
+    assert.deepEqual(
+      (replaced.tags as { slug: string }[]).map((x) => x.slug),
+      [next],
+    );
+
+    const cleared = await admin.replaceDestinationTags(adminActor, id, []);
+    assert.equal((cleared.tags as unknown[]).length, 0);
+
+    await admin.replaceDestinationTags(adminActor, id, [keep]);
+    try {
+      await admin.replaceDestinationTags(adminActor, id, [`missing-${runId}`, next]);
+      assert.fail('invalid tag replace should fail');
+    } catch (err) {
+      assert.ok(err instanceof AppException);
+      assert.equal(err.code, 'VALIDATION_FAILED');
+    }
+
+    const afterFail = await admin.getStaffDestination(id);
+    assert.deepEqual(
+      (afterFail.tags as { slug: string }[]).map((x) => x.slug),
+      [keep],
+      'prior tags must remain after failed replace',
+    );
+
+    await db.execute(sql`delete from catalog.destinations where id = ${id}::uuid`);
+    await db.execute(sql`delete from catalog.tags where slug in (${keep}, ${next})`);
+  });
+});
+
+test('stale lifecycle transition is rejected with CONFLICT (optimistic concurrency)', async (t) => {
+  if (!databaseUrl) {
+    t.skip('DATABASE_URL not set');
+    return;
+  }
+
+  await withServices(async ({ admin, repo, db }) => {
+    const runId = `race${Date.now()}`;
+    const slug = `race-${runId}`;
+    await db.execute(sql`
+      insert into geo.countries (code, name_en, is_active)
+      values ('EG', 'Egypt', true)
+      on conflict (code) do update set is_active = true
+    `);
+
+    const created = await admin.createDestination(adminActor, {
+      slug,
+      nameEn: 'Race Dest',
+      nameAr: 'سباق',
+      countryCode: 'EG',
+    });
+    const id = String(created.id);
+
+    const pending = await admin.transitionDestination(adminActor, id, 'pending_verification');
+    assert.equal(pending.lifecycleStatus, 'pending_verification');
+
+    // Stale writer still believes status is draft — optimistic WHERE must no-op.
+    const stale = await repo.transitionDestination({
+      id,
+      from: 'draft',
+      to: 'rejected',
+      actorId: adminActor.userId,
+      rejectionReason: 'stale writer',
+    });
+    assert.equal(stale, null, 'optimistic update must not overwrite newer status');
+
+    const stillPending = await admin.getStaffDestination(id);
+    assert.equal(stillPending.lifecycleStatus, 'pending_verification');
+
+    // Service maps a missed optimistic update to HTTP 409 CONFLICT.
+    // Simulate: wrap repo so the first lifecycle read sees draft, but the row is already pending.
+    const originalGet = repo.getDestinationLifecycle.bind(repo);
+    let reads = 0;
+    repo.getDestinationLifecycle = async (destId: string) => {
+      reads += 1;
+      if (reads === 1) {
+        return { id: destId, slug, lifecycleStatus: 'draft' };
+      }
+      return originalGet(destId);
+    };
+    try {
+      await admin.transitionDestination(adminActor, id, 'archived');
+      assert.fail('stale service transition should conflict');
+    } catch (err) {
+      assert.ok(err instanceof AppException);
+      assert.equal(err.code, 'CONFLICT');
+      assert.equal(err.getStatus(), 409);
+    } finally {
+      repo.getDestinationLifecycle = originalGet;
+    }
+
+    const unchanged = await admin.getStaffDestination(id);
+    assert.equal(unchanged.lifecycleStatus, 'pending_verification');
+
+    await db.execute(sql`delete from catalog.destinations where id = ${id}::uuid`);
+  });
+});

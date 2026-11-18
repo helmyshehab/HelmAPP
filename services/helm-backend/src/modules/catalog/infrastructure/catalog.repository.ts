@@ -768,66 +768,78 @@ export class CatalogRepository {
     return Boolean(row.hitsSelf || row.hasLoop);
   }
 
-  async createDestination(input: {
-    slug: string;
-    nameEn: string;
-    nameAr: string;
-    countryCode: string;
-    cityId?: string | null;
-    parentId?: string | null;
-    shortDescriptionEn?: string | null;
-    shortDescriptionAr?: string | null;
-    summaryEn?: string | null;
-    summaryAr?: string | null;
-    descriptionEn?: string | null;
-    descriptionAr?: string | null;
-    timezone?: string | null;
-    latitude?: number | null;
-    longitude?: number | null;
-    addressText?: string | null;
-    websiteUrl?: string | null;
-    isFeatured?: boolean;
-    externalKey?: string | null;
-  }) {
+  async createDestination(
+    input: {
+      slug: string;
+      nameEn: string;
+      nameAr: string;
+      countryCode: string;
+      cityId?: string | null;
+      parentId?: string | null;
+      shortDescriptionEn?: string | null;
+      shortDescriptionAr?: string | null;
+      summaryEn?: string | null;
+      summaryAr?: string | null;
+      descriptionEn?: string | null;
+      descriptionAr?: string | null;
+      timezone?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+      addressText?: string | null;
+      websiteUrl?: string | null;
+      isFeatured?: boolean;
+      externalKey?: string | null;
+    },
+    tagSlugs?: string[],
+  ) {
     const db = this.requireDb();
+    const initialTags = tagSlugs ?? [];
     try {
-      const rows = await db.execute(sql`
-        insert into catalog.destinations (
-          slug, name_en, name_ar, country_code, city_id, parent_id,
-          short_description_en, short_description_ar,
-          summary_en, summary_ar, description_en, description_ar,
-          timezone, latitude, longitude, address_text, website_url,
-          is_featured, external_key, lifecycle_status
-        ) values (
-          ${input.slug},
-          ${input.nameEn},
-          ${input.nameAr},
-          ${input.countryCode.toUpperCase()},
-          ${input.cityId ?? null}::uuid,
-          ${input.parentId ?? null}::uuid,
-          ${input.shortDescriptionEn ?? null},
-          ${input.shortDescriptionAr ?? null},
-          ${input.summaryEn ?? null},
-          ${input.summaryAr ?? null},
-          ${input.descriptionEn ?? null},
-          ${input.descriptionAr ?? null},
-          ${input.timezone ?? null},
-          ${input.latitude ?? null},
-          ${input.longitude ?? null},
-          ${input.addressText ?? null},
-          ${input.websiteUrl ?? null},
-          ${input.isFeatured ?? false},
-          ${input.externalKey ?? null},
-          'draft'
-        )
-        returning id
-      `);
-      const created = (rows as unknown as { id: string }[])[0];
-      if (!created?.id) throw AppException.validation('Failed to create destination');
-      return this.getDestinationById(String(created.id));
+      const id = await db.transaction(async (tx) => {
+        const rows = await tx.execute(sql`
+          insert into catalog.destinations (
+            slug, name_en, name_ar, country_code, city_id, parent_id,
+            short_description_en, short_description_ar,
+            summary_en, summary_ar, description_en, description_ar,
+            timezone, latitude, longitude, address_text, website_url,
+            is_featured, external_key, lifecycle_status
+          ) values (
+            ${input.slug},
+            ${input.nameEn},
+            ${input.nameAr},
+            ${input.countryCode.toUpperCase()},
+            ${input.cityId ?? null}::uuid,
+            ${input.parentId ?? null}::uuid,
+            ${input.shortDescriptionEn ?? null},
+            ${input.shortDescriptionAr ?? null},
+            ${input.summaryEn ?? null},
+            ${input.summaryAr ?? null},
+            ${input.descriptionEn ?? null},
+            ${input.descriptionAr ?? null},
+            ${input.timezone ?? null},
+            ${input.latitude ?? null},
+            ${input.longitude ?? null},
+            ${input.addressText ?? null},
+            ${input.websiteUrl ?? null},
+            ${input.isFeatured ?? false},
+            ${input.externalKey ?? null},
+            'draft'
+          )
+          returning id
+        `);
+        const created = (rows as unknown as { id: string }[])[0];
+        if (!created?.id) throw AppException.validation('Failed to create destination');
+        const destinationId = String(created.id);
+        if (initialTags.length > 0) {
+          await this.replaceDestinationTagsOn(tx, destinationId, initialTags);
+        }
+        return destinationId;
+      });
+      return this.getDestinationById(id);
     } catch (err) {
+      if (err instanceof AppException) throw err;
       const message = err instanceof Error ? err.message : String(err);
-      if (message.includes('destinations_slug') || message.toLowerCase().includes('unique')) {
+      if (message.includes('destinations_slug') || /unique/i.test(message)) {
         throw AppException.validation(`Destination slug already exists: ${input.slug}`);
       }
       throw err;
@@ -942,8 +954,13 @@ export class CatalogRepository {
     return this.getDestinationById(id);
   }
 
+  /**
+   * Optimistic lifecycle update: only succeeds when the row still has `from`.
+   * Returns null when the destination is missing or the status changed concurrently.
+   */
   async transitionDestination(input: {
     id: string;
+    from: LifecycleStatus;
     to: LifecycleStatus;
     actorId: string;
     rejectionReason?: string;
@@ -968,6 +985,7 @@ export class CatalogRepository {
           else published_at
         end
       where id = ${input.id}::uuid
+        and lifecycle_status = ${input.from}::catalog.lifecycle_status
       returning id
     `);
     const updated = (rows as unknown as { id: string }[])[0];
@@ -1062,51 +1080,56 @@ export class CatalogRepository {
    */
   async replaceDestinationTags(destinationId: string, tagSlugs: string[]): Promise<void> {
     const db = this.requireDb();
+    await db.transaction(async (tx) => {
+      await this.replaceDestinationTagsOn(tx, destinationId, tagSlugs);
+    });
+  }
+
+  private async replaceDestinationTagsOn(
+    tx: Parameters<Parameters<DrizzleClient['transaction']>[0]>[0],
+    destinationId: string,
+    tagSlugs: string[],
+  ): Promise<void> {
     const uniqueSlugs = [...new Set(tagSlugs.map((s) => s.trim()).filter(Boolean))];
 
-    await db.transaction(async (tx) => {
-      await tx.execute(sql`
-        delete from catalog.destination_tags
-        where destination_id = ${destinationId}::uuid
-      `);
+    await tx.execute(sql`
+      delete from catalog.destination_tags
+      where destination_id = ${destinationId}::uuid
+    `);
 
-      const resolvedIds: string[] = [];
-      for (const slug of uniqueSlugs) {
-        const existing = await tx.execute(sql`
-          select id, is_active as "isActive"
-          from catalog.tags
-          where slug = ${slug}
-          limit 1
-        `);
-        const found = (existing as unknown as { id: string; isActive: boolean }[])[0];
-        if (!found) {
-          throw AppException.validation(`Unknown tag slug: ${slug}`);
-        }
-        if (!found.isActive) {
-          throw AppException.validation(`Tag is inactive: ${slug}`);
-        }
-        resolvedIds.push(String(found.id));
-        await tx.execute(sql`
-          insert into catalog.destination_tags (destination_id, tag_id)
-          values (${destinationId}::uuid, ${String(found.id)}::uuid)
-          on conflict do nothing
-        `);
+    for (const slug of uniqueSlugs) {
+      const existing = await tx.execute(sql`
+        select id, is_active as "isActive"
+        from catalog.tags
+        where slug = ${slug}
+        limit 1
+      `);
+      const found = (existing as unknown as { id: string; isActive: boolean }[])[0];
+      if (!found) {
+        throw AppException.validation(`Unknown tag slug: ${slug}`);
       }
-
-      const tagsArray =
-        uniqueSlugs.length === 0
-          ? sql`'{}'::text[]`
-          : sql`ARRAY[${sql.join(
-              uniqueSlugs.map((v) => sql`${v}`),
-              sql`,`,
-            )}]::text[]`;
+      if (!found.isActive) {
+        throw AppException.validation(`Tag is inactive: ${slug}`);
+      }
       await tx.execute(sql`
-        update catalog.destinations
-        set tags = ${tagsArray}
-        where id = ${destinationId}::uuid
+        insert into catalog.destination_tags (destination_id, tag_id)
+        values (${destinationId}::uuid, ${String(found.id)}::uuid)
+        on conflict do nothing
       `);
-      void resolvedIds;
-    });
+    }
+
+    const tagsArray =
+      uniqueSlugs.length === 0
+        ? sql`'{}'::text[]`
+        : sql`ARRAY[${sql.join(
+            uniqueSlugs.map((v) => sql`${v}`),
+            sql`,`,
+          )}]::text[]`;
+    await tx.execute(sql`
+      update catalog.destinations
+      set tags = ${tagsArray}
+      where id = ${destinationId}::uuid
+    `);
   }
 
   async listCountries(filters: {

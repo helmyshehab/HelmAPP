@@ -263,6 +263,28 @@ test('fail-closed when rolesSource is fallback', async () => {
   );
 });
 
+test('stale lifecycle transition returns CONFLICT when expected from no longer matches', async () => {
+  const repo = {
+    getDestinationLifecycle: async () => ({
+      id: draftId,
+      slug: 'x',
+      lifecycleStatus: 'draft',
+    }),
+    transitionDestination: async () => null,
+  };
+  const audit = { record: async () => undefined };
+  const admin = new CatalogAdminService(repo as never, audit as never, null);
+  await expectCode(
+    () =>
+      admin.transitionDestination(
+        principal(['operator']),
+        draftId,
+        'pending_verification',
+      ),
+    'CONFLICT',
+  );
+});
+
 test('tag replacement clears with empty array; operator blocked on published', async () => {
   let replacedWith: string[] | undefined;
   const draftRepo = {
