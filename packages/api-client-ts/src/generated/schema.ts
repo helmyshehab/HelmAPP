@@ -286,6 +286,8 @@ export interface paths {
          *
          *     Same-status transitions (`from === to`) are allowed for every status (no-op).
          *     Invalid edges return HTTP 400.
+         *     Stale concurrent updates (row lifecycle no longer matches the expected
+         *     from-status used for optimistic concurrency) return HTTP 409.
          *
          *     Admin-only target statuses: verified, approved, published, archived.
          *     Operators may submit for verification (and other non-admin targets); reaching
@@ -929,6 +931,18 @@ export interface components {
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
+        /**
+         * @description Resource state conflict (for example, a stale concurrent lifecycle
+         *     transition where the expected from-status no longer matches)
+         */
+        Conflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
     };
     parameters: {
         Slug: string;
@@ -1388,6 +1402,7 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     adminReplaceCatalogDestinationTags: {

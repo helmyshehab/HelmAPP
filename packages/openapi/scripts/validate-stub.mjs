@@ -33,4 +33,17 @@ if (!spec.includes("bearerAuth")) {
   console.error("openapi.yaml must define bearerAuth security scheme");
   process.exit(1);
 }
+if (!spec.includes("Conflict:") || !spec.includes('"#/components/responses/Conflict"')) {
+  console.error("openapi.yaml must define Conflict response and reference it");
+  process.exit(1);
+}
+if (
+  !spec.includes("/v1/admin/catalog/destinations/{id}/transition:") ||
+  !spec.includes('"409"')
+) {
+  console.error(
+    "openapi.yaml destination transition must document HTTP 409 Conflict",
+  );
+  process.exit(1);
+}
 console.log("@helm/openapi: foundation contract OK");

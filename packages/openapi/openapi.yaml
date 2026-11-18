@@ -411,6 +411,8 @@ paths:
 
         Same-status transitions (`from === to`) are allowed for every status (no-op).
         Invalid edges return HTTP 400.
+        Stale concurrent updates (row lifecycle no longer matches the expected
+        from-status used for optimistic concurrency) return HTTP 409.
 
         Admin-only target statuses: verified, approved, published, archived.
         Operators may submit for verification (and other non-admin targets); reaching
@@ -441,6 +443,8 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
   /v1/admin/catalog/destinations/{id}/tags:
     put:
       operationId: adminReplaceCatalogDestinationTags
@@ -701,6 +705,14 @@ components:
             $ref: "#/components/schemas/Problem"
     NotFound:
       description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Conflict:
+      description: |
+        Resource state conflict (for example, a stale concurrent lifecycle
+        transition where the expected from-status no longer matches)
       content:
         application/problem+json:
           schema:
