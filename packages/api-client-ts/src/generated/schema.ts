@@ -175,6 +175,172 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/geo/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List countries (public read-only)
+         * @description Canonical `geo.countries` lookup for pickers. Read-only; no write methods on `/v1/geo/*`.
+         */
+        get: operations["listGeoCountries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/geo/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List cities (public read-only)
+         * @description Canonical `geo.cities` lookup. Prefer filtering by `country` (ISO-3166-1 alpha-2).
+         *     Read-only; no write methods on `/v1/geo/*`.
+         */
+        get: operations["listGeoCities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/catalog/destinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff list of catalog destinations (includes unpublished) */
+        get: operations["adminListCatalogDestinations"];
+        put?: never;
+        /**
+         * Create a draft catalog destination
+         * @description Always creates `lifecycleStatus=draft` for every actor (operator or administrator).
+         *     Clients must not supply a lifecycle status; any such field is rejected by the implementation.
+         */
+        post: operations["adminCreateCatalogDestination"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/catalog/destinations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a catalog destination by id (staff) */
+        get: operations["adminGetCatalogDestination"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update a catalog destination
+         * @description Operators may update only curatable lifecycles (draft, pending_verification, rejected).
+         *     Slug may be changed only before publication. Published slugs are immutable via this
+         *     endpoint; exceptional post-publish renames require a dedicated audited redirect/alias
+         *     flow (not part of this contract surface).
+         */
+        patch: operations["adminUpdateCatalogDestination"];
+        trace?: never;
+    };
+    "/v1/admin/catalog/destinations/{id}/transition": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Transition destination lifecycle
+         * @description Follows the shared catalog lifecycle state machine (same edges as Step 5 places).
+         *     Allowed from → to transitions (runtime-validated against the current DB status):
+         *
+         *     - draft → pending_verification, archived, rejected
+         *     - pending_verification → verified, rejected, draft
+         *     - verified → approved, rejected, pending_verification
+         *     - approved → published, rejected, archived
+         *     - published → archived
+         *     - rejected → draft, pending_verification, archived
+         *     - archived → draft
+         *
+         *     Same-status transitions (`from === to`) are allowed for every status (no-op).
+         *     Invalid edges return HTTP 400.
+         *
+         *     Admin-only target statuses: verified, approved, published, archived.
+         *     Operators may submit for verification (and other non-admin targets); reaching
+         *     those admin-only targets requires administrator or super-administrator.
+         */
+        post: operations["adminTransitionCatalogDestination"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/catalog/destinations/{id}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace destination tags (explicit set)
+         * @description Manual tag editing uses explicit replacement semantics — the provided `tagSlugs`
+         *     become the full tag set for the destination (transactional). JSON import remains
+         *     additive and is unchanged by this contract.
+         */
+        put: operations["adminReplaceCatalogDestinationTags"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/audit-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List audit events for an entity
+         * @description Restricted to administrator and super-administrator. Operators must rely on
+         *     lifecycle actor timestamps on the destination resource instead of this API.
+         */
+        get: operations["adminListAuditEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/catalog/places": {
         parameters: {
             query?: never;
@@ -455,6 +621,216 @@ export interface components {
             descriptionEn?: string;
             externalKey?: string;
         };
+        /**
+         * @description Creates a destination in draft only. Do not include lifecycleStatus —
+         *     the server always sets draft regardless of actor.
+         */
+        CreateDestinationRequest: {
+            slug: string;
+            nameEn: string;
+            nameAr: string;
+            shortDescriptionEn?: string;
+            shortDescriptionAr?: string;
+            summaryEn?: string;
+            summaryAr?: string;
+            descriptionEn?: string;
+            descriptionAr?: string;
+            /** @description Must resolve to an existing geo.countries row */
+            countryCode: string;
+            /**
+             * Format: uuid
+             * @description Optional; when set must belong to the same countryCode
+             */
+            cityId?: string | null;
+            /**
+             * Format: uuid
+             * @description Optional parent destination; cycles are rejected
+             */
+            parentId?: string | null;
+            timezone?: string;
+            latitude?: number | null;
+            longitude?: number | null;
+            addressText?: string;
+            /** Format: uri */
+            websiteUrl?: string;
+            /** @default false */
+            isFeatured: boolean;
+            externalKey?: string;
+            /** @description Initial tags (optional); subsequent form edits use PUT replace */
+            tagSlugs?: string[];
+        };
+        /**
+         * @description Partial update. Slug changes are allowed only before publication.
+         *     Published slugs are immutable through this request.
+         */
+        UpdateDestinationRequest: {
+            /**
+             * @description If the destination is published, including this field is a validation
+             *     error (HTTP 400). Published slug changes require the separate audited
+             *     redirect/alias operation (not this endpoint).
+             */
+            slug?: string;
+            nameEn?: string;
+            nameAr?: string;
+            shortDescriptionEn?: string | null;
+            shortDescriptionAr?: string | null;
+            summaryEn?: string | null;
+            summaryAr?: string | null;
+            descriptionEn?: string | null;
+            descriptionAr?: string | null;
+            countryCode?: string;
+            /** Format: uuid */
+            cityId?: string | null;
+            /** Format: uuid */
+            parentId?: string | null;
+            timezone?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            addressText?: string | null;
+            /** Format: uri */
+            websiteUrl?: string | null;
+            isFeatured?: boolean;
+            externalKey?: string | null;
+        };
+        ReplaceDestinationTagsRequest: {
+            /** @description Full replacement set of active tag slugs (may be empty) */
+            tagSlugs: string[];
+        };
+        DestinationProvenance: {
+            /** Format: uuid */
+            id: string;
+            sourceType: string;
+            name: string;
+            url?: string | null;
+            referenceCode?: string | null;
+            notes?: string | null;
+            /** Format: date-time */
+            collectedAt?: string | null;
+            verificationStatus?: string | null;
+            confidence?: number | null;
+        };
+        /** @description Staff destination view (includes unpublished and internal workflow fields) */
+        DestinationAdmin: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            nameEn: string;
+            nameAr: string;
+            shortDescriptionEn?: string | null;
+            shortDescriptionAr?: string | null;
+            summaryEn?: string | null;
+            summaryAr?: string | null;
+            descriptionEn?: string | null;
+            descriptionAr?: string | null;
+            countryCode: string;
+            /** Format: uuid */
+            cityId?: string | null;
+            /** Format: uuid */
+            parentId?: string | null;
+            timezone?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            addressText?: string | null;
+            websiteUrl?: string | null;
+            isFeatured?: boolean;
+            externalKey?: string | null;
+            lifecycleStatus: components["schemas"]["LifecycleStatus"];
+            /** Format: uuid */
+            verifiedBy?: string | null;
+            /** Format: date-time */
+            verifiedAt?: string | null;
+            /** Format: uuid */
+            approvedBy?: string | null;
+            /** Format: date-time */
+            approvedAt?: string | null;
+            /** Format: uuid */
+            rejectedBy?: string | null;
+            /** Format: date-time */
+            rejectedAt?: string | null;
+            rejectionReason?: string | null;
+            /** Format: date-time */
+            archivedAt?: string | null;
+            /** Format: date-time */
+            publishedAt?: string | null;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+            tags?: {
+                /** Format: uuid */
+                id?: string;
+                slug: string;
+                nameEn: string;
+                nameAr: string;
+            }[];
+            sources?: components["schemas"]["DestinationProvenance"][];
+            /** @description Existing media references only (no upload in Step 6) */
+            media?: components["schemas"]["PublicMediaRef"][];
+        };
+        DestinationAdminListResponse: {
+            items: components["schemas"]["DestinationAdmin"][];
+            total: number;
+            limit: number;
+            offset: number;
+        };
+        GeoCountry: {
+            code: string;
+            nameEn: string;
+            nameAr?: string | null;
+            defaultCurrency?: string | null;
+            phoneCode?: string | null;
+            isActive: boolean;
+        };
+        GeoCountryListResponse: {
+            items: components["schemas"]["GeoCountry"][];
+            total: number;
+            limit: number;
+            offset: number;
+        };
+        GeoCity: {
+            /** Format: uuid */
+            id: string;
+            countryCode: string;
+            /** Format: uuid */
+            regionId?: string | null;
+            slug: string;
+            nameEn: string;
+            nameAr?: string | null;
+            timezone?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            isActive: boolean;
+        };
+        GeoCityListResponse: {
+            items: components["schemas"]["GeoCity"][];
+            total: number;
+            limit: number;
+            offset: number;
+        };
+        AuditEvent: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            actorUserId?: string | null;
+            action: string;
+            entityType: string;
+            /** Format: uuid */
+            entityId?: string | null;
+            before?: {
+                [key: string]: unknown;
+            } | null;
+            after?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AuditEventListResponse: {
+            items: components["schemas"]["AuditEvent"][];
+            total: number;
+            limit: number;
+            offset: number;
+        };
         PlaceAdminSummary: {
             /** Format: uuid */
             id: string;
@@ -556,6 +932,7 @@ export interface components {
     };
     parameters: {
         Slug: string;
+        DestinationId: string;
         CountryFilter: string;
         FeaturedFilter: "true" | "false";
         SearchQuery: string;
@@ -812,6 +1189,263 @@ export interface operations {
                     "application/json": components["schemas"]["TagListResponse"];
                 };
             };
+        };
+    };
+    listGeoCountries: {
+        parameters: {
+            query?: {
+                /** @description When true, only active countries (default true when omitted by clients that pass it) */
+                active?: "true" | "false";
+                q?: components["parameters"]["SearchQuery"];
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Country list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeoCountryListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+        };
+    };
+    listGeoCities: {
+        parameters: {
+            query?: {
+                country?: components["parameters"]["CountryFilter"];
+                q?: components["parameters"]["SearchQuery"];
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description City list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeoCityListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+        };
+    };
+    adminListCatalogDestinations: {
+        parameters: {
+            query?: {
+                q?: components["parameters"]["SearchQuery"];
+                country?: components["parameters"]["CountryFilter"];
+                featured?: components["parameters"]["FeaturedFilter"];
+                lifecycleStatus?: components["schemas"]["LifecycleStatus"];
+                /** @description Filter by parent destination id; omit for any */
+                parentId?: string;
+                /** @description When true, only destinations with no parent */
+                topLevelOnly?: "true" | "false";
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff destination list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdminListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreateCatalogDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDestinationRequest"];
+            };
+        };
+        responses: {
+            /** @description Draft destination created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminGetCatalogDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff destination detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdateCatalogDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDestinationRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated destination */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminTransitionCatalogDestination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleTransitionRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated destination lifecycle */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminReplaceCatalogDestinationTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceDestinationTagsRequest"];
+            };
+        };
+        responses: {
+            /** @description Destination with replaced tags */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListAuditEvents: {
+        parameters: {
+            query: {
+                entityType: "destination" | "place" | "import_run" | "poi" | "media" | "rating" | "price";
+                entityId: string;
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated audit events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEventListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     adminListCatalogPlaces: {

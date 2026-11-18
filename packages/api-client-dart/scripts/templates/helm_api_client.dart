@@ -155,4 +155,112 @@ class HelmApiClient {
   Future<Map<String, dynamic>> listCatalogCategories() => _getJson('/v1/catalog/categories');
 
   Future<Map<String, dynamic>> listCatalogTags() => _getJson('/v1/catalog/tags');
+
+  Future<Map<String, dynamic>> listGeoCountries({String? q}) {
+    final params = <String, String>{};
+    if (q != null) params['q'] = q;
+    final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
+    return _getJson('/v1/geo/countries$query');
+  }
+
+  Future<Map<String, dynamic>> listGeoCities({String? country, String? q}) {
+    final params = <String, String>{};
+    if (country != null) params['country'] = country;
+    if (q != null) params['q'] = q;
+    final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
+    return _getJson('/v1/geo/cities$query');
+  }
+
+  Future<Map<String, dynamic>> adminListCatalogDestinations({
+    required String accessToken,
+    String? country,
+    String? q,
+    String? lifecycleStatus,
+  }) {
+    final params = <String, String>{};
+    if (country != null) params['country'] = country;
+    if (q != null) params['q'] = q;
+    if (lifecycleStatus != null) params['lifecycleStatus'] = lifecycleStatus;
+    final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
+    return _getJson('/v1/admin/catalog/destinations$query', accessToken: accessToken);
+  }
+
+  Future<Map<String, dynamic>> adminGetCatalogDestination({
+    required String accessToken,
+    required String id,
+  }) =>
+      _getJson('/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}',
+          accessToken: accessToken);
+
+  Future<Map<String, dynamic>> adminCreateCatalogDestination({
+    required String accessToken,
+    required Map<String, dynamic> body,
+  }) =>
+      _sendJson('/v1/admin/catalog/destinations',
+          method: 'POST', accessToken: accessToken, body: body);
+
+  Future<Map<String, dynamic>> adminUpdateCatalogDestination({
+    required String accessToken,
+    required String id,
+    required Map<String, dynamic> body,
+  }) =>
+      _sendJson('/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}',
+          method: 'PATCH', accessToken: accessToken, body: body);
+
+  Future<Map<String, dynamic>> adminTransitionCatalogDestination({
+    required String accessToken,
+    required String id,
+    required Map<String, dynamic> body,
+  }) =>
+      _sendJson(
+          '/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/transition',
+          method: 'POST',
+          accessToken: accessToken,
+          body: body);
+
+  Future<Map<String, dynamic>> adminReplaceCatalogDestinationTags({
+    required String accessToken,
+    required String id,
+    required Map<String, dynamic> body,
+  }) =>
+      _sendJson('/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/tags',
+          method: 'PUT', accessToken: accessToken, body: body);
+
+  Future<Map<String, dynamic>> adminListAuditEvents({
+    required String accessToken,
+    required String entityType,
+    required String entityId,
+  }) {
+    final query = '?${Uri(queryParameters: {
+      'entityType': entityType,
+      'entityId': entityId,
+    }).query}';
+    return _getJson('/v1/admin/audit-events$query', accessToken: accessToken);
+  }
+
+  Future<Map<String, dynamic>> _sendJson(
+    String path, {
+    required String method,
+    required String accessToken,
+    required Map<String, dynamic> body,
+  }) async {
+    final headers = <String, String>{
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    };
+    late http.Response res;
+    if (method == 'POST') {
+      res = await _http.post(_u(path), headers: headers, body: jsonEncode(body));
+    } else if (method == 'PATCH') {
+      res = await _http.patch(_u(path), headers: headers, body: jsonEncode(body));
+    } else if (method == 'PUT') {
+      res = await _http.put(_u(path), headers: headers, body: jsonEncode(body));
+    } else {
+      throw Exception('Unsupported method $method');
+    }
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw Exception('$path failed: ${res.statusCode}');
+    }
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
 }

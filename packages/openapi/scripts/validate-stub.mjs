@@ -17,8 +17,12 @@ for (const path of [
   "/v1/catalog/places",
   "/v1/catalog/categories",
   "/v1/catalog/tags",
+  "/v1/geo/countries",
+  "/v1/geo/cities",
+  "/v1/admin/catalog/destinations",
   "/v1/admin/catalog/places",
   "/v1/admin/catalog/import",
+  "/v1/admin/audit-events",
 ]) {
   if (!spec.includes(path)) {
     console.error(`openapi.yaml must define ${path}`);

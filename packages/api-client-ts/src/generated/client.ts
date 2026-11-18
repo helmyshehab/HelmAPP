@@ -21,6 +21,15 @@ export type CatalogImportResult = components["schemas"]["CatalogImportResult"];
 export type CreatePlaceRequest = components["schemas"]["CreatePlaceRequest"];
 export type LifecycleTransitionRequest = components["schemas"]["LifecycleTransitionRequest"];
 export type CatalogImportRequest = components["schemas"]["CatalogImportRequest"];
+export type DestinationAdmin = components["schemas"]["DestinationAdmin"];
+export type DestinationAdminListResponse = components["schemas"]["DestinationAdminListResponse"];
+export type CreateDestinationRequest = components["schemas"]["CreateDestinationRequest"];
+export type UpdateDestinationRequest = components["schemas"]["UpdateDestinationRequest"];
+export type ReplaceDestinationTagsRequest = components["schemas"]["ReplaceDestinationTagsRequest"];
+export type GeoCountryListResponse = components["schemas"]["GeoCountryListResponse"];
+export type GeoCityListResponse = components["schemas"]["GeoCityListResponse"];
+export type AuditEventListResponse = components["schemas"]["AuditEventListResponse"];
+export type LifecycleStatus = components["schemas"]["LifecycleStatus"];
 
 export type HelmClientOptions = {
   baseUrl: string;
@@ -147,6 +156,114 @@ export function createHelmClient(options: HelmClientOptions) {
     },
     async listCatalogTags(): Promise<TagListResponse> {
       return getJson<TagListResponse>("/v1/catalog/tags");
+    },
+    async listGeoCountries(params?: {
+      active?: boolean;
+      q?: string;
+      limit?: number;
+      offset?: number;
+    }): Promise<GeoCountryListResponse> {
+      return getJson<GeoCountryListResponse>(
+        `/v1/geo/countries${qs({
+          active: params?.active,
+          q: params?.q,
+          limit: params?.limit,
+          offset: params?.offset,
+        })}`,
+      );
+    },
+    async listGeoCities(params?: {
+      country?: string;
+      q?: string;
+      limit?: number;
+      offset?: number;
+    }): Promise<GeoCityListResponse> {
+      return getJson<GeoCityListResponse>(
+        `/v1/geo/cities${qs({
+          country: params?.country,
+          q: params?.q,
+          limit: params?.limit,
+          offset: params?.offset,
+        })}`,
+      );
+    },
+    async adminListCatalogDestinations(params?: {
+      q?: string;
+      country?: string;
+      featured?: boolean;
+      lifecycleStatus?: LifecycleStatus;
+      parentId?: string;
+      topLevelOnly?: boolean;
+      limit?: number;
+      offset?: number;
+    }): Promise<DestinationAdminListResponse> {
+      return getJson<DestinationAdminListResponse>(
+        `/v1/admin/catalog/destinations${qs({
+          q: params?.q,
+          country: params?.country,
+          featured: params?.featured,
+          lifecycleStatus: params?.lifecycleStatus,
+          parentId: params?.parentId,
+          topLevelOnly: params?.topLevelOnly,
+          limit: params?.limit,
+          offset: params?.offset,
+        })}`,
+      );
+    },
+    async adminGetCatalogDestination(id: string): Promise<DestinationAdmin> {
+      return getJson<DestinationAdmin>(
+        `/v1/admin/catalog/destinations/${encodeURIComponent(id)}`,
+      );
+    },
+    async adminCreateCatalogDestination(
+      body: CreateDestinationRequest,
+    ): Promise<DestinationAdmin> {
+      return sendJson<DestinationAdmin>("/v1/admin/catalog/destinations", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+    },
+    async adminUpdateCatalogDestination(
+      id: string,
+      body: UpdateDestinationRequest,
+    ): Promise<DestinationAdmin> {
+      return sendJson<DestinationAdmin>(
+        `/v1/admin/catalog/destinations/${encodeURIComponent(id)}`,
+        { method: "PATCH", body: JSON.stringify(body) },
+      );
+    },
+    async adminTransitionCatalogDestination(
+      id: string,
+      body: LifecycleTransitionRequest,
+    ): Promise<DestinationAdmin> {
+      return sendJson<DestinationAdmin>(
+        `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/transition`,
+        { method: "POST", body: JSON.stringify(body) },
+      );
+    },
+    async adminReplaceCatalogDestinationTags(
+      id: string,
+      body: ReplaceDestinationTagsRequest,
+    ): Promise<DestinationAdmin> {
+      return sendJson<DestinationAdmin>(
+        `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/tags`,
+        { method: "PUT", body: JSON.stringify(body) },
+      );
+    },
+    async adminListAuditEvents(params: {
+      entityType: string;
+      entityId: string;
+      limit?: number;
+      offset?: number;
+    }): Promise<AuditEventListResponse> {
+      return getJson<AuditEventListResponse>(
+        `/v1/admin/audit-events${qs({
+          entityType: params.entityType,
+          entityId: params.entityId,
+          limit: params.limit,
+          offset: params.offset,
+        })}`,
+      );
     },
     async adminCreateCatalogPlace(body: CreatePlaceRequest): Promise<PlaceAdminSummary> {
       return sendJson<PlaceAdminSummary>("/v1/admin/catalog/places", {
