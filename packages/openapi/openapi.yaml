@@ -614,13 +614,155 @@ components:
         status:
           type: string
           enum: [published]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Active public tag slugs (detail responses only; list may omit)
         media:
           type: array
           items:
             $ref: "#/components/schemas/PublicMediaRef"
+          description: Present on place detail responses only
+        details:
+          nullable: true
+          description: |
+            Category-specific public detail object for the place detail route only.
+            `null` when no detail row exists. List endpoints omit this field.
+            Discriminated by `type`: accommodation | dining | attraction | activity | nightlife | transport.
+          oneOf:
+            - $ref: "#/components/schemas/PlaceAccommodationDetails"
+            - $ref: "#/components/schemas/PlaceDiningDetails"
+            - $ref: "#/components/schemas/PlaceAttractionDetails"
+            - $ref: "#/components/schemas/PlaceActivityDetails"
+            - $ref: "#/components/schemas/PlaceNightlifeDetails"
+            - $ref: "#/components/schemas/PlaceTransportDetails"
         updatedAt:
           type: string
           format: date-time
+    PlaceAccommodationDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [accommodation]
+        accommodationType:
+          type: string
+        starRating:
+          type: integer
+          nullable: true
+        amenities:
+          type: array
+          items:
+            type: string
+        roomFeatures:
+          type: array
+          items:
+            type: string
+        checkInTime:
+          type: string
+          nullable: true
+        checkOutTime:
+          type: string
+          nullable: true
+    PlaceDiningDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [dining]
+        cuisineTypes:
+          type: array
+          items:
+            type: string
+        mealTypes:
+          type: array
+          items:
+            type: string
+        dietaryOptions:
+          type: array
+          items:
+            type: string
+        openingHours:
+          type: object
+          additionalProperties: true
+    PlaceAttractionDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [attraction]
+        attractionType:
+          type: string
+        typicalDurationMinutes:
+          type: integer
+          nullable: true
+        bookingRequired:
+          type: boolean
+          nullable: true
+        suitableFor:
+          type: array
+          items:
+            type: string
+        seasonalNotes:
+          type: string
+          nullable: true
+    PlaceActivityDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [activity]
+        activityType:
+          type: string
+        typicalDurationMinutes:
+          type: integer
+          nullable: true
+        bookingRequired:
+          type: boolean
+          nullable: true
+        suitableFor:
+          type: array
+          items:
+            type: string
+        seasonalAvailability:
+          type: string
+          nullable: true
+    PlaceNightlifeDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [nightlife]
+        venueType:
+          type: string
+        musicGenres:
+          type: array
+          items:
+            type: string
+        ageRestriction:
+          type: integer
+          nullable: true
+        eventNotes:
+          type: string
+          nullable: true
+    PlaceTransportDetails:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [transport]
+        transportType:
+          type: string
+        serviceNotes:
+          type: string
+          nullable: true
     PlaceListResponse:
       type: object
       required: [items, total, limit, offset]

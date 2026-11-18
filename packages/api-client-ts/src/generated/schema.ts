@@ -341,9 +341,70 @@ export interface components {
             isFeatured?: boolean;
             /** @enum {string} */
             status: "published";
+            /** @description Active public tag slugs (detail responses only; list may omit) */
+            tags?: string[];
+            /** @description Present on place detail responses only */
             media?: components["schemas"]["PublicMediaRef"][];
+            /**
+             * @description Category-specific public detail object for the place detail route only.
+             *     `null` when no detail row exists. List endpoints omit this field.
+             *     Discriminated by `type`: accommodation | dining | attraction | activity | nightlife | transport.
+             */
+            details?: (components["schemas"]["PlaceAccommodationDetails"] | components["schemas"]["PlaceDiningDetails"] | components["schemas"]["PlaceAttractionDetails"] | components["schemas"]["PlaceActivityDetails"] | components["schemas"]["PlaceNightlifeDetails"] | components["schemas"]["PlaceTransportDetails"]) | null;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        PlaceAccommodationDetails: {
+            /** @enum {string} */
+            type: "accommodation";
+            accommodationType?: string;
+            starRating?: number | null;
+            amenities?: string[];
+            roomFeatures?: string[];
+            checkInTime?: string | null;
+            checkOutTime?: string | null;
+        };
+        PlaceDiningDetails: {
+            /** @enum {string} */
+            type: "dining";
+            cuisineTypes?: string[];
+            mealTypes?: string[];
+            dietaryOptions?: string[];
+            openingHours?: {
+                [key: string]: unknown;
+            };
+        };
+        PlaceAttractionDetails: {
+            /** @enum {string} */
+            type: "attraction";
+            attractionType?: string;
+            typicalDurationMinutes?: number | null;
+            bookingRequired?: boolean | null;
+            suitableFor?: string[];
+            seasonalNotes?: string | null;
+        };
+        PlaceActivityDetails: {
+            /** @enum {string} */
+            type: "activity";
+            activityType?: string;
+            typicalDurationMinutes?: number | null;
+            bookingRequired?: boolean | null;
+            suitableFor?: string[];
+            seasonalAvailability?: string | null;
+        };
+        PlaceNightlifeDetails: {
+            /** @enum {string} */
+            type: "nightlife";
+            venueType?: string;
+            musicGenres?: string[];
+            ageRestriction?: number | null;
+            eventNotes?: string | null;
+        };
+        PlaceTransportDetails: {
+            /** @enum {string} */
+            type: "transport";
+            transportType?: string;
+            serviceNotes?: string | null;
         };
         PlaceListResponse: {
             items: components["schemas"]["PlacePublic"][];

@@ -270,6 +270,128 @@ export class CatalogRepository {
     return rows as unknown as Record<string, unknown>[];
   }
 
+  async listPublicTagsForPlace(placeId: string): Promise<string[]> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select t.slug
+      from catalog.place_tags pt
+      join catalog.tags t on t.id = pt.tag_id
+      where pt.place_id = ${placeId}::uuid
+        and t.is_active = true
+      order by t.slug asc
+    `);
+    return (rows as unknown as { slug: string }[]).map((r) => r.slug);
+  }
+
+  /**
+   * Public category-specific detail for a place. Returns null when no detail row exists.
+   * Never includes staff-only / provenance fields.
+   */
+  async getPublicPlaceDetails(
+    placeId: string,
+    category: string,
+  ): Promise<Record<string, unknown> | null> {
+    const db = this.requireDb();
+    const diningCategories = new Set(['restaurant', 'cafe', 'bar', 'beach_club']);
+
+    if (category === 'accommodation') {
+      const rows = await db.execute(sql`
+        select
+          'accommodation' as type,
+          accommodation_type as "accommodationType",
+          star_rating as "starRating",
+          amenities,
+          room_features as "roomFeatures",
+          check_in_time as "checkInTime",
+          check_out_time as "checkOutTime"
+        from catalog.place_accommodation_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+    }
+
+    if (diningCategories.has(category)) {
+      const rows = await db.execute(sql`
+        select
+          'dining' as type,
+          cuisine_types as "cuisineTypes",
+          meal_types as "mealTypes",
+          dietary_options as "dietaryOptions",
+          opening_hours as "openingHours"
+        from catalog.place_dining_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+    }
+
+    if (category === 'attraction') {
+      const rows = await db.execute(sql`
+        select
+          'attraction' as type,
+          attraction_type as "attractionType",
+          typical_duration_minutes as "typicalDurationMinutes",
+          booking_required as "bookingRequired",
+          suitable_for as "suitableFor",
+          seasonal_notes as "seasonalNotes"
+        from catalog.place_attraction_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+    }
+
+    if (category === 'activity') {
+      const rows = await db.execute(sql`
+        select
+          'activity' as type,
+          activity_type as "activityType",
+          typical_duration_minutes as "typicalDurationMinutes",
+          booking_required as "bookingRequired",
+          suitable_for as "suitableFor",
+          seasonal_availability as "seasonalAvailability"
+        from catalog.place_activity_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+    }
+
+    if (category === 'nightlife') {
+      const rows = await db.execute(sql`
+        select
+          'nightlife' as type,
+          venue_type as "venueType",
+          music_genres as "musicGenres",
+          age_restriction as "ageRestriction",
+          event_notes as "eventNotes"
+        from catalog.place_nightlife_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      const row = (rows as unknown as Record<string, unknown>[])[0];
+      if (!row) return null;
+      // age_restriction_verified is staff-only — never selected
+      return row;
+    }
+
+    if (category === 'transport') {
+      const rows = await db.execute(sql`
+        select
+          'transport' as type,
+          transport_type as "transportType",
+          service_notes as "serviceNotes"
+        from catalog.place_transport_details
+        where place_id = ${placeId}::uuid
+        limit 1
+      `);
+      return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+    }
+
+    return null;
+  }
+
   async listTags(activeOnly: boolean) {
     const db = this.requireDb();
     const rows = await db.execute(sql`

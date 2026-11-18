@@ -100,8 +100,20 @@ export class CatalogQueryService {
   async getPublicPlace(slug: string) {
     const row = await this.repo.getPlaceBySlug(slug, true);
     if (!row) throw AppException.notFound(`Place not found: ${slug}`);
-    const media = await this.repo.listPublicMediaForPlace(String(row.id));
-    const body = { ...toPublicPlace(row), media };
+    const placeId = String(row.id);
+    const category = String(row.category);
+    const [media, tags, details] = await Promise.all([
+      this.repo.listPublicMediaForPlace(placeId),
+      this.repo.listPublicTagsForPlace(placeId),
+      this.repo.getPublicPlaceDetails(placeId, category),
+    ]);
+    // List endpoints stay lean — category details only on the detail route.
+    const body = {
+      ...toPublicPlace(row),
+      tags,
+      media,
+      details: details ?? null,
+    };
     assertNoInternalLeak(body);
     return body;
   }

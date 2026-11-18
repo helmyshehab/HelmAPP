@@ -405,15 +405,31 @@ export class CatalogImportWriter {
             name_en = ${dest.nameEn},
             name_ar = ${dest.nameAr},
             country_code = ${dest.countryCode.toUpperCase()},
-            city_id = ${cityId},
-            summary_en = ${dest.summaryEn ?? null},
-            summary_ar = ${dest.summaryAr ?? null},
-            short_description_en = ${dest.shortDescriptionEn ?? null},
-            short_description_ar = ${dest.shortDescriptionAr ?? null},
-            latitude = ${dest.latitude ?? null},
-            longitude = ${dest.longitude ?? null},
-            timezone = ${dest.timezone ?? null},
-            tags = ${textArray(dest.tags)}
+            city_id = case when ${cityId !== null} then ${cityId}::uuid else city_id end,
+            summary_en = case
+              when ${dest.summaryEn !== undefined} then ${dest.summaryEn ?? null}
+              else summary_en end,
+            summary_ar = case
+              when ${dest.summaryAr !== undefined} then ${dest.summaryAr ?? null}
+              else summary_ar end,
+            short_description_en = case
+              when ${dest.shortDescriptionEn !== undefined} then ${dest.shortDescriptionEn ?? null}
+              else short_description_en end,
+            short_description_ar = case
+              when ${dest.shortDescriptionAr !== undefined} then ${dest.shortDescriptionAr ?? null}
+              else short_description_ar end,
+            latitude = case
+              when ${dest.latitude !== undefined} then ${dest.latitude ?? null}
+              else latitude end,
+            longitude = case
+              when ${dest.longitude !== undefined} then ${dest.longitude ?? null}
+              else longitude end,
+            timezone = case
+              when ${dest.timezone !== undefined} then ${dest.timezone ?? null}
+              else timezone end,
+            tags = case
+              when ${dest.tags !== undefined} then ${textArray(dest.tags)}
+              else tags end
           where id = ${id}::uuid
         `);
         action = 'updated';
@@ -580,22 +596,47 @@ export class CatalogImportWriter {
           return { id: String(byKey[0].id), action: 'skipped' };
         }
         id = String(byKey[0].id);
+        // Required fields always replace. Optional scalars: omitted → keep existing
+        // (never silently clear curated values). Detail/tag/rating blocks below are
+        // additive or replace-only-when-present.
         await tx.execute(sql`
           update catalog.places set
             name_en = ${place.nameEn},
             name_ar = ${place.nameAr},
             subcategory = ${place.subcategory},
-            short_description_en = ${place.shortDescriptionEn ?? null},
-            short_description_ar = ${place.shortDescriptionAr ?? null},
-            description_en = ${place.descriptionEn ?? null},
-            description_ar = ${place.descriptionAr ?? null},
-            latitude = ${place.latitude ?? null},
-            longitude = ${place.longitude ?? null},
-            address_text = ${place.addressText ?? null},
-            website_url = ${place.websiteUrl ?? null},
-            contact_phone = ${place.contactPhone ?? null},
-            contact_email = ${place.contactEmail ?? null},
-            price_level = ${place.priceLevel ?? null}
+            short_description_en = case
+              when ${place.shortDescriptionEn !== undefined} then ${place.shortDescriptionEn ?? null}
+              else short_description_en end,
+            short_description_ar = case
+              when ${place.shortDescriptionAr !== undefined} then ${place.shortDescriptionAr ?? null}
+              else short_description_ar end,
+            description_en = case
+              when ${place.descriptionEn !== undefined} then ${place.descriptionEn ?? null}
+              else description_en end,
+            description_ar = case
+              when ${place.descriptionAr !== undefined} then ${place.descriptionAr ?? null}
+              else description_ar end,
+            latitude = case
+              when ${place.latitude !== undefined} then ${place.latitude ?? null}
+              else latitude end,
+            longitude = case
+              when ${place.longitude !== undefined} then ${place.longitude ?? null}
+              else longitude end,
+            address_text = case
+              when ${place.addressText !== undefined} then ${place.addressText ?? null}
+              else address_text end,
+            website_url = case
+              when ${place.websiteUrl !== undefined} then ${place.websiteUrl ?? null}
+              else website_url end,
+            contact_phone = case
+              when ${place.contactPhone !== undefined} then ${place.contactPhone ?? null}
+              else contact_phone end,
+            contact_email = case
+              when ${place.contactEmail !== undefined} then ${place.contactEmail ?? null}
+              else contact_email end,
+            price_level = case
+              when ${place.priceLevel !== undefined} then ${place.priceLevel ?? null}
+              else price_level end
           where id = ${id}::uuid
         `);
         action = 'updated';

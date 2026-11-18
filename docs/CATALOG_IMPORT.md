@@ -17,6 +17,24 @@ Curated destination datasets (Bali, Thailand, etc.) import into the **same** cat
 - Record provenance via `sources[]`.
 - Do not invent ratings, prices, or verification claims.
 
+## `updateIfExists` semantics
+
+When `updateIfExists: true` and a matching `externalKey` exists:
+
+| Field group | Behavior |
+|-------------|----------|
+| Required identity fields (`nameEn`, `nameAr`, `subcategory`, …) | Always replaced |
+| Optional scalars (`shortDescription*`, `description*`, geo, contact, `priceLevel`, …) | **Omitted → keep existing.** Provided → replace. Never silently cleared by omission. |
+| Category detail blocks (`accommodation`, `dining`, …) | **Omitted → keep existing detail row.** Provided → upsert that detail table only. |
+| `tags` / `sources` | **Additive.** Omission does not remove existing tags or provenance links. Provided entries are linked/upserted. |
+| `rating` | Omitted → keep. Provided → upsert that platform/observation row and refresh denormalized place rating columns. |
+
+Conflicts:
+
+- Duplicate `externalKey` or `slug` **within the same payload** → validation failure.
+- DB slug already owned by a **different** `externalKey` → rejected (no silent overwrite).
+- Existing row with same `externalKey` and `updateIfExists: false` → **skipped** (deterministic, no duplicate).
+
 ## Endpoint
 
 `POST /v1/admin/catalog/import`
