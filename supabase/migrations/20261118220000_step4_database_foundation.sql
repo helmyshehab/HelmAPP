@@ -39,42 +39,6 @@ as $$
   select coalesce(nullif(current_setting('request.jwt.claim.role', true), ''), 'anon');
 $$;
 
--- Staff role check for RLS (customer is implicit for authenticated users)
-create or replace function identity.has_role(required identity.app_role)
-returns boolean
-language sql
-stable
-security definer
-set search_path = identity, pg_temp
-as $$
-  select exists (
-    select 1
-    from identity.user_roles ur
-    where ur.user_id = auth.uid()
-      and ur.role = required
-  );
-$$;
-
-create or replace function identity.has_any_role(required identity.app_role[])
-returns boolean
-language sql
-stable
-security definer
-set search_path = identity, pg_temp
-as $$
-  select exists (
-    select 1
-    from identity.user_roles ur
-    where ur.user_id = auth.uid()
-      and ur.role = any (required)
-  );
-$$;
-
-revoke all on function identity.has_role(identity.app_role) from public;
-revoke all on function identity.has_any_role(identity.app_role[]) from public;
-grant execute on function identity.has_role(identity.app_role) to public;
-grant execute on function identity.has_any_role(identity.app_role[]) to public;
-
 -- ---------------------------------------------------------------------------
 -- Reference: currencies
 -- ---------------------------------------------------------------------------
@@ -240,6 +204,46 @@ create unique index if not exists idx_user_roles_active_unique
 
 create index if not exists idx_user_roles_user on identity.user_roles (user_id);
 
+-- Staff role check for RLS (customer is implicit for authenticated users)
+create or replace function identity.has_role(required identity.app_role)
+returns boolean
+language sql
+stable
+security definer
+set search_path = identity, auth, pg_temp
+as $$
+  select exists (
+    select 1
+    from identity.user_roles ur
+    where ur.user_id = auth.uid()
+      and ur.role = required
+      and ur.revoked_at is null
+  );
+$$;
+
+create or replace function identity.has_any_role(required identity.app_role[])
+returns boolean
+language sql
+stable
+security definer
+set search_path = identity, auth, pg_temp
+as $$
+  select exists (
+    select 1
+    from identity.user_roles ur
+    where ur.user_id = auth.uid()
+      and ur.role = any (required)
+      and ur.revoked_at is null
+  );
+$$;
+
+-- RLS helpers are callable by authenticated DB roles; keep PUBLIC for Supabase `authenticated`/`anon`.
+revoke all on function identity.has_role(identity.app_role) from public;
+revoke all on function identity.has_any_role(identity.app_role[]) from public;
+grant execute on function identity.has_role(identity.app_role) to public;
+grant execute on function identity.has_any_role(identity.app_role[]) to public;
+
+
 drop trigger if exists user_accounts_set_updated_at on identity.user_accounts;
 create trigger user_accounts_set_updated_at
   before update on identity.user_accounts
@@ -258,7 +262,7 @@ create or replace function identity.assign_role(
 ) returns uuid
 language plpgsql
 security definer
-set search_path = identity, ops, pg_temp
+set search_path = identity, ops, auth, pg_temp
 as $$
 declare
   v_id uuid;
@@ -294,8 +298,15 @@ begin
 end;
 $$;
 
+-- assign_role is SECURITY DEFINER: do NOT grant to PUBLIC.
+-- Callable by table owner / service role and explicitly by helm_authenticated for tested paths.
 revoke all on function identity.assign_role(uuid, identity.app_role, uuid) from public;
-grant execute on function identity.assign_role(uuid, identity.app_role, uuid) to public;
+do $$ begin
+  grant execute on function identity.assign_role(uuid, identity.app_role, uuid) to helm_authenticated;
+exception when undefined_object then
+  -- role created later in this migration; grant applied after role exists
+  null;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Catalog: destinations expansion + places foundation
@@ -447,6 +458,7 @@ grant execute on function auth.uid() to helm_authenticated, helm_anon;
 grant execute on function auth.role() to helm_authenticated, helm_anon;
 grant execute on function identity.has_role(identity.app_role) to helm_authenticated, helm_anon;
 grant execute on function identity.has_any_role(identity.app_role[]) to helm_authenticated, helm_anon;
+grant execute on function identity.assign_role(uuid, identity.app_role, uuid) to helm_authenticated;
 
 grant select, insert, update, delete on all tables in schema identity, catalog, pricing, packages, ops, geo, markets
   to helm_authenticated;
