@@ -13,3 +13,5 @@ export type PaymentSession = {
 export interface PaymentPort {
   createSession(intent: PaymentIntent): Promise<PaymentSession>;
 }
+
+export const PAYMENT_PORT = Symbol('PAYMENT_PORT');

@@ -18,6 +18,29 @@ class HealthResponse {
       );
 }
 
+class ReadyResponse {
+  ReadyResponse({
+    required this.status,
+    required this.service,
+    required this.checks,
+    this.detail,
+    this.timestamp,
+  });
+  final String status;
+  final String service;
+  final Map<String, dynamic> checks;
+  final String? detail;
+  final String? timestamp;
+
+  factory ReadyResponse.fromJson(Map<String, dynamic> json) => ReadyResponse(
+        status: json['status'] as String,
+        service: json['service'] as String,
+        checks: Map<String, dynamic>.from(json['checks'] as Map),
+        detail: json['detail'] as String?,
+        timestamp: json['timestamp'] as String?,
+      );
+}
+
 class MetaResponse {
   MetaResponse({required this.name, required this.version, required this.apiVersion});
   final String name;
@@ -31,7 +54,20 @@ class MetaResponse {
       );
 }
 
-/// Minimal generated Helm حلم API client (Step 2 health/meta stub).
+class MeResponse {
+  MeResponse({required this.userId, required this.roles, this.email});
+  final String userId;
+  final String? email;
+  final List<String> roles;
+
+  factory MeResponse.fromJson(Map<String, dynamic> json) => MeResponse(
+        userId: json['userId'] as String,
+        email: json['email'] as String?,
+        roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
+      );
+}
+
+/// Generated Helm حلم API client (foundation: health/ready/meta/me).
 class HelmApiClient {
   HelmApiClient({required this.baseUrl, http.Client? httpClient})
       : _http = httpClient ?? http.Client();
@@ -52,11 +88,30 @@ class HelmApiClient {
     return HealthResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
+  Future<ReadyResponse> getReady() async {
+    final res = await _http.get(_u('/v1/ready'));
+    if (res.statusCode != 200 && res.statusCode != 503) {
+      throw Exception('getReady failed: ${res.statusCode}');
+    }
+    return ReadyResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
   Future<MetaResponse> getMeta() async {
     final res = await _http.get(_u('/v1/meta'));
     if (res.statusCode != 200) {
       throw Exception('getMeta failed: ${res.statusCode}');
     }
     return MetaResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<MeResponse> getMe({required String accessToken}) async {
+    final res = await _http.get(
+      _u('/v1/me'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('getMe failed: ${res.statusCode}');
+    }
+    return MeResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 }

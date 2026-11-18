@@ -45,6 +45,7 @@ Recorded at Step 2 scaffold (2026-11-18). Versions are pinned in package manifes
 | `reflect-metadata` | 0.2.2 | Free | Nest DI |
 | `rxjs` | 7.8.2 | Free (Apache-2.0) | Nest peer |
 | `zod` | 3.25.76 | Free (MIT) | Env/validation |
+| `jose` | 5.9.6 | Free (MIT) | JWT verify/sign for AuthPort (mock + Supabase JWT); no paid IdP |
 | `tsx` | 4.20.5 | Free (MIT) | Dev runner |
 | `@types/node` | 22.18.6 | Free | Dev |
 | `@types/express` | 5.0.3 | Free | Dev |
