@@ -70,3 +70,55 @@ jobs:
       - run: pnpm --filter @helm/api-client-ts build
       - run: pnpm --filter @helm/helm-backend typecheck
       - run: pnpm --filter @helm/helm-backend test
+
+  web-typecheck:
+    name: Next.js web/admin typecheck
+    runs-on: ubuntu-latest
+    needs: [openapi-clients]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @helm/api-client-ts build
+      - run: pnpm --filter helm-web typecheck
+      - run: pnpm --filter helm-admin typecheck
+
+  migrations-apply:
+    name: Migration apply reproducibility
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15.14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install psql
+        run: sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq postgresql-client
+      - name: Apply migrations + seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          SEED: "true"
+        run: ./scripts/apply-migrations.sh
+      - name: Assert seed destinations exist
+        env:
+          PGPASSWORD: postgres
+        run: |
+          count=$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select count(*) from catalog.destinations where publish_status='published'")
+          echo "published_destinations=$count"
+          test "$count" -ge 1
