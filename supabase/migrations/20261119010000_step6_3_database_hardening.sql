@@ -9,30 +9,43 @@
 -- ---------------------------------------------------------------------------
 -- Parent hierarchy locking strategy
 -- ---------------------------------------------------------------------------
--- Problem: a row-level BEFORE trigger that only runs a recursive ancestor CTE
--- is racy. Two concurrent transactions can each see an acyclic graph, then
--- commit a mutual parent swap (A→B and B→A) that forms a cycle.
+-- Problem: a recursive CTE alone inside a BEFORE ROW trigger is racy — two
+-- concurrent transactions can each observe an acyclic graph, then commit a
+-- mutual parent swap (A→B and B→A).
 --
--- Strategy:
---   1. Take a single transaction-scoped advisory lock
---      `pg_advisory_xact_lock(hashtext('catalog.destinations.parent_hierarchy'))`
---      BEFORE any row locks in this function. One key serializes ALL parent_id
---      mutations on catalog.destinations for the duration of the writing
---      transaction (held until COMMIT/ROLLBACK).
---   2. Lock the mutating row and the new parent with SELECT … FOR UPDATE,
---      ordered by id to keep lock acquisition order stable.
---   3. Recursively walk ancestors of the new parent; reject if NEW.id appears
---      (indirect cycle) or if NEW.parent_id = NEW.id (self-parent; also CHECK).
+-- Database trigger (final integrity authority for all writers, including
+-- direct SQL):
+--   * BEFORE INSERT OR UPDATE OF parent_id runs
+--     catalog.enforce_destination_parent_acyclic().
+--   * Takes pg_advisory_xact_lock(hashtext(
+--       'catalog.destinations.parent_hierarchy')) then walks ancestors.
+--   * Rejects self-parent and ancestor cycles (CHECK also blocks self-parent).
 --
--- Lock scope: global to destination hierarchy mutations (not per-subtree).
--- Rationale: correct under concurrency with a simple deadlock profile.
--- Deadlocks: hierarchy writers that always take the advisory lock first cannot
--- deadlock each other on this key. Deadlock remains possible only if some other
--- session locks destination rows first and later waits on this advisory lock
--- while a hierarchy writer holds the advisory lock and waits on those rows —
--- application writers should acquire the same advisory lock (or avoid holding
--- destination row locks across unrelated work) when mutating parent_id.
--- The database remains the final integrity authority for cycles.
+-- IMPORTANT — lock ordering for UPDATE:
+--   PostgreSQL acquires the UPDATE *target* row lock BEFORE BEFORE-ROW
+--   triggers run. Therefore this trigger's advisory lock is NOT acquired
+--   before the mutating row lock. Concurrent direct-SQL mutual reparents
+--   (A→B and B→A) can DEADLOCK (40P01) via that row lock + advisory/FK
+--   waits. Deadlock aborts one writer; cycles still do not persist.
+--   Do NOT claim the trigger alone provides deadlock-free serialization
+--   for direct SQL.
+--
+-- Application (Nest CatalogRepository) — deadlock-avoiding path:
+--   * Before any INSERT/UPDATE that changes parent_id, acquire the SAME
+--     transaction-scoped advisory lock key in the same transaction, then
+--     issue the mutating SQL. That places the advisory lock before
+--     destination row locks for app-mediated writes.
+--   * Covered paths: createDestination (when parentId set),
+--     updateDestination (when parentId changes). Import writer does not
+--     set parent_id.
+--
+-- Lock scope: one global key for all catalog.destinations parent_id mutations
+-- (held until COMMIT/ROLLBACK).
+-- Guarantees:
+--   * App-mediated parent changes: serialized without mutual-swap deadlock;
+--     second writer sees prior commit and gets a cycle rejection.
+--   * Direct SQL: cycle rejection OR deadlock abort; final graph stays acyclic.
+--   * Trigger remains the final integrity backstop for every writer.
 -- ---------------------------------------------------------------------------
 
 -- Self-parent CHECK (belt-and-suspenders with the trigger).
@@ -54,6 +67,7 @@ $$;
 create or replace function catalog.enforce_destination_parent_acyclic()
 returns trigger
 language plpgsql
+set search_path = catalog, pg_temp
 as $$
 declare
   lock_key integer := hashtext('catalog.destinations.parent_hierarchy');
@@ -73,10 +87,12 @@ begin
       using errcode = '23514';
   end if;
 
-  -- Serialize hierarchy mutations for this transaction before row locks.
+  -- Serialize hierarchy checks for this transaction. Note: for UPDATE, the
+  -- target row is already locked by PostgreSQL before this trigger runs.
   perform pg_advisory_xact_lock(lock_key);
 
-  -- Lock involved rows in id order after the advisory lock.
+  -- Lock involved rows in id order after the advisory lock (extra safety for
+  -- reads; mutual UPDATE reparents may still deadlock — see header comment).
   perform 1
   from catalog.destinations
   where id in (new.id, new.parent_id)
@@ -116,8 +132,9 @@ $$;
 
 comment on function catalog.enforce_destination_parent_acyclic() is
   'Rejects self-parent and ancestor cycles on catalog.destinations.parent_id. '
-  'Uses pg_advisory_xact_lock(hashtext(''catalog.destinations.parent_hierarchy'')) '
-  'before FOR UPDATE row locks, then a recursive ancestor walk.';
+  'Uses pg_advisory_xact_lock(hashtext(''catalog.destinations.parent_hierarchy'')). '
+  'Nest acquires the same lock before parent mutations to avoid UPDATE deadlocks; '
+  'direct SQL mutual reparents may still deadlock (40P01) while remaining acyclic.';
 
 drop trigger if exists destinations_enforce_parent_acyclic on catalog.destinations;
 create trigger destinations_enforce_parent_acyclic
@@ -168,6 +185,7 @@ $$;
 create or replace function catalog.enforce_destination_city_country()
 returns trigger
 language plpgsql
+set search_path = catalog, geo, pg_temp
 as $$
 declare
   city_country char(2);

@@ -5,6 +5,18 @@ import { AppException } from '../../../common/errors/app.exception';
 import type { LifecycleStatus } from '../domain/lifecycle';
 import type { PlaceCategory } from '../domain/categories';
 
+/**
+ * Must match `hashtext(...)` key in `catalog.enforce_destination_parent_acyclic`
+ * (Step 6.3). Nest acquires this xact advisory lock *before* INSERT/UPDATE that
+ * change `parent_id`, so the lock is held prior to destination row locks.
+ */
+export const DESTINATION_PARENT_HIERARCHY_LOCK_KEY =
+  'catalog.destinations.parent_hierarchy';
+
+type SqlExecutor = {
+  execute: (query: ReturnType<typeof sql>) => Promise<unknown>;
+};
+
 export type PlaceListFilters = {
   country?: string;
   city?: string;
@@ -724,6 +736,17 @@ export class CatalogRepository {
   }
 
   /**
+   * Transaction-scoped advisory lock for destination parent hierarchy mutations.
+   * Call inside the same transaction, before any INSERT/UPDATE that takes
+   * destination row locks when `parent_id` may change.
+   */
+  async lockDestinationParentHierarchy(executor: SqlExecutor): Promise<void> {
+    await executor.execute(sql`
+      select pg_advisory_xact_lock(hashtext(${DESTINATION_PARENT_HIERARCHY_LOCK_KEY}))
+    `);
+  }
+
+  /**
    * Application-level parent-cycle check. Walking from `parentId` up the ancestor
    * chain: reject self-parent and any path that reaches `destinationId`.
    * Database trigger `catalog.enforce_destination_parent_acyclic` (Step 6.3)
@@ -797,6 +820,10 @@ export class CatalogRepository {
     const initialTags = tagSlugs ?? [];
     try {
       const id = await db.transaction(async (tx) => {
+        // Parent set on create: lock before INSERT takes row/FK locks.
+        if (input.parentId) {
+          await this.lockDestinationParentHierarchy(tx);
+        }
         const rows = await tx.execute(sql`
           insert into catalog.destinations (
             slug, name_en, name_ar, country_code, city_id, parent_id,
@@ -839,11 +866,7 @@ export class CatalogRepository {
       return this.getDestinationById(id);
     } catch (err) {
       if (err instanceof AppException) throw err;
-      const message = err instanceof Error ? err.message : String(err);
-      if (message.includes('destinations_slug') || /unique/i.test(message)) {
-        throw AppException.validation(`Destination slug already exists: ${input.slug}`);
-      }
-      throw err;
+      throw this.mapDestinationWriteError(err, input.slug);
     }
   }
 
@@ -921,8 +944,12 @@ export class CatalogRepository {
           : (current.externalKey as string | null),
     };
 
-    try {
-      await db.execute(sql`
+    const parentChanging =
+      patch.parentId !== undefined &&
+      String(patch.parentId ?? '') !== String(current.parentId ?? '');
+
+    const writeUpdate = async (executor: SqlExecutor) => {
+      await executor.execute(sql`
         update catalog.destinations set
           slug = ${next.slug},
           name_en = ${next.nameEn},
@@ -945,14 +972,44 @@ export class CatalogRepository {
           external_key = ${next.externalKey}
         where id = ${id}::uuid
       `);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (message.includes('destinations_slug') || message.toLowerCase().includes('unique')) {
-        throw AppException.validation(`Destination slug already exists: ${next.slug}`);
+    };
+
+    try {
+      if (parentChanging) {
+        // Lock before UPDATE acquires the target row lock (same key as DB trigger).
+        await db.transaction(async (tx) => {
+          await this.lockDestinationParentHierarchy(tx);
+          await writeUpdate(tx);
+        });
+      } else {
+        await writeUpdate(db);
       }
-      throw err;
+    } catch (err) {
+      throw this.mapDestinationWriteError(err, next.slug);
     }
     return this.getDestinationById(id);
+  }
+
+  private mapDestinationWriteError(err: unknown, slug: string): Error {
+    if (err instanceof AppException) return err;
+    const blob = collectErrorText(err);
+    const code = collectErrorCode(err);
+    if (code === '40P01' || /deadlock detected/i.test(blob)) {
+      return AppException.conflict(
+        'Destination hierarchy update deadlocked; retry the parent change',
+      );
+    }
+    if (
+      /hierarchy cycle/i.test(blob) ||
+      /cannot reference itself/i.test(blob) ||
+      /parent_not_self/i.test(blob)
+    ) {
+      return AppException.validation('Parent destination would create a hierarchy cycle');
+    }
+    if (blob.includes('destinations_slug') || /unique/i.test(blob)) {
+      return AppException.validation(`Destination slug already exists: ${slug}`);
+    }
+    return err instanceof Error ? err : new Error(blob);
   }
 
   /**
@@ -1210,4 +1267,32 @@ export class CatalogRepository {
     const total = Number((countRes as unknown as { c: number }[])[0]?.c ?? 0);
     return { items: rows as unknown as Record<string, unknown>[], total, limit, offset };
   }
+}
+
+function collectErrorText(err: unknown): string {
+  const parts: string[] = [];
+  let cur: unknown = err;
+  for (let depth = 0; cur && depth < 5; depth += 1) {
+    if (cur instanceof Error) {
+      parts.push(cur.message);
+      cur = cur.cause;
+      continue;
+    }
+    if (cur && typeof cur === 'object' && 'message' in cur) {
+      parts.push(String((cur as { message: unknown }).message));
+    }
+    break;
+  }
+  return parts.join('\n');
+}
+
+function collectErrorCode(err: unknown): string {
+  let cur: unknown = err;
+  for (let depth = 0; cur && depth < 5; depth += 1) {
+    if (cur && typeof cur === 'object' && 'code' in cur && (cur as { code: unknown }).code) {
+      return String((cur as { code: unknown }).code);
+    }
+    cur = cur instanceof Error ? cur.cause : undefined;
+  }
+  return '';
 }
