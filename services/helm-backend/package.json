@@ -2,7 +2,7 @@
   "name": "@helm/helm-backend",
   "version": "0.0.1",
   "private": true,
-  "description": "Helm حلم NestJS modular monolith (Step 2 skeleton)",
+  "description": "Helm حلم NestJS modular monolith (Step 3 backend foundation)",
   "license": "UNLICENSED",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -10,13 +10,14 @@
     "start": "node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "node --import tsx --test test/health.test.ts"
+    "test": "node --import tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.2.11",
     "@nestjs/core": "11.2.11",
     "@nestjs/platform-express": "11.2.11",
     "drizzle-orm": "0.45.4",
+    "jose": "5.9.6",
     "postgres": "3.4.7",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",

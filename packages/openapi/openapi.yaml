@@ -3,31 +3,53 @@ info:
   title: Helm حلم API
   description: |
     Single source of truth for Helm حلم `/v1`.
-    Step 2 stub: health/meta only. Product endpoints land in later phases.
-  version: 0.1.0
+    Step 3: platform foundation (health/ready/meta/me + authz). Product endpoints land in later phases.
+  version: 0.2.0
   contact:
     name: Helmy Shehab
 servers:
   - url: http://127.0.0.1:8080
     description: Local helm-backend
+security: []
 paths:
   /v1/health:
     get:
       operationId: getHealth
-      summary: Liveness / readiness probe
+      summary: Liveness probe
       tags: [meta]
+      security: []
       responses:
         "200":
-          description: Service is healthy
+          description: Service process is alive
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+  /v1/ready:
+    get:
+      operationId: getReady
+      summary: Readiness probe
+      tags: [meta]
+      security: []
+      responses:
+        "200":
+          description: Service is ready to accept traffic
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: Service is not ready (e.g. database configured but unreachable)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
   /v1/meta:
     get:
       operationId: getMeta
       summary: Service metadata
       tags: [meta]
+      security: []
       responses:
         "200":
           description: Build / API metadata
@@ -35,7 +57,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MetaResponse"
+  /v1/me:
+    get:
+      operationId: getMe
+      summary: Current authenticated principal
+      tags: [identity]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Authenticated caller profile foundation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401":
+          description: Missing or invalid access token
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth access token (or local mock JWT)
   schemas:
     HealthResponse:
       type: object
@@ -50,6 +98,28 @@ components:
         timestamp:
           type: string
           format: date-time
+    ReadyResponse:
+      type: object
+      required: [status, service, checks]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, unavailable]
+        service:
+          type: string
+          example: helm-backend
+        checks:
+          type: object
+          required: [database]
+          properties:
+            database:
+              type: string
+              enum: [ok, skipped, failed]
+        detail:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
     MetaResponse:
       type: object
       required: [name, version, apiVersion]
@@ -59,13 +129,31 @@ components:
           example: Helm حلم
         version:
           type: string
-          example: 0.0.1
+          example: 0.1.0
         apiVersion:
           type: string
           example: v1
+    MeResponse:
+      type: object
+      required: [userId, roles]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppRole"
+    AppRole:
+      type: string
+      enum: [customer, operator, administrator, super-administrator]
     Problem:
       type: object
       description: RFC 7807 problem+json
+      required: [type, title, status]
       properties:
         type:
           type: string
@@ -82,4 +170,6 @@ components:
           type: string
 tags:
   - name: meta
-    description: Health and service metadata (Step 2 stub)
+    description: Health, readiness, and service metadata
+  - name: identity
+    description: Authenticated identity foundation (no product profile CMS yet)

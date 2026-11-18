@@ -14,3 +14,5 @@ export type FlightQuote = {
 export interface FlightPort {
   quote(request: FlightQuoteRequest): Promise<FlightQuote[]>;
 }
+
+export const FLIGHT_PORT = Symbol('FLIGHT_PORT');

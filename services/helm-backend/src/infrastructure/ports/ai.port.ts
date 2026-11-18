@@ -13,3 +13,5 @@ export type AiGenerateResult = {
 export interface AiPort {
   generate(input: AiGenerateInput): Promise<AiGenerateResult>;
 }
+
+export const AI_PORT = Symbol('AI_PORT');

@@ -8,8 +8,14 @@ if (!spec.includes("openapi:")) {
   console.error("openapi.yaml missing openapi version");
   process.exit(1);
 }
-if (!spec.includes("/v1/health")) {
-  console.error("openapi.yaml must define /v1/health");
+for (const path of ["/v1/health", "/v1/ready", "/v1/meta", "/v1/me"]) {
+  if (!spec.includes(path)) {
+    console.error(`openapi.yaml must define ${path}`);
+    process.exit(1);
+  }
+}
+if (!spec.includes("bearerAuth")) {
+  console.error("openapi.yaml must define bearerAuth security scheme");
   process.exit(1);
 }
-console.log("@helm/openapi: stub OK");
+console.log("@helm/openapi: foundation contract OK");

@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import { GetMeUseCase } from './application/get-me.use-case';
+import { MeController } from './api/me.controller';
 
 /**
- * IdentityModule — domain boundary stub (Step 2).
- * No product feature implementation yet.
+ * IdentityModule — authz integration + /v1/me foundation.
+ * Profile CMS and BD-12 auth method flows land in later phases.
  */
 @Module({
-  providers: [],
-  exports: [],
+  controllers: [MeController],
+  providers: [GetMeUseCase],
+  exports: [GetMeUseCase],
 })
 export class IdentityModule {}

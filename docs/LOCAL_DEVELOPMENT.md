@@ -30,8 +30,10 @@ supabase db reset          # migrations + seed.sql
 docker compose -f docker/docker-compose.yml up -d postgres
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres SEED=true ./scripts/apply-migrations.sh
 
-# API
-pnpm --filter @helm/helm-backend dev   # http://127.0.0.1:8080/v1/health
+# API (AUTH_PROVIDER=mock by default)
+pnpm --filter @helm/helm-backend dev
+# Public:  http://127.0.0.1:8080/v1/health | /v1/ready | /v1/meta
+# Authed:  http://127.0.0.1:8080/v1/me  (Bearer mock JWT from tests / MockAuthAdapter)
 
 # Web / admin
 pnpm --filter helm-web dev             # :3000

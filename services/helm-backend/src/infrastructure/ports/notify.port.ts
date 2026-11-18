@@ -9,3 +9,5 @@ export type NotifyMessage = {
 export interface NotifyPort {
   send(message: NotifyMessage): Promise<void>;
 }
+
+export const NOTIFY_PORT = Symbol('NOTIFY_PORT');
