@@ -3,8 +3,9 @@ info:
   title: Helm حلم API
   description: |
     Single source of truth for Helm حلم `/v1`.
-    Step 5: travel catalog discovery + admin lifecycle/import (no booking/AI yet).
-  version: 0.3.0
+    Step 5: travel catalog discovery + admin lifecycle/import.
+    Step 6.1: destination admin, geo lookup, and audit-history contracts (implementation follows).
+  version: 0.4.0
   contact:
     name: Helmy Shehab
 servers:
@@ -216,6 +217,288 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TagListResponse"
+  /v1/geo/countries:
+    get:
+      operationId: listGeoCountries
+      summary: List countries (public read-only)
+      description: |
+        Canonical `geo.countries` lookup for pickers. Read-only; no write methods on `/v1/geo/*`.
+      tags: [geo]
+      security: []
+      parameters:
+        - name: active
+          in: query
+          description: When true, only active countries (default true when omitted by clients that pass it)
+          schema:
+            type: string
+            enum: ["true", "false"]
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Country list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeoCountryListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/geo/cities:
+    get:
+      operationId: listGeoCities
+      summary: List cities (public read-only)
+      description: |
+        Canonical `geo.cities` lookup. Prefer filtering by `country` (ISO-3166-1 alpha-2).
+        Read-only; no write methods on `/v1/geo/*`.
+      tags: [geo]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/CountryFilter"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: City list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeoCityListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/admin/catalog/destinations:
+    get:
+      operationId: adminListCatalogDestinations
+      summary: Staff list of catalog destinations (includes unpublished)
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/CountryFilter"
+        - $ref: "#/components/parameters/FeaturedFilter"
+        - name: lifecycleStatus
+          in: query
+          schema:
+            $ref: "#/components/schemas/LifecycleStatus"
+        - name: parentId
+          in: query
+          description: Filter by parent destination id; omit for any
+          schema:
+            type: string
+            format: uuid
+        - name: topLevelOnly
+          in: query
+          description: When true, only destinations with no parent
+          schema:
+            type: string
+            enum: ["true", "false"]
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Staff destination list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdminListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: adminCreateCatalogDestination
+      summary: Create a draft catalog destination
+      description: |
+        Always creates `lifecycleStatus=draft` for every actor (operator or administrator).
+        Clients must not supply a lifecycle status; any such field is rejected by the implementation.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDestinationRequest"
+      responses:
+        "201":
+          description: Draft destination created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/admin/catalog/destinations/{id}:
+    get:
+      operationId: adminGetCatalogDestination
+      summary: Get a catalog destination by id (staff)
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      responses:
+        "200":
+          description: Staff destination detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: adminUpdateCatalogDestination
+      summary: Update a catalog destination
+      description: |
+        Operators may update only curatable lifecycles (draft, pending_verification, rejected).
+        Slug may be changed only before publication. Published slugs are immutable via this
+        endpoint; exceptional post-publish renames require a dedicated audited redirect/alias
+        flow (not part of this contract surface).
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDestinationRequest"
+      responses:
+        "200":
+          description: Updated destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/destinations/{id}/transition:
+    post:
+      operationId: adminTransitionCatalogDestination
+      summary: Transition destination lifecycle
+      description: |
+        Follows the shared catalog lifecycle state machine. Operators may submit for
+        verification; verify/approve/publish/archive (and privileged reject paths) require
+        administrator or super-administrator.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LifecycleTransitionRequest"
+      responses:
+        "200":
+          description: Updated destination lifecycle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/destinations/{id}/tags:
+    put:
+      operationId: adminReplaceCatalogDestinationTags
+      summary: Replace destination tags (explicit set)
+      description: |
+        Manual tag editing uses explicit replacement semantics — the provided `tagSlugs`
+        become the full tag set for the destination (transactional). JSON import remains
+        additive and is unchanged by this contract.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplaceDestinationTagsRequest"
+      responses:
+        "200":
+          description: Destination with replaced tags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/audit-events:
+    get:
+      operationId: adminListAuditEvents
+      summary: List audit events for an entity
+      description: |
+        Restricted to administrator and super-administrator. Operators must rely on
+        lifecycle actor timestamps on the destination resource instead of this API.
+      tags: [audit-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [destination, place, import_run, poi, media, rating, price]
+        - name: entityId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Paginated audit events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditEventListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /v1/admin/catalog/places:
     get:
       operationId: adminListCatalogPlaces
@@ -342,6 +625,13 @@ components:
       required: true
       schema:
         type: string
+    DestinationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     CountryFilter:
       name: country
       in: query
@@ -869,6 +1159,478 @@ components:
           type: string
         externalKey:
           type: string
+    CreateDestinationRequest:
+      type: object
+      description: |
+        Creates a destination in draft only. Do not include lifecycleStatus —
+        the server always sets draft regardless of actor.
+      required: [slug, nameEn, nameAr, countryCode]
+      additionalProperties: false
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 120
+        nameEn:
+          type: string
+          minLength: 1
+          maxLength: 200
+        nameAr:
+          type: string
+          minLength: 1
+          maxLength: 200
+        shortDescriptionEn:
+          type: string
+          maxLength: 500
+        shortDescriptionAr:
+          type: string
+          maxLength: 500
+        summaryEn:
+          type: string
+        summaryAr:
+          type: string
+        descriptionEn:
+          type: string
+          maxLength: 10000
+        descriptionAr:
+          type: string
+          maxLength: 10000
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: Must resolve to an existing geo.countries row
+        cityId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional; when set must belong to the same countryCode
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional parent destination; cycles are rejected
+        timezone:
+          type: string
+          maxLength: 80
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        addressText:
+          type: string
+        websiteUrl:
+          type: string
+          format: uri
+        isFeatured:
+          type: boolean
+          default: false
+        externalKey:
+          type: string
+          maxLength: 200
+        tagSlugs:
+          type: array
+          items:
+            type: string
+          description: Initial tags (optional); subsequent form edits use PUT replace
+    UpdateDestinationRequest:
+      type: object
+      description: |
+        Partial update. Slug changes are allowed only before publication.
+        Published slugs are immutable through this request.
+      additionalProperties: false
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 120
+          description: Ignored/rejected when destination is published
+        nameEn:
+          type: string
+          minLength: 1
+          maxLength: 200
+        nameAr:
+          type: string
+          minLength: 1
+          maxLength: 200
+        shortDescriptionEn:
+          type: string
+          maxLength: 500
+          nullable: true
+        shortDescriptionAr:
+          type: string
+          maxLength: 500
+          nullable: true
+        summaryEn:
+          type: string
+          nullable: true
+        summaryAr:
+          type: string
+          nullable: true
+        descriptionEn:
+          type: string
+          maxLength: 10000
+          nullable: true
+        descriptionAr:
+          type: string
+          maxLength: 10000
+          nullable: true
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+        cityId:
+          type: string
+          format: uuid
+          nullable: true
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        timezone:
+          type: string
+          maxLength: 80
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        addressText:
+          type: string
+          nullable: true
+        websiteUrl:
+          type: string
+          format: uri
+          nullable: true
+        isFeatured:
+          type: boolean
+        externalKey:
+          type: string
+          maxLength: 200
+          nullable: true
+    ReplaceDestinationTagsRequest:
+      type: object
+      required: [tagSlugs]
+      additionalProperties: false
+      properties:
+        tagSlugs:
+          type: array
+          description: Full replacement set of active tag slugs (may be empty)
+          items:
+            type: string
+            minLength: 1
+            maxLength: 120
+    DestinationProvenance:
+      type: object
+      required: [id, sourceType, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        sourceType:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          nullable: true
+        referenceCode:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        collectedAt:
+          type: string
+          format: date-time
+          nullable: true
+        verificationStatus:
+          type: string
+          nullable: true
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+    DestinationAdmin:
+      type: object
+      description: Staff destination view (includes unpublished and internal workflow fields)
+      required:
+        - id
+        - slug
+        - nameEn
+        - nameAr
+        - countryCode
+        - lifecycleStatus
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        shortDescriptionEn:
+          type: string
+          nullable: true
+        shortDescriptionAr:
+          type: string
+          nullable: true
+        summaryEn:
+          type: string
+          nullable: true
+        summaryAr:
+          type: string
+          nullable: true
+        descriptionEn:
+          type: string
+          nullable: true
+        descriptionAr:
+          type: string
+          nullable: true
+        countryCode:
+          type: string
+        cityId:
+          type: string
+          format: uuid
+          nullable: true
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+        timezone:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        addressText:
+          type: string
+          nullable: true
+        websiteUrl:
+          type: string
+          nullable: true
+        isFeatured:
+          type: boolean
+        externalKey:
+          type: string
+          nullable: true
+        lifecycleStatus:
+          $ref: "#/components/schemas/LifecycleStatus"
+        verifiedBy:
+          type: string
+          format: uuid
+          nullable: true
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectedBy:
+          type: string
+          format: uuid
+          nullable: true
+        rejectedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+        archivedAt:
+          type: string
+          format: date-time
+          nullable: true
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: object
+            required: [slug, nameEn, nameAr]
+            properties:
+              id:
+                type: string
+                format: uuid
+              slug:
+                type: string
+              nameEn:
+                type: string
+              nameAr:
+                type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/DestinationProvenance"
+        media:
+          type: array
+          description: Existing media references only (no upload in Step 6)
+          items:
+            $ref: "#/components/schemas/PublicMediaRef"
+    DestinationAdminListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DestinationAdmin"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    GeoCountry:
+      type: object
+      required: [code, nameEn, isActive]
+      properties:
+        code:
+          type: string
+          minLength: 2
+          maxLength: 2
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+          nullable: true
+        defaultCurrency:
+          type: string
+          nullable: true
+        phoneCode:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+    GeoCountryListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeoCountry"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    GeoCity:
+      type: object
+      required: [id, countryCode, slug, nameEn, isActive]
+      properties:
+        id:
+          type: string
+          format: uuid
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+        regionId:
+          type: string
+          format: uuid
+          nullable: true
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+          nullable: true
+        timezone:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        isActive:
+          type: boolean
+    GeoCityListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeoCity"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    AuditEvent:
+      type: object
+      required: [id, action, entityType, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        actorUserId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          type: string
+        entityType:
+          type: string
+        entityId:
+          type: string
+          format: uuid
+          nullable: true
+        before:
+          type: object
+          nullable: true
+          additionalProperties: true
+        after:
+          type: object
+          nullable: true
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+    AuditEventListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEvent"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
     PlaceAdminSummary:
       type: object
       required: [id, slug, lifecycleStatus]
@@ -985,5 +1747,9 @@ tags:
     description: Authenticated identity foundation (no product profile CMS yet)
   - name: catalog
     description: Public travel catalog discovery (published entries only)
+  - name: geo
+    description: Public read-only geographic reference lookups (countries, cities)
   - name: catalog-admin
     description: Staff catalog curation, lifecycle, and curated JSON import
+  - name: audit-admin
+    description: Administrator audit-history reads (not available to operators)
