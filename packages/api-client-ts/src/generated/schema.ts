@@ -273,9 +273,23 @@ export interface paths {
         put?: never;
         /**
          * Transition destination lifecycle
-         * @description Follows the shared catalog lifecycle state machine. Operators may submit for
-         *     verification; verify/approve/publish/archive (and privileged reject paths) require
-         *     administrator or super-administrator.
+         * @description Follows the shared catalog lifecycle state machine (same edges as Step 5 places).
+         *     Allowed from → to transitions (runtime-validated against the current DB status):
+         *
+         *     - draft → pending_verification, archived, rejected
+         *     - pending_verification → verified, rejected, draft
+         *     - verified → approved, rejected, pending_verification
+         *     - approved → published, rejected, archived
+         *     - published → archived
+         *     - rejected → draft, pending_verification, archived
+         *     - archived → draft
+         *
+         *     Same-status transitions (`from === to`) are allowed for every status (no-op).
+         *     Invalid edges return HTTP 400.
+         *
+         *     Admin-only target statuses: verified, approved, published, archived.
+         *     Operators may submit for verification (and other non-admin targets); reaching
+         *     those admin-only targets requires administrator or super-administrator.
          */
         post: operations["adminTransitionCatalogDestination"];
         delete?: never;
@@ -650,7 +664,11 @@ export interface components {
          *     Published slugs are immutable through this request.
          */
         UpdateDestinationRequest: {
-            /** @description Ignored/rejected when destination is published */
+            /**
+             * @description If the destination is published, including this field is a validation
+             *     error (HTTP 400). Published slug changes require the separate audited
+             *     redirect/alias operation (not this endpoint).
+             */
             slug?: string;
             nameEn?: string;
             nameAr?: string;
