@@ -18,6 +18,10 @@ export type CategoryListResponse = components["schemas"]["CategoryListResponse"]
 export type TagListResponse = components["schemas"]["TagListResponse"];
 export type PlaceAdminSummary = components["schemas"]["PlaceAdminSummary"];
 export type CatalogImportResult = components["schemas"]["CatalogImportResult"];
+export type CatalogImportRunStatus = components["schemas"]["CatalogImportRunStatus"];
+export type CatalogImportRunListItem = components["schemas"]["CatalogImportRunListItem"];
+export type CatalogImportRunListResponse = components["schemas"]["CatalogImportRunListResponse"];
+export type CatalogImportRunDetail = components["schemas"]["CatalogImportRunDetail"];
 export type CreatePlaceRequest = components["schemas"]["CreatePlaceRequest"];
 export type LifecycleTransitionRequest = components["schemas"]["LifecycleTransitionRequest"];
 export type CatalogImportRequest = components["schemas"]["CatalogImportRequest"];
@@ -285,6 +289,28 @@ export function createHelmClient(options: HelmClientOptions) {
         method: "POST",
         body: JSON.stringify(body),
       });
+    },
+    async adminListCatalogImportRuns(params?: {
+      status?: CatalogImportRunStatus;
+      dryRun?: boolean;
+      sourceLabel?: string;
+      limit?: number;
+      offset?: number;
+    }): Promise<CatalogImportRunListResponse> {
+      return getJson<CatalogImportRunListResponse>(
+        `/v1/admin/catalog/import-runs${qs({
+          status: params?.status,
+          dryRun: params?.dryRun,
+          sourceLabel: params?.sourceLabel,
+          limit: params?.limit,
+          offset: params?.offset,
+        })}`,
+      );
+    },
+    async adminGetCatalogImportRun(id: string): Promise<CatalogImportRunDetail> {
+      return getJson<CatalogImportRunDetail>(
+        `/v1/admin/catalog/import-runs/${encodeURIComponent(id)}`,
+      );
     },
   };
 }

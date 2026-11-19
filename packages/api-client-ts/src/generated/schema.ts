@@ -378,6 +378,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/catalog/import-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List catalog import runs (newest first)
+         * @description Staff-readable history of dry-run and apply runs from catalog.import_runs.
+         *     Does not return original JSON payloads (not stored). Use GET by id for error details.
+         *     Pagination total is authoritative for the filtered set — do not invent global totals.
+         */
+        get: operations["adminListCatalogImportRuns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/catalog/import-runs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one catalog import run with error report
+         * @description Returns run metadata, summary counts, and stored error_report.
+         *     Does not include the original import JSON (not persisted).
+         *     For actor audit trail, use GET /v1/admin/audit-events?entityType=import_run&entityId=…
+         */
+        get: operations["adminGetCatalogImportRun"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/catalog/import": {
         parameters: {
             query?: never;
@@ -852,10 +896,19 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * @description Persisted import-run lifecycle (catalog.import_runs.status).
+         *     completed = no row-level errors; partial = some successes with errors (or dry-run with preview errors);
+         *     failed = apply with errors and zero destination/place mutations.
+         * @enum {string}
+         */
+        CatalogImportRunStatus: "completed" | "partial" | "failed";
         CatalogImportResult: {
             dryRun: boolean;
             /** Format: uuid */
             importRunId: string;
+            /** @description Optional for backward compatibility; mirrors persisted import_runs.status */
+            status?: components["schemas"]["CatalogImportRunStatus"];
             placesInPayload?: number;
             destinationsInPayload?: number;
             destinationsWouldCreate?: number;
@@ -879,6 +932,57 @@ export interface components {
             updated?: number;
             skipped?: number;
             errors?: {
+                path?: string;
+                message?: string;
+            }[];
+        };
+        /** @description Useful counts extracted from import_runs.summary (shape varies dry-run vs apply) */
+        CatalogImportRunSummaryCounts: {
+            destinationsInPayload?: number;
+            placesInPayload?: number;
+            destinationsWouldCreate?: number;
+            destinationsWouldUpdate?: number;
+            destinationsWouldSkip?: number;
+            placesWouldCreate?: number;
+            placesWouldUpdate?: number;
+            placesWouldSkip?: number;
+            destinationsCreated?: number;
+            destinationsUpdated?: number;
+            destinationsSkipped?: number;
+            placesCreated?: number;
+            placesUpdated?: number;
+            placesSkipped?: number;
+            wouldCreate?: number;
+            wouldUpdate?: number;
+            wouldSkip?: number;
+            created?: number;
+            updated?: number;
+            skipped?: number;
+        } & {
+            [key: string]: unknown;
+        };
+        CatalogImportRunListItem: {
+            /** Format: uuid */
+            id: string;
+            dryRun: boolean;
+            status: components["schemas"]["CatalogImportRunStatus"];
+            sourceLabel?: string | null;
+            /** Format: uuid */
+            actorUserId?: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            errorCount: number;
+            summary: components["schemas"]["CatalogImportRunSummaryCounts"];
+        };
+        CatalogImportRunListResponse: {
+            items: components["schemas"]["CatalogImportRunListItem"][];
+            /** @description Total rows matching filters (not a global unfiltered aggregate unless filters omitted) */
+            total: number;
+            limit: number;
+            offset: number;
+        };
+        CatalogImportRunDetail: components["schemas"]["CatalogImportRunListItem"] & {
+            errors: {
                 path?: string;
                 message?: string;
             }[];
@@ -1542,6 +1646,62 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListCatalogImportRuns: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["CatalogImportRunStatus"];
+                /** @description When set, filter dry-run vs apply runs */
+                dryRun?: boolean;
+                /** @description Case-insensitive substring match on source_label */
+                sourceLabel?: string;
+                limit?: components["parameters"]["Limit"];
+                offset?: components["parameters"]["Offset"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated import runs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportRunListResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminGetCatalogImportRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import run detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogImportRunDetail"];
+                };
+            };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];

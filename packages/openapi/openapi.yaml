@@ -603,6 +603,82 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/import-runs:
+    get:
+      operationId: adminListCatalogImportRuns
+      summary: List catalog import runs (newest first)
+      description: |
+        Staff-readable history of dry-run and apply runs from catalog.import_runs.
+        Does not return original JSON payloads (not stored). Use GET by id for error details.
+        Pagination total is authoritative for the filtered set — do not invent global totals.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CatalogImportRunStatus"
+        - name: dryRun
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: When set, filter dry-run vs apply runs
+        - name: sourceLabel
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+          description: Case-insensitive substring match on source_label
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          description: Paginated import runs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogImportRunListResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/admin/catalog/import-runs/{id}:
+    get:
+      operationId: adminGetCatalogImportRun
+      summary: Get one catalog import run with error report
+      description: |
+        Returns run metadata, summary counts, and stored error_report.
+        Does not include the original import JSON (not persisted).
+        For actor audit trail, use GET /v1/admin/audit-events?entityType=import_run&entityId=…
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Import run detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogImportRunDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/admin/catalog/import:
     post:
       operationId: adminImportCatalog
@@ -1691,6 +1767,13 @@ components:
           type: object
           description: Canonical helm.catalog.import.v1 document
           additionalProperties: true
+    CatalogImportRunStatus:
+      type: string
+      description: |
+        Persisted import-run lifecycle (catalog.import_runs.status).
+        completed = no row-level errors; partial = some successes with errors (or dry-run with preview errors);
+        failed = apply with errors and zero destination/place mutations.
+      enum: [completed, partial, failed]
     CatalogImportResult:
       type: object
       required: [dryRun, importRunId]
@@ -1700,6 +1783,9 @@ components:
         importRunId:
           type: string
           format: uuid
+        status:
+          $ref: "#/components/schemas/CatalogImportRunStatus"
+          description: Optional for backward compatibility; mirrors persisted import_runs.status
         placesInPayload:
           type: integer
         destinationsInPayload:
@@ -1751,6 +1837,106 @@ components:
                 type: string
               message:
                 type: string
+    CatalogImportRunSummaryCounts:
+      type: object
+      description: Useful counts extracted from import_runs.summary (shape varies dry-run vs apply)
+      additionalProperties: true
+      properties:
+        destinationsInPayload:
+          type: integer
+        placesInPayload:
+          type: integer
+        destinationsWouldCreate:
+          type: integer
+        destinationsWouldUpdate:
+          type: integer
+        destinationsWouldSkip:
+          type: integer
+        placesWouldCreate:
+          type: integer
+        placesWouldUpdate:
+          type: integer
+        placesWouldSkip:
+          type: integer
+        destinationsCreated:
+          type: integer
+        destinationsUpdated:
+          type: integer
+        destinationsSkipped:
+          type: integer
+        placesCreated:
+          type: integer
+        placesUpdated:
+          type: integer
+        placesSkipped:
+          type: integer
+        wouldCreate:
+          type: integer
+        wouldUpdate:
+          type: integer
+        wouldSkip:
+          type: integer
+        created:
+          type: integer
+        updated:
+          type: integer
+        skipped:
+          type: integer
+    CatalogImportRunListItem:
+      type: object
+      required: [id, dryRun, status, createdAt, errorCount, summary]
+      properties:
+        id:
+          type: string
+          format: uuid
+        dryRun:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/CatalogImportRunStatus"
+        sourceLabel:
+          type: string
+          nullable: true
+        actorUserId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        errorCount:
+          type: integer
+        summary:
+          $ref: "#/components/schemas/CatalogImportRunSummaryCounts"
+    CatalogImportRunListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CatalogImportRunListItem"
+        total:
+          type: integer
+          description: Total rows matching filters (not a global unfiltered aggregate unless filters omitted)
+        limit:
+          type: integer
+        offset:
+          type: integer
+    CatalogImportRunDetail:
+      allOf:
+        - $ref: "#/components/schemas/CatalogImportRunListItem"
+        - type: object
+          required: [errors]
+          properties:
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  message:
+                    type: string
     Problem:
       type: object
       description: RFC 7807 problem+json
