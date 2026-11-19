@@ -45,6 +45,7 @@ export class CatalogQueryService {
     country?: string;
     city?: string;
     area?: string;
+    destinationSlug?: string;
     category?: string;
     subcategory?: string;
     minRating?: number;
@@ -68,6 +69,9 @@ export class CatalogQueryService {
     if (query.country && !/^[A-Za-z]{2}$/.test(query.country)) {
       throw AppException.validation('country must be ISO-3166 alpha-2');
     }
+    if (query.destinationSlug != null && query.destinationSlug.trim().length === 0) {
+      throw AppException.validation('destinationSlug must be non-empty when provided');
+    }
     if (query.limit != null && (query.limit < 1 || query.limit > 100)) {
       throw AppException.validation('limit must be 1–100');
     }
@@ -79,6 +83,7 @@ export class CatalogQueryService {
       country: query.country?.toUpperCase(),
       city: query.city,
       area: query.area,
+      destinationSlug: query.destinationSlug?.trim(),
       category: query.category,
       subcategory: query.subcategory,
       minRating: query.minRating,

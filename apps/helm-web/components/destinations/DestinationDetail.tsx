@@ -1,18 +1,30 @@
 import Link from "next/link";
+import type { PlacePublic } from "@helm/api-client-ts";
 import {
   formatTagLabel,
   pickPrimaryCopy,
   type DestinationDetailFields,
 } from "@/lib/destinations/present";
 import { formatCountryLabel } from "@/lib/geo/country-label";
+import { DestinationPlaces } from "./DestinationPlaces";
 
 type DestinationDetailProps = {
   destination: DestinationDetailFields;
+  places?: PlacePublic[];
+  placesError?: string | null;
+  placesPage?: number;
+  placesPageSize?: number;
+  placesTotal?: number;
   locale?: string;
 };
 
 export function DestinationDetail({
   destination,
+  places = [],
+  placesError = null,
+  placesPage = 1,
+  placesPageSize = 50,
+  placesTotal = 0,
   locale = "en",
 }: DestinationDetailProps) {
   const { summary, description } = pickPrimaryCopy(destination);
@@ -57,6 +69,15 @@ export function DestinationDetail({
           ))}
         </div>
       ) : null}
+
+      <DestinationPlaces
+        places={places}
+        destinationSlug={destination.slug}
+        errorMessage={placesError}
+        page={placesPage}
+        pageSize={placesPageSize}
+        total={placesTotal}
+      />
     </main>
   );
 }

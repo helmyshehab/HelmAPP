@@ -21,6 +21,8 @@ export type PlaceListFilters = {
   country?: string;
   city?: string;
   area?: string;
+  /** Exact match on joined destination slug (`catalog.destinations.slug`). */
+  destinationSlug?: string;
   category?: string;
   subcategory?: string;
   minRating?: number;
@@ -188,6 +190,10 @@ export class CatalogRepository {
         and (${filters.country ?? null}::text is null or d.country_code = ${filters.country ?? null})
         and (${filters.city ?? null}::text is null or c.slug = ${filters.city ?? null})
         and (${filters.area ?? null}::text is null or a.slug = ${filters.area ?? null})
+        and (
+          ${filters.destinationSlug ?? null}::text is null
+          or d.slug = ${filters.destinationSlug ?? null}
+        )
         and (${filters.category ?? null}::text is null or p.category::text = ${filters.category ?? null})
         and (${filters.subcategory ?? null}::text is null or p.subcategory = ${filters.subcategory ?? null})
         and (${filters.minRating ?? null}::numeric is null or p.rating_value >= ${filters.minRating ?? null})
@@ -222,6 +228,10 @@ export class CatalogRepository {
         and (${filters.country ?? null}::text is null or d.country_code = ${filters.country ?? null})
         and (${filters.city ?? null}::text is null or c.slug = ${filters.city ?? null})
         and (${filters.area ?? null}::text is null or a.slug = ${filters.area ?? null})
+        and (
+          ${filters.destinationSlug ?? null}::text is null
+          or d.slug = ${filters.destinationSlug ?? null}
+        )
         and (${filters.category ?? null}::text is null or p.category::text = ${filters.category ?? null})
         and (${filters.subcategory ?? null}::text is null or p.subcategory = ${filters.subcategory ?? null})
         and (${filters.minRating ?? null}::numeric is null or p.rating_value >= ${filters.minRating ?? null})

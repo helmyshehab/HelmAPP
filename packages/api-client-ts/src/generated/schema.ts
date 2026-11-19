@@ -1217,6 +1217,8 @@ export interface operations {
                 country?: components["parameters"]["CountryFilter"];
                 city?: string;
                 area?: string;
+                /** @description Optional exact match on the place's destination slug. When omitted, destination filtering is unchanged. When provided, must be nonblank and at most 120 characters. */
+                destinationSlug?: string;
                 category?: components["schemas"]["PlaceCategory"];
                 subcategory?: string;
                 minRating?: number;

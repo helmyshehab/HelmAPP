@@ -123,6 +123,7 @@ export function createHelmClient(options: HelmClientOptions) {
       country?: string;
       city?: string;
       area?: string;
+      destinationSlug?: string;
       category?: string;
       subcategory?: string;
       minRating?: number;
@@ -139,6 +140,7 @@ export function createHelmClient(options: HelmClientOptions) {
           country: params?.country,
           city: params?.city,
           area: params?.area,
+          destinationSlug: params?.destinationSlug,
           category: params?.category,
           subcategory: params?.subcategory,
           minRating: params?.minRating,
