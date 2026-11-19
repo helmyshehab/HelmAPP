@@ -338,10 +338,13 @@ insert into pricing.price_records (
 insert into identity.user_accounts (id, auth_provider_ref, primary_email, status)
 values (
   '55555555-5555-5555-5555-555555555555',
-  'local-demo-customer',
+  '55555555-5555-5555-5555-555555555555',
   'demo.customer@helm.local',
   'active'
-) on conflict (id) do nothing;
+) on conflict (id) do update set
+  auth_provider_ref = excluded.auth_provider_ref,
+  primary_email = excluded.primary_email,
+  status = excluded.status;
 
 insert into identity.customer_profiles (
   user_id, first_name, last_name, display_name,
@@ -373,13 +376,20 @@ where not exists (
     and revoked_at is null
 );
 
--- Demo staff users for RLS harness (local only)
+-- Demo staff users for RLS harness + helm-admin local Auth (Step 6.4).
+-- Auth user UUIDs MUST equal these ids. Create Auth rows with:
+--   DEMO_STAFF_PASSWORD=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+--   node scripts/seed-local-staff-auth.mjs
+-- auth_provider_ref stores the Supabase Auth UID (same as id) after local Auth seed.
 insert into identity.user_accounts (id, auth_provider_ref, primary_email, status)
 values
-  ('66666666-6666-6666-6666-666666666666', 'local-demo-operator', 'demo.operator@helm.local', 'active'),
-  ('77777777-7777-7777-7777-777777777777', 'local-demo-admin', 'demo.admin@helm.local', 'active'),
-  ('88888888-8888-8888-8888-888888888888', 'local-demo-super', 'demo.super@helm.local', 'active')
-on conflict (id) do nothing;
+  ('66666666-6666-6666-6666-666666666666', '66666666-6666-6666-6666-666666666666', 'demo.operator@helm.local', 'active'),
+  ('77777777-7777-7777-7777-777777777777', '77777777-7777-7777-7777-777777777777', 'demo.admin@helm.local', 'active'),
+  ('88888888-8888-8888-8888-888888888888', '88888888-8888-8888-8888-888888888888', 'demo.super@helm.local', 'active')
+on conflict (id) do update set
+  auth_provider_ref = excluded.auth_provider_ref,
+  primary_email = excluded.primary_email,
+  status = excluded.status;
 
 insert into identity.user_roles (user_id, role, granted_by)
 select v.user_id, v.role::identity.app_role, v.granted_by

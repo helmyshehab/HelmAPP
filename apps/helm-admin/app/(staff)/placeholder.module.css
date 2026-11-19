@@ -1,0 +1,41 @@
+.panel {
+  max-width: 40rem;
+  padding: 1.5rem 1.35rem;
+  border: 1px solid var(--helm-border);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--helm-shadow);
+  animation: rise 380ms ease both;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--helm-sea-deep);
+  font-weight: 700;
+}
+
+.title {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-display), "Iowan Old Style", serif;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+  font-weight: 600;
+}
+
+.copy {
+  margin: 0.75rem 0 0;
+  color: var(--helm-ink-soft);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
