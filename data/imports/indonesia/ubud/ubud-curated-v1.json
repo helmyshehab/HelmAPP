@@ -1,0 +1,866 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "ubud-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:ubud",
+      "slug": "ubud",
+      "nameEn": "Ubud",
+      "nameAr": "أوبود",
+      "countryCode": "ID",
+      "summaryEn": "Central Bali’s cultural heart — rice terraces, temples, cafes, and day excursions into Kintamani, Tampaksiring, and the Ayung River.",
+      "summaryAr": "قلب بالي الثقافي — مدرجات الأرز والمعابد والمقاهي ورحلات يومية إلى كينتاماني وتامباكسيرينغ ونهر أيونغ.",
+      "shortDescriptionEn": "Central Bali cultural destination — temples, rice terraces, cafes, and nearby excursions. Recommended stay 2–4 days.",
+      "tags": [
+        "culture",
+        "nature",
+        "jungle",
+        "rice_terraces",
+        "wellness",
+        "adventure",
+        "food",
+        "cafes"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:ubud:hujan-locale",
+      "destinationSlug": "ubud",
+      "category": "restaurant",
+      "subcategory": "modern_indonesian",
+      "slug": "ubud-hujan-locale",
+      "nameEn": "Hujan Locale",
+      "nameAr": "هوجان لوكال",
+      "shortDescriptionEn": "A polished introduction to Indonesian flavours without leaving the Ubud dining circuit.",
+      "descriptionEn": "Modern Indonesian restaurant in Ubud known for regional ingredients presented in a contemporary dining format.\n\nArea: Ubud. Central Ubud dining",
+      "tags": [
+        "indonesian",
+        "modern",
+        "dinner",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.5,
+        "scale": 5,
+        "reviewCount": 1691,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "indonesian",
+          "modern_indonesian"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:kubu-at-mandapa",
+      "destinationSlug": "ubud",
+      "category": "restaurant",
+      "subcategory": "fine_dining",
+      "slug": "ubud-kubu-at-mandapa",
+      "nameEn": "Kubu at Mandapa",
+      "nameAr": "كوبو في ماندابا",
+      "shortDescriptionEn": "Destination fine dining with a strong sense of place beside the river.",
+      "descriptionEn": "Fine-dining restaurant associated with Mandapa, a Ritz-Carlton Reserve property, emphasizing riverside setting and elevated tasting menus.\n\nArea: Ubud. Mandapa resort area, riverside fine dining",
+      "tags": [
+        "fine_dining",
+        "luxury",
+        "riverside",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 1489,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 4,
+      "dining": {
+        "cuisineTypes": [
+          "fine_dining",
+          "indonesian_inspired"
+        ],
+        "mealTypes": [
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:moksa",
+      "destinationSlug": "ubud",
+      "category": "restaurant",
+      "subcategory": "plant_based",
+      "slug": "ubud-moksa",
+      "nameEn": "Moksa Ubud",
+      "nameAr": "موكسا أوبود",
+      "shortDescriptionEn": "One of Ubud’s better-known plant-based dining destinations.",
+      "descriptionEn": "Plant-based restaurant in Ubud focused on fresh produce and vegetarian/vegan plates in a garden setting.\n\nArea: Ubud. Ubud plant-based dining",
+      "tags": [
+        "plant_based",
+        "vegan",
+        "garden",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.7,
+        "scale": 5,
+        "reviewCount": 1154,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "plant_based",
+          "vegetarian"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": [
+          "vegan",
+          "vegetarian"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:murnis-warung",
+      "destinationSlug": "ubud",
+      "category": "restaurant",
+      "subcategory": "indonesian_balinese",
+      "slug": "ubud-murnis-warung",
+      "nameEn": "Murni’s Warung",
+      "nameAr": "مورنيز وارونغ",
+      "shortDescriptionEn": "Classic Ubud warung dining with a riverside setting and deep local history.",
+      "descriptionEn": "Long-standing Balinese/Indonesian warung overlooking the Campuhan river gorge — a local institution.\n\nArea: Ubud. Campuhan / central Ubud classic warung",
+      "tags": [
+        "balinese",
+        "warung",
+        "riverside",
+        "classic"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.3,
+        "scale": 5,
+        "reviewCount": 1849,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "indonesian",
+          "balinese"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:aperitif-restaurant",
+      "destinationSlug": "ubud",
+      "category": "restaurant",
+      "subcategory": "fine_dining",
+      "slug": "ubud-aperitif-restaurant",
+      "nameEn": "Apéritif Restaurant",
+      "nameAr": "مطعم أبيريتيف",
+      "shortDescriptionEn": "Elevated evening dining for travellers seeking a special-occasion table in Ubud.",
+      "descriptionEn": "Fine-dining restaurant in Ubud known for refined tasting menus and cocktail-forward hospitality.\n\nArea: Ubud. Ubud fine dining",
+      "tags": [
+        "fine_dining",
+        "luxury",
+        "cocktails",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 434,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 4,
+      "dining": {
+        "cuisineTypes": [
+          "fine_dining",
+          "contemporary"
+        ],
+        "mealTypes": [
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:suka-ubud",
+      "destinationSlug": "ubud",
+      "category": "cafe",
+      "subcategory": "brunch_specialty_coffee",
+      "slug": "ubud-suka-ubud",
+      "nameEn": "Suka Ubud",
+      "nameAr": "سوكا أوبود",
+      "shortDescriptionEn": "Strong brunch and coffee stop for daytime plans in Ubud.",
+      "descriptionEn": "Cafe known for brunch plates and specialty coffee in the Ubud cafe scene.\n\nArea: Ubud. Ubud cafe / brunch",
+      "tags": [
+        "brunch",
+        "coffee",
+        "cafe",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.8,
+        "scale": 5,
+        "reviewCount": 511,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "brunch"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "brunch",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:watercress",
+      "destinationSlug": "ubud",
+      "category": "cafe",
+      "subcategory": "brunch_cafe",
+      "slug": "ubud-watercress",
+      "nameEn": "Watercress Ubud",
+      "nameAr": "ووتركريس أوبود",
+      "shortDescriptionEn": "Reliable brunch cafe with strong traveller review volume.",
+      "descriptionEn": "Popular Ubud brunch cafe with a broad daytime menu and busy local reputation.\n\nArea: Ubud. Ubud brunch cafe",
+      "tags": [
+        "brunch",
+        "cafe",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.5,
+        "scale": 5,
+        "reviewCount": 1768,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "brunch"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "brunch",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:ivy-cafe",
+      "destinationSlug": "ubud",
+      "category": "cafe",
+      "subcategory": "all_day_cafe",
+      "slug": "ubud-ivy-cafe",
+      "nameEn": "Ivy Cafe",
+      "nameAr": "مقهى آيفي",
+      "shortDescriptionEn": "Flexible daytime cafe stop with consistently high public ratings.",
+      "descriptionEn": "All-day cafe in Ubud with a large review footprint among travellers.\n\nArea: Ubud. Ubud all-day cafe",
+      "tags": [
+        "cafe",
+        "all_day",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 5,
+        "scale": 5,
+        "reviewCount": 1996,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:gangga-coffee",
+      "destinationSlug": "ubud",
+      "category": "cafe",
+      "subcategory": "coffee_shop",
+      "slug": "ubud-gangga-coffee",
+      "nameEn": "Gangga Coffee Ubud",
+      "nameAr": "غانغا كوفي أوبود",
+      "shortDescriptionEn": "Compact coffee stop when you want beans and a quieter cafe pace.",
+      "descriptionEn": "Coffee-focused cafe in Ubud suited to shorter specialty-coffee stops.\n\nArea: Ubud. Ubud specialty coffee",
+      "tags": [
+        "coffee",
+        "specialty_coffee",
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.7,
+        "scale": 5,
+        "reviewCount": 384,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "priceLevel": 2,
+      "dining": {
+        "cuisineTypes": [
+          "coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "snacks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:sacred-monkey-forest",
+      "destinationSlug": "ubud",
+      "category": "attraction",
+      "subcategory": "nature_wildlife_cultural_site",
+      "slug": "ubud-sacred-monkey-forest",
+      "nameEn": "Sacred Monkey Forest Sanctuary",
+      "nameAr": "محمية غابة القرود المقدسة",
+      "shortDescriptionEn": "Signature Ubud nature-and-culture visit combining forest paths and temple grounds.",
+      "descriptionEn": "Forest sanctuary and temple complex in Padangtegal known for long-tailed macaques and shaded walking paths.\n\nArea: Padangtegal, Ubud. Within greater Ubud; not a single walking-distance cluster with all other listings",
+      "tags": [
+        "nature",
+        "wildlife",
+        "temple",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.2,
+        "scale": 5,
+        "reviewCount": 35730,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "attraction": {
+        "attractionType": "natural",
+        "suitableFor": [
+          "families",
+          "first_time_visitors"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:campuhan-ridge-walk",
+      "destinationSlug": "ubud",
+      "category": "attraction",
+      "subcategory": "scenic_walk",
+      "slug": "ubud-campuhan-ridge-walk",
+      "nameEn": "Campuhan Ridge Walk",
+      "nameAr": "ممر كامبوهان ريدج",
+      "shortDescriptionEn": "Easy scenic walk with open views close to central Ubud.",
+      "descriptionEn": "Open ridge walking path through grassy hills above the Campuhan river confluence — a popular free scenic walk.\n\nArea: Campuhan, Ubud. Scenic ridge walk from Campuhan / central Ubud approaches",
+      "tags": [
+        "walk",
+        "views",
+        "nature",
+        "free"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.3,
+        "scale": 5,
+        "reviewCount": 6789,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "attraction": {
+        "attractionType": "viewpoint",
+        "suitableFor": [
+          "walkers",
+          "sunrise"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:tirta-empul",
+      "destinationSlug": "ubud",
+      "category": "attraction",
+      "subcategory": "hindu_temple_cultural_site",
+      "slug": "ubud-tirta-empul",
+      "nameEn": "Tirta Empul Temple",
+      "nameAr": "معبد تيرتا إمبُل",
+      "shortDescriptionEn": "Important cultural site and day excursion from Ubud into Tampaksiring.",
+      "descriptionEn": "Hindu water temple in Tampaksiring known for purification pools fed by a natural spring.\n\nArea: Tampaksiring. Excursion destination in Tampaksiring — not central Ubud walking distance",
+      "tags": [
+        "temple",
+        "culture",
+        "tampaksiring",
+        "day_trip"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.4,
+        "scale": 5,
+        "reviewCount": 3644,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "attraction": {
+        "attractionType": "cultural",
+        "suitableFor": [
+          "culture",
+          "day_trip"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:mount-batur-sunrise-trek",
+      "destinationSlug": "ubud",
+      "category": "activity",
+      "subcategory": "guided_volcano_trek",
+      "slug": "ubud-mount-batur-sunrise-trek",
+      "nameEn": "Mount Batur Sunrise Trek",
+      "nameAr": "تسلق شروق جبل باتور",
+      "shortDescriptionEn": "Classic Bali adventure day trip for active travellers based in Ubud.",
+      "descriptionEn": "Guided sunrise trek on Mount Batur in the Kintamani volcanic region northeast of Ubud.\n\nArea: Kintamani. Kintamani / Mount Batur excursion — typically pre-dawn departure from Ubud area\n\nIndicative advertised starting price: USD 22 (indicative_advertised_starting_price; not a confirmed supplier quote).",
+      "tags": [
+        "trek",
+        "volcano",
+        "sunrise",
+        "kintamani",
+        "excursion"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 5,
+        "scale": 5,
+        "reviewCount": 1351,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "activity": {
+        "activityType": "adventure"
+      }
+    },
+    {
+      "externalKey": "id:ubud:atv-quad-bike-adventure",
+      "destinationSlug": "ubud",
+      "category": "activity",
+      "subcategory": "atv_off_road",
+      "slug": "ubud-atv-quad-bike-adventure",
+      "nameEn": "Ubud ATV Quad Bike Adventure",
+      "nameAr": "مغامرة الدراجات الرباعية في أوبود",
+      "shortDescriptionEn": "High-energy off-road activity popular with short-stay travellers.",
+      "descriptionEn": "Guided ATV / quad-bike adventure through countryside trails near the Ubud area.\n\nArea: Greater Ubud / surrounding villages. Off-road routes typically around village roads and farmland outside the town centre\n\nIndicative advertised starting price: USD 29 (indicative_advertised_starting_price; not a confirmed supplier quote).",
+      "tags": [
+        "atv",
+        "adventure",
+        "off_road",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 1995,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "activity": {
+        "activityType": "adventure"
+      }
+    },
+    {
+      "externalKey": "id:ubud:ayung-river-rafting",
+      "destinationSlug": "ubud",
+      "category": "activity",
+      "subcategory": "white_water_rafting",
+      "slug": "ubud-ayung-river-rafting",
+      "nameEn": "Ayung River White-Water Rafting",
+      "nameAr": "تجديف نهر أيونغ",
+      "shortDescriptionEn": "Signature Bali water adventure reachable as an excursion from Ubud.",
+      "descriptionEn": "White-water rafting on the Ayung River through jungle gorges north of Ubud (Payangan area).\n\nArea: Payangan / Ayung River. Payangan / Ayung River excursion — not a central Ubud walking venue\n\nIndicative advertised starting price: USD 23 (indicative_advertised_starting_price; not a confirmed supplier quote).",
+      "tags": [
+        "rafting",
+        "ayung",
+        "payangan",
+        "water_sports",
+        "excursion"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 615,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:ubud:balinese-cooking-class",
+      "destinationSlug": "ubud",
+      "category": "activity",
+      "subcategory": "cooking_class_cultural_experience",
+      "slug": "ubud-balinese-cooking-class",
+      "nameEn": "Balinese Cooking Class & Market Tour",
+      "nameAr": "دورة طبخ بالية وجولة سوق",
+      "shortDescriptionEn": "Cultural food experience that pairs well with Ubud’s culinary reputation.",
+      "descriptionEn": "Hands-on Balinese cooking class, often paired with a guided market tour for fresh ingredients.\n\nArea: Ubud. Usually includes a local market visit plus hands-on cooking near Ubud\n\nIndicative advertised starting price: USD 18 (indicative_advertised_starting_price; not a confirmed supplier quote).",
+      "tags": [
+        "cooking_class",
+        "culture",
+        "food",
+        "market"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Ubud dataset v1",
+          "notes": "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 396,
+        "platform": "provider_unspecified",
+        "observedAt": "2026-11-19"
+      },
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:ubud:donna",
+      "destinationSlug": "ubud",
+      "category": "bar",
+      "subcategory": "restaurant_cocktail_bar",
+      "slug": "ubud-donna",
+      "nameEn": "Donna",
+      "nameAr": "دونا",
+      "shortDescriptionEn": "Evening venue when you want dinner and cocktails in one stop.",
+      "descriptionEn": "Restaurant and cocktail bar in Ubud combining dinner service with a strong drinks programme.\n\nArea: Ubud. Ubud restaurant–cocktail bar",
+      "tags": [
+        "cocktails",
+        "bar",
+        "dinner",
+        "ubud"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "maps_listing",
+          "name": "Tripadvisor public listing snapshot",
+          "notes": "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 2463,
+        "platform": "Tripadvisor",
+        "observedAt": "2026-11-19"
+      },
+      "dining": {
+        "cuisineTypes": [
+          "contemporary",
+          "cocktails"
+        ],
+        "mealTypes": [
+          "dinner",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:ubud:no-mas",
+      "destinationSlug": "ubud",
+      "category": "nightlife",
+      "subcategory": "live_music_cocktail_bar",
+      "slug": "ubud-no-mas",
+      "nameEn": "No Más",
+      "nameAr": "نو ماس",
+      "shortDescriptionEn": "Live-music drinks stop for later evenings in town.",
+      "descriptionEn": "Cocktail bar with live music energy — an evening nightlife option in Ubud.\n\nArea: Ubud. Ubud live-music cocktail venue",
+      "tags": [
+        "live_music",
+        "cocktails",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Business listing snapshot",
+          "notes": "Rating value and review_count preserved from a business-listing snapshot. Not Helm-verified. Distinct from Tripadvisor.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.4,
+        "scale": 5,
+        "reviewCount": 232,
+        "platform": "business_listing_snapshot",
+        "observedAt": "2026-11-19"
+      },
+      "nightlife": {
+        "venueType": "music_venue",
+        "musicGenres": [
+          "live"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:blue-door",
+      "destinationSlug": "ubud",
+      "category": "nightlife",
+      "subcategory": "club_live_music",
+      "slug": "ubud-blue-door",
+      "nameEn": "The Blue Door Bar, Restaurant & Club",
+      "nameAr": "ذا بلو دور",
+      "shortDescriptionEn": "Later-night option when the evening needs a clubbier energy.",
+      "descriptionEn": "Bar, restaurant, and club venue in Ubud oriented toward later nightlife and live music.\n\nArea: Ubud. Ubud club / late nightlife venue",
+      "tags": [
+        "club",
+        "live_music",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Business listing snapshot",
+          "notes": "Rating value and review_count preserved from a business-listing snapshot. Not Helm-verified. Distinct from Tripadvisor.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.8,
+        "scale": 5,
+        "reviewCount": 114,
+        "platform": "business_listing_snapshot",
+        "observedAt": "2026-11-19"
+      },
+      "nightlife": {
+        "venueType": "nightclub",
+        "musicGenres": [
+          "live",
+          "dance"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:ubud:lokal-bar",
+      "destinationSlug": "ubud",
+      "category": "nightlife",
+      "subcategory": "cocktail_live_music_bar",
+      "slug": "ubud-lokal-bar",
+      "nameEn": "Lokal Bar Ubud",
+      "nameAr": "لوكال بار أوبود",
+      "shortDescriptionEn": "Smaller-venue cocktails and live music without a full club night.",
+      "descriptionEn": "Cocktail bar with live-music programming in Ubud’s evening scene.\n\nArea: Ubud. Ubud cocktail / live-music bar",
+      "tags": [
+        "cocktails",
+        "live_music",
+        "bar",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Business listing snapshot",
+          "notes": "Rating value and review_count preserved from a business-listing snapshot. Not Helm-verified. Distinct from Tripadvisor.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "rating": {
+        "value": 4.9,
+        "scale": 5,
+        "reviewCount": 28,
+        "platform": "business_listing_snapshot",
+        "observedAt": "2026-11-19"
+      },
+      "nightlife": {
+        "venueType": "bar_nightlife",
+        "musicGenres": [
+          "live"
+        ]
+      }
+    }
+  ]
+}
