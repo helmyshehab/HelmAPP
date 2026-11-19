@@ -6,14 +6,22 @@ create extension if not exists "pgcrypto";
 create extension if not exists "citext";
 
 -- Stub Supabase auth helpers for plain Postgres / local apply without full Auth.
+-- On hosted/local Supabase, auth.uid() already exists and is owned by Auth —
+-- CREATE OR REPLACE fails with permission denied for schema auth (42501).
+-- Only install the JWT-claim fallback when the function is missing.
 create schema if not exists auth;
-create or replace function auth.uid()
-returns uuid
-language sql
-stable
-as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
-$$;
+do $$
+begin
+  if to_regprocedure('auth.uid()') is null then
+    create function auth.uid()
+    returns uuid
+    language sql
+    stable
+    as $fn$
+      select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+    $fn$;
+  end if;
+end $$;
 
 create schema if not exists identity;
 create schema if not exists catalog;

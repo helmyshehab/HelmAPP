@@ -20,24 +20,33 @@ begin
 end;
 $$;
 
--- Auth helpers for plain Postgres / Supabase-compatible JWT claim settings
+-- Auth helpers for plain Postgres / Supabase-compatible JWT claim settings.
+-- Preserve Supabase Auth's auth.uid()/auth.role() when present; only create
+-- claim-based fallbacks when missing (plain Postgres Compose path).
 create schema if not exists auth;
 
-create or replace function auth.uid()
-returns uuid
-language sql
-stable
-as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
-$$;
+do $$
+begin
+  if to_regprocedure('auth.uid()') is null then
+    create function auth.uid()
+    returns uuid
+    language sql
+    stable
+    as $fn$
+      select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+    $fn$;
+  end if;
 
-create or replace function auth.role()
-returns text
-language sql
-stable
-as $$
-  select coalesce(nullif(current_setting('request.jwt.claim.role', true), ''), 'anon');
-$$;
+  if to_regprocedure('auth.role()') is null then
+    create function auth.role()
+    returns text
+    language sql
+    stable
+    as $fn$
+      select coalesce(nullif(current_setting('request.jwt.claim.role', true), ''), 'anon');
+    $fn$;
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Reference: currencies
@@ -451,11 +460,27 @@ do $$ begin
 exception when duplicate_object then null;
 end $$;
 
-grant usage on schema auth, identity, catalog, pricing, packages, ops, geo, markets, verification, commerce, fulfillment, ai
+grant usage on schema identity, catalog, pricing, packages, ops, geo, markets, verification, commerce, fulfillment, ai
   to helm_authenticated, helm_anon;
 
-grant execute on function auth.uid() to helm_authenticated, helm_anon;
-grant execute on function auth.role() to helm_authenticated, helm_anon;
+-- auth schema/functions may be owned by Supabase Auth — skip grants we cannot make.
+do $$
+begin
+  grant usage on schema auth to helm_authenticated, helm_anon;
+exception
+  when insufficient_privilege then null;
+  when undefined_object then null;
+end $$;
+
+do $$
+begin
+  grant execute on function auth.uid() to helm_authenticated, helm_anon;
+  grant execute on function auth.role() to helm_authenticated, helm_anon;
+exception
+  when insufficient_privilege then null;
+  when undefined_function then null;
+end $$;
+
 grant execute on function identity.has_role(identity.app_role) to helm_authenticated, helm_anon;
 grant execute on function identity.has_any_role(identity.app_role[]) to helm_authenticated, helm_anon;
 grant execute on function identity.assign_role(uuid, identity.app_role, uuid) to helm_authenticated;
