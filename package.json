@@ -15,6 +15,8 @@
     "codegen:check": "pnpm codegen && git diff --exit-code -- packages/api-client-ts packages/api-client-dart || (echo 'Generated clients are dirty. Do not hand-edit; regenerate from OpenAPI.' && exit 1)",
     "dataset:ubud:build": "node scripts/build-ubud-dataset-v1.mjs",
     "dataset:ubud:validate": "node scripts/validate-ubud-dataset-v1.mjs",
+    "dataset:uluwatu:build": "node scripts/build-uluwatu-dataset-v1.mjs",
+    "dataset:uluwatu:validate": "node scripts/validate-uluwatu-dataset-v1.mjs",
     "test": "turbo run test"
   },
   "devDependencies": {
