@@ -19,6 +19,11 @@ import {
   type FieldErrors,
 } from "../../lib/destinations/form-schema";
 import {
+  canStartMutation,
+  runEditSaveSequence,
+  runTagReplaceRetry,
+} from "../../lib/destinations/edit-save";
+import {
   canEditDestinationFields,
   isPublishedSlugImmutable,
 } from "../../lib/destinations/lifecycle-ui";
@@ -58,6 +63,9 @@ export function DestinationForm({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [partialTagsMessage, setPartialTagsMessage] = useState<string | null>(
+    null,
+  );
   const [cities, setCities] = useState<CityOption[]>(initialCities);
   const [parents, setParents] = useState<ParentOption[]>(initialParents);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -66,6 +74,7 @@ export function DestinationForm({
   const editable = mode === "create" || canEditDestinationFields(status, isAdmin);
   const slugLocked =
     mode === "edit" && isPublishedSlugImmutable(status);
+  const busy = pending;
 
   useEffect(() => {
     let cancelled = false;
@@ -123,11 +132,17 @@ export function DestinationForm({
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function clearAlerts() {
     setFormError(null);
     setSuccess(null);
+    setPartialTagsMessage(null);
     setFieldErrors({});
+  }
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!canStartMutation(busy)) return;
+    clearAlerts();
 
     if (!editable) {
       setFormError("This destination cannot be edited in its current state.");
@@ -160,25 +175,85 @@ export function DestinationForm({
         return;
       }
 
-      const updateResult = await updateDestinationAction(
-        destination.id,
-        validated.body,
-      );
-      if (!updateResult.ok) {
-        setFormError(updateResult.message);
+      // Capture the intended tag set before awaiting mutations.
+      const intendedTagSlugs = [...values.tagSlugs];
+      const outcome = await runEditSaveSequence({
+        tagSlugs: intendedTagSlugs,
+        updateFields: async () => {
+          const result = await updateDestinationAction(
+            destination.id,
+            validated.body,
+          );
+          return result.ok
+            ? { ok: true }
+            : { ok: false, message: result.message };
+        },
+        replaceTags: async (tagSlugs) => {
+          const result = await replaceDestinationTagsAction(
+            destination.id,
+            tagSlugs,
+          );
+          return result.ok
+            ? { ok: true }
+            : { ok: false, message: result.message };
+        },
+      });
+
+      if (outcome.kind === "fields_failed") {
+        setFormError(outcome.message);
         return;
       }
 
-      const tagsResult = await replaceDestinationTagsAction(
-        destination.id,
-        values.tagSlugs,
-      );
-      if (!tagsResult.ok) {
-        setFormError(tagsResult.message);
+      if (outcome.kind === "partial_tags_failed") {
+        // Keep the user's intended tags in local state; do not claim full success.
+        setValues((prev) => ({
+          ...prev,
+          tagSlugs: [...outcome.intendedTagSlugs],
+        }));
+        setPartialTagsMessage(outcome.message);
+        setSuccess(null);
+        // Reconcile field-level server state after successful PATCH.
+        router.refresh();
         return;
       }
 
-      setSuccess("Destination saved.");
+      setPartialTagsMessage(null);
+      setSuccess(outcome.message);
+      router.refresh();
+    });
+  }
+
+  function onRetryTags() {
+    if (!destination || !canStartMutation(busy)) return;
+    setFormError(null);
+    setSuccess(null);
+
+    const intendedTagSlugs = [...values.tagSlugs];
+    startTransition(async () => {
+      const outcome = await runTagReplaceRetry({
+        tagSlugs: intendedTagSlugs,
+        replaceTags: async (tagSlugs) => {
+          const result = await replaceDestinationTagsAction(
+            destination.id,
+            tagSlugs,
+          );
+          return result.ok
+            ? { ok: true }
+            : { ok: false, message: result.message };
+        },
+      });
+
+      if (outcome.kind === "tags_failed") {
+        setValues((prev) => ({
+          ...prev,
+          tagSlugs: [...outcome.intendedTagSlugs],
+        }));
+        setPartialTagsMessage(outcome.message);
+        return;
+      }
+
+      setPartialTagsMessage(null);
+      setSuccess(outcome.message);
       router.refresh();
     });
   }
@@ -188,6 +263,25 @@ export function DestinationForm({
       {formError ? (
         <div className={styles.errorBox} role="alert">
           {formError}
+        </div>
+      ) : null}
+      {partialTagsMessage ? (
+        <div className={styles.errorBox} role="alert">
+          <p>{partialTagsMessage}</p>
+          <p className={styles.muted}>
+            Your intended tag selection is still in the form. Retry tags without
+            re-saving destination fields.
+          </p>
+          <div className={styles.actionsRow}>
+            <button
+              type="button"
+              className={styles.button}
+              disabled={busy || !editable}
+              onClick={onRetryTags}
+            >
+              {busy ? "Retrying tags…" : "Retry tag save"}
+            </button>
+          </div>
         </div>
       ) : null}
       {success ? (
@@ -479,8 +573,12 @@ export function DestinationForm({
       </section>
 
       <div className={styles.actionsRow}>
-        <button className={styles.button} type="submit" disabled={!editable || pending}>
-          {pending
+        <button
+          className={styles.button}
+          type="submit"
+          disabled={!editable || busy}
+        >
+          {busy
             ? "Saving…"
             : mode === "create"
               ? "Create draft"
@@ -489,7 +587,7 @@ export function DestinationForm({
         <button
           className={styles.secondaryButton}
           type="button"
-          disabled={pending}
+          disabled={busy}
           onClick={() => router.push("/destinations")}
         >
           Back to list
