@@ -1,0 +1,928 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "pattaya-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:pattaya",
+      "slug": "pattaya",
+      "nameEn": "Pattaya",
+      "nameAr": "باتايا",
+      "countryCode": "TH",
+      "summaryEn": "Gulf coast city for beach days, family attractions, and nightlife — distinct from Bangkok and Andaman destinations.",
+      "summaryAr": "مدينة على خليج تايلاند لأيام الشاطئ وعائلات وسهرات — متميزة عن بانكوك ووجهات أندامان.",
+      "shortDescriptionEn": "Eastern Gulf beach city break. Recommended stay 3–5 days.",
+      "tags": [
+        "beach",
+        "nightlife",
+        "family",
+        "gulf",
+        "day_trips"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Pattaya destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Thailand geo (TH/THB) is an apply-time prerequisite.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:pattaya:mantra",
+      "destinationSlug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "international",
+      "slug": "pattaya-mantra",
+      "nameEn": "Mantra Restaurant & Bar",
+      "nameAr": "مانترا",
+      "shortDescriptionEn": "Big-night international dining.",
+      "descriptionEn": "Large north Pattaya international restaurant and bar lead.\n\nArea: Wongamat / north. Large international dining venue",
+      "tags": [
+        "international"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.mantra-pattaya.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.mantra-pattaya.com/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:glass-house",
+      "destinationSlug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "slug": "pattaya-glass-house",
+      "nameEn": "The Glass House by the Pier",
+      "nameAr": "ذا غلاس هاوس",
+      "shortDescriptionEn": "Pier seafood dinner.",
+      "descriptionEn": "North Pattaya pier seafood dining lead.\n\nArea: Naklua / north. Pier seafood dining",
+      "tags": [
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "seafood"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:jomtien-seafood",
+      "destinationSlug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "slug": "pattaya-jomtien-seafood",
+      "nameEn": "Jomtien Seafood lead",
+      "nameAr": "مأكولات جومتين",
+      "shortDescriptionEn": "Jomtien seafood plates.",
+      "descriptionEn": "Indicative Jomtien beach seafood dining lead.\n\nArea: Jomtien. Jomtien beach seafood",
+      "tags": [
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "seafood"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:indian-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "international",
+      "slug": "pattaya-indian-pattaya",
+      "nameEn": "Central Pattaya Indian / international lead",
+      "nameAr": "مطبخ عالمي باتايا",
+      "shortDescriptionEn": "Central international dinner.",
+      "descriptionEn": "Indicative central Pattaya international dining lead.\n\nArea: Central Pattaya. International dining lead",
+      "tags": [
+        "international"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:thai-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "slug": "pattaya-thai-pattaya",
+      "nameEn": "Local Thai Restaurant lead",
+      "nameAr": "مطعم تايلاندي محلي",
+      "shortDescriptionEn": "Local Thai dinner.",
+      "descriptionEn": "Indicative local Thai restaurant lead away from Walking Street.\n\nArea: Naklua / central. Local Thai dining lead",
+      "tags": [
+        "thai"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:after-you-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "cafe",
+      "subcategory": "dessert_cafe",
+      "slug": "pattaya-after-you-pattaya",
+      "nameEn": "After You Pattaya lead",
+      "nameAr": "أفتر يو باتايا",
+      "shortDescriptionEn": "Dessert café stop.",
+      "descriptionEn": "After You dessert café brand lead in Pattaya retail areas.\n\nArea: Central / mall. Dessert café brand lead",
+      "tags": [
+        "dessert"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.afteryoudessertcafe.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.afteryoudessertcafe.com/",
+      "dining": {
+        "cuisineTypes": [
+          "dessert_cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:amazon-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "slug": "pattaya-amazon-pattaya",
+      "nameEn": "Café Amazon Pattaya lead",
+      "nameAr": "كافيه أمازون باتايا",
+      "shortDescriptionEn": "Easy coffee stop.",
+      "descriptionEn": "Café Amazon practical coffee lead; pin branch in Admin.\n\nArea: City-wide. Chain coffee lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.cafeamazon.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.cafeamazon.com/",
+      "dining": {
+        "cuisineTypes": [
+          "chain_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:jomtien-cafe",
+      "destinationSlug": "pattaya",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "pattaya-jomtien-cafe",
+      "nameEn": "Jomtien Beach Cafe lead",
+      "nameAr": "مقهى جومتين",
+      "shortDescriptionEn": "Jomtien beach café.",
+      "descriptionEn": "Indicative Jomtien beach café/brunch lead.\n\nArea: Jomtien. Beach café lead",
+      "tags": [
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:avani-cafe",
+      "destinationSlug": "pattaya",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "pattaya-avani-cafe",
+      "nameEn": "Hotel lobby café lead",
+      "nameAr": "مقهى فندقي",
+      "shortDescriptionEn": "Quiet resort coffee.",
+      "descriptionEn": "Indicative north Pattaya resort café lead for quieter coffee.\n\nArea: Wongamat / north. Resort café lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:pattaya:walking-street",
+      "destinationSlug": "pattaya",
+      "category": "attraction",
+      "subcategory": "nightlife_district",
+      "slug": "pattaya-walking-street",
+      "nameEn": "Walking Street",
+      "nameAr": "ووكينغ ستريت",
+      "shortDescriptionEn": "Iconic nightlife district stroll.",
+      "descriptionEn": "Pattaya’s famous night entertainment street. Treat as a district attraction; individual venues curated separately where listed.\n\nArea: South Pattaya. Famous nightlife street (attraction/district)",
+      "tags": [
+        "nightlife_district"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "other"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:sanctuary-of-truth",
+      "destinationSlug": "pattaya",
+      "category": "attraction",
+      "subcategory": "wooden_temple",
+      "slug": "pattaya-sanctuary-of-truth",
+      "nameEn": "Sanctuary of Truth",
+      "nameAr": "محراب الحقيقة",
+      "shortDescriptionEn": "Intricate wooden temple visit.",
+      "descriptionEn": "Vast wooden sanctuary landmark in north Pattaya/Naklua.\n\nArea: Naklua / north. Hand-carved wooden temple landmark",
+      "tags": [
+        "landmark"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:koh-larn",
+      "destinationSlug": "pattaya",
+      "category": "attraction",
+      "subcategory": "island",
+      "slug": "pattaya-koh-larn",
+      "nameEn": "Koh Larn (Coral Island)",
+      "nameAr": "كو لان",
+      "shortDescriptionEn": "Coral Island beach day.",
+      "descriptionEn": "Popular gulf island day trip for beaches and water sports. Not a separate Helm destination in V1.\n\nArea: Offshore day trip. Island day trip from Pattaya",
+      "tags": [
+        "island"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:pattaya-park",
+      "destinationSlug": "pattaya",
+      "category": "activity",
+      "subcategory": "family_activity",
+      "slug": "pattaya-pattaya-park",
+      "nameEn": "Pattaya Park Tower / family activity lead",
+      "nameAr": "باتايا بارك",
+      "shortDescriptionEn": "Family park activity.",
+      "descriptionEn": "Indicative family amusement/tower activity lead.\n\nArea: Southern outskirts. Family activity lead",
+      "tags": [
+        "family"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:diving-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "activity",
+      "subcategory": "diving",
+      "slug": "pattaya-diving-pattaya",
+      "nameEn": "Pattaya / Koh Larn Dive or Snorkel",
+      "nameAr": "غوص باتايا",
+      "shortDescriptionEn": "Gulf snorkel or dive day.",
+      "descriptionEn": "Indicative dive/snorkel outing toward wrecks or Koh Larn.\n\nArea: Pier departures. Water sports lead",
+      "tags": [
+        "diving"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:alcazar",
+      "destinationSlug": "pattaya",
+      "category": "activity",
+      "subcategory": "show",
+      "slug": "pattaya-alcazar",
+      "nameEn": "Alcazar Cabaret Show",
+      "nameAr": "عرض ألكازار",
+      "shortDescriptionEn": "Classic cabaret night.",
+      "descriptionEn": "Famous Pattaya cabaret show lead. Showtimes unverified in staging.\n\nArea: Central Pattaya. Cabaret theatre show",
+      "tags": [
+        "show"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alcazarthailand.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.alcazarthailand.com/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:cooking-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "slug": "pattaya-cooking-pattaya",
+      "nameEn": "Pattaya Thai Cooking Class",
+      "nameAr": "دورة طبخ باتايا",
+      "shortDescriptionEn": "Hands-on Thai cooking.",
+      "descriptionEn": "Indicative Thai cooking class activity in/near Pattaya.\n\nArea: City-wide. Cooking class lead",
+      "tags": [
+        "cooking"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:walking-street-bar",
+      "destinationSlug": "pattaya",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "slug": "pattaya-walking-street-bar",
+      "nameEn": "Walking Street Club lead",
+      "nameAr": "نادي ووكينغ ستريت",
+      "shortDescriptionEn": "Walking Street club night.",
+      "descriptionEn": "Indicative Walking Street club/venue lead.\n\nArea: Walking Street. Club lead on Walking Street",
+      "tags": [
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:pattaya:horizon",
+      "destinationSlug": "pattaya",
+      "category": "bar",
+      "subcategory": "rooftop_bar",
+      "slug": "pattaya-horizon",
+      "nameEn": "Horizon Rooftop Bar lead",
+      "nameAr": "هورايزون رووف توب",
+      "shortDescriptionEn": "Rooftop sunset drinks.",
+      "descriptionEn": "Indicative Pattaya rooftop bar lead for skyline/sea views.\n\nArea: Central / beach road hotels. Rooftop bar lead",
+      "tags": [
+        "rooftop"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:pattaya:jomtien-nightlife",
+      "destinationSlug": "pattaya",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "slug": "pattaya-jomtien-nightlife",
+      "nameEn": "Jomtien Nightlife lead",
+      "nameAr": "سهرات جومتين",
+      "shortDescriptionEn": "Laid-back Jomtien night.",
+      "descriptionEn": "Indicative Jomtien beach-bar nightlife lead vs Walking Street intensity.\n\nArea: Jomtien. Quieter beach nightlife lead",
+      "tags": [
+        "jomtien"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:pattaya:tiffany",
+      "destinationSlug": "pattaya",
+      "category": "nightlife",
+      "subcategory": "cabaret_district",
+      "slug": "pattaya-tiffany",
+      "nameEn": "Tiffany's Show vicinity nightlife lead",
+      "nameAr": "تيفاني شو",
+      "shortDescriptionEn": "Cabaret district night out.",
+      "descriptionEn": "Cabaret-show district nightlife lead (complementary to Alcazar activity).\n\nArea: North/central Pattaya. Cabaret-district nightlife lead",
+      "tags": [
+        "show",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:pattaya:hilton-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "pattaya-hilton-pattaya",
+      "nameEn": "Hilton Pattaya",
+      "nameAr": "هيلتون باتايا",
+      "shortDescriptionEn": "Central beachfront Hilton.",
+      "descriptionEn": "Hilton Pattaya on Central Beach Road.\n\nArea: Central Beach Road. Beachfront Hilton",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.hilton.com/en/hotels/phhhihi-hilton-pattaya/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.hilton.com/en/hotels/phhhihi-hilton-pattaya/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:marriott-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "pattaya-marriott-pattaya",
+      "nameEn": "Pattaya Marriott Resort & Spa",
+      "nameAr": "ماريوت باتايا",
+      "shortDescriptionEn": "North beach Marriott resort.",
+      "descriptionEn": "Marriott resort on quieter north Pattaya/Wongamat beach.\n\nArea: Wongamat / north. North Pattaya Marriott resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.marriott.com/en-us/hotels/pyxmz-pattaya-marriott-resort-and-spa/overview/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.marriott.com/en-us/hotels/pyxmz-pattaya-marriott-resort-and-spa/overview/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:intercontinental-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "pattaya-intercontinental-pattaya",
+      "nameEn": "InterContinental Pattaya Resort",
+      "nameAr": "إنتركونتيننتال باتايا",
+      "shortDescriptionEn": "Cove InterContinental resort.",
+      "descriptionEn": "InterContinental Pattaya Resort in a cove south of centre.\n\nArea: South / Cape. Cliff/cove InterContinental",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.ihg.com/intercontinental/hotels/us/en/pattaya/pyxha/hoteldetail",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.ihg.com/intercontinental/hotels/us/en/pattaya/pyxha/hoteldetail",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:woodlands",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "pattaya-woodlands",
+      "nameEn": "Woodlands Resort Pattaya",
+      "nameAr": "وودلاندز",
+      "shortDescriptionEn": "Garden resort stay.",
+      "descriptionEn": "Garden-set Woodlands Resort Pattaya lead.\n\nArea: Central/north gardens. Garden resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.woodland-resort.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.woodland-resort.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:amari-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "pattaya-amari-pattaya",
+      "nameEn": "Amari Pattaya",
+      "nameAr": "أماري باتايا",
+      "shortDescriptionEn": "Beach Road Amari stay.",
+      "descriptionEn": "Amari hotel on Pattaya Beach Road.\n\nArea: Beach Road. Amari beach hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.amari.com/pattaya",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.amari.com/pattaya",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:centara-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "pattaya-centara-pattaya",
+      "nameEn": "Centara Grand Mirage Beach Resort Pattaya",
+      "nameAr": "سينتارا ميراج",
+      "shortDescriptionEn": "Family Mirage resort.",
+      "descriptionEn": "Family-oriented Centara Grand Mirage resort in Wongamat.\n\nArea: Wongamat. Family fantasy resort",
+      "tags": [
+        "resort",
+        "family"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.centarahotelsresorts.com/centaragrand/cgmp",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.centarahotelsresorts.com/centaragrand/cgmp",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:pullman-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "pattaya-pullman-pattaya",
+      "nameEn": "Pullman Pattaya Hotel G",
+      "nameAr": "بولمان باتايا",
+      "shortDescriptionEn": "Central Pullman stay.",
+      "descriptionEn": "Pullman Pattaya Hotel G on the central beachfront.\n\nArea: Central beach. Pullman beach hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.pullmanpattayahotelg.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.pullmanpattayahotelg.com/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:avonova",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "pattaya-avonova",
+      "nameEn": "Avani+ Riverside Bangkok is wrong — Avani Pattaya Resort",
+      "nameAr": "أڤاني باتايا",
+      "shortDescriptionEn": "Wongamat Avani resort.",
+      "descriptionEn": "Avani Pattaya Resort on Wongamat beach.\n\nArea: Wongamat. Avani Pattaya resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.avanihotels.com/en/pattaya",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.avanihotels.com/en/pattaya",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:hard-rock-pattaya",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "pattaya-hard-rock-pattaya",
+      "nameEn": "Hard Rock Hotel Pattaya",
+      "nameAr": "هارد روك باتايا",
+      "shortDescriptionEn": "Beach Road Hard Rock stay.",
+      "descriptionEn": "Hard Rock Hotel on Pattaya Beach Road.\n\nArea: Beach Road. Hard Rock beach hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.hardrockhotels.com/pattaya/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.hardrockhotels.com/pattaya/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:pattaya:jomtien-hotel",
+      "destinationSlug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "pattaya-jomtien-hotel",
+      "nameEn": "Seaview Jomtien Hotel lead",
+      "nameAr": "فندق جومتين",
+      "shortDescriptionEn": "Jomtien beach hotel.",
+      "descriptionEn": "Practical Jomtien beach hotel staging lead.\n\nArea: Jomtien. Jomtien hotel lead",
+      "tags": [
+        "hotel",
+        "jomtien"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    }
+  ]
+}

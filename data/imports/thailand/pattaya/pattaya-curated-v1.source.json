@@ -1,0 +1,2159 @@
+{
+  "dataset": "pattaya-curated-v1",
+  "format": "helm.catalog.editorial.v1",
+  "compiled_at": "2026-11-19",
+  "locale_primary": "en",
+  "locale_secondary": "ar",
+  "research_status": "Staging research leads for Thailand catalogue foundation. Not a verified inventory. Prefer Helm Admin editorial curation before publish.",
+  "country": {
+    "name": "Thailand",
+    "iso2": "TH",
+    "currency": "THB",
+    "note": "Apply-time prerequisite: geo.countries must include TH and pricing.currencies must include THB (not present in default seed.sql as of this dataset)."
+  },
+  "destination": {
+    "name": "Pattaya",
+    "name_ar": "باتايا",
+    "slug": "pattaya",
+    "external_key": "id:pattaya",
+    "type": "destination_area",
+    "type_note": "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    "region": "Eastern Gulf of Thailand",
+    "parent": "Thailand",
+    "parent_note": "Editorial parent label. Import format does not set parent_id; countryCode TH is required at apply time.",
+    "country_code": "TH",
+    "recommended_duration": "3–5 days",
+    "tags": [
+      "beach",
+      "nightlife",
+      "family",
+      "gulf",
+      "day_trips"
+    ],
+    "data_status": "curated_needs_verification",
+    "publication_status": "draft",
+    "unpublished": true,
+    "summary_en": "Gulf coast city for beach days, family attractions, and nightlife — distinct from Bangkok and Andaman destinations.",
+    "summary_ar": "مدينة على خليج تايلاند لأيام الشاطئ وعائلات وسهرات — متميزة عن بانكوك ووجهات أندامان."
+  },
+  "category_distribution": {
+    "restaurant": 5,
+    "cafe": 4,
+    "attraction": 3,
+    "activity": 4,
+    "bar_beach_club_nightlife": 4,
+    "accommodation": 10
+  },
+  "geography_note": "Central Pattaya, Jomtien, Naklua/Wongamat, and outlying islands (e.g. Koh Larn day trips) are separate clusters. Do not treat Pattaya as interchangeable with Bangkok.",
+  "integrity": {
+    "do_not_invent": [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified"
+    ],
+    "accommodation_import": "Only accommodationType mapped; starRating and amenities omitted until verified",
+    "lifecycle": "all_records_draft_curated_needs_verification"
+  },
+  "places": [
+    {
+      "external_key": "pattaya-mantra",
+      "name": "Mantra Restaurant & Bar",
+      "name_ar": "مانترا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "international",
+      "area": "Wongamat / north",
+      "area_note": "Large international dining venue",
+      "description": "Large north Pattaya international restaurant and bar lead.",
+      "why_visit": "Big-night international dining.",
+      "best_for": [
+        "dinner",
+        "international"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.mantra-pattaya.com/"
+      ],
+      "tags": [
+        "international"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-glass-house",
+      "name": "The Glass House by the Pier",
+      "name_ar": "ذا غلاس هاوس",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "area": "Naklua / north",
+      "area_note": "Pier seafood dining",
+      "description": "North Pattaya pier seafood dining lead.",
+      "why_visit": "Pier seafood dinner.",
+      "best_for": [
+        "dinner",
+        "seafood"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-jomtien-seafood",
+      "name": "Jomtien Seafood lead",
+      "name_ar": "مأكولات جومتين",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "area": "Jomtien",
+      "area_note": "Jomtien beach seafood",
+      "description": "Indicative Jomtien beach seafood dining lead.",
+      "why_visit": "Jomtien seafood plates.",
+      "best_for": [
+        "dinner",
+        "seafood"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-indian-pattaya",
+      "name": "Central Pattaya Indian / international lead",
+      "name_ar": "مطبخ عالمي باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "international",
+      "area": "Central Pattaya",
+      "area_note": "International dining lead",
+      "description": "Indicative central Pattaya international dining lead.",
+      "why_visit": "Central international dinner.",
+      "best_for": [
+        "dinner",
+        "international"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "international"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-thai-pattaya",
+      "name": "Local Thai Restaurant lead",
+      "name_ar": "مطعم تايلاندي محلي",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "area": "Naklua / central",
+      "area_note": "Local Thai dining lead",
+      "description": "Indicative local Thai restaurant lead away from Walking Street.",
+      "why_visit": "Local Thai dinner.",
+      "best_for": [
+        "dinner",
+        "thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-after-you-pattaya",
+      "name": "After You Pattaya lead",
+      "name_ar": "أفتر يو باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "cafe",
+      "subcategory": "dessert_cafe",
+      "area": "Central / mall",
+      "area_note": "Dessert café brand lead",
+      "description": "After You dessert café brand lead in Pattaya retail areas.",
+      "why_visit": "Dessert café stop.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.afteryoudessertcafe.com/"
+      ],
+      "tags": [
+        "dessert"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-amazon-pattaya",
+      "name": "Café Amazon Pattaya lead",
+      "name_ar": "كافيه أمازون باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "area": "City-wide",
+      "area_note": "Chain coffee lead",
+      "description": "Café Amazon practical coffee lead; pin branch in Admin.",
+      "why_visit": "Easy coffee stop.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.cafeamazon.com/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-jomtien-cafe",
+      "name": "Jomtien Beach Cafe lead",
+      "name_ar": "مقهى جومتين",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Jomtien",
+      "area_note": "Beach café lead",
+      "description": "Indicative Jomtien beach café/brunch lead.",
+      "why_visit": "Jomtien beach café.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cafe"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-avani-cafe",
+      "name": "Hotel lobby café lead",
+      "name_ar": "مقهى فندقي",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Wongamat / north",
+      "area_note": "Resort café lead",
+      "description": "Indicative north Pattaya resort café lead for quieter coffee.",
+      "why_visit": "Quiet resort coffee.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-walking-street",
+      "name": "Walking Street",
+      "name_ar": "ووكينغ ستريت",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "attraction",
+      "subcategory": "nightlife_district",
+      "area": "South Pattaya",
+      "area_note": "Famous nightlife street (attraction/district)",
+      "description": "Pattaya’s famous night entertainment street. Treat as a district attraction; individual venues curated separately where listed.",
+      "why_visit": "Iconic nightlife district stroll.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "nightlife_district"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-sanctuary-of-truth",
+      "name": "Sanctuary of Truth",
+      "name_ar": "محراب الحقيقة",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "attraction",
+      "subcategory": "wooden_temple",
+      "area": "Naklua / north",
+      "area_note": "Hand-carved wooden temple landmark",
+      "description": "Vast wooden sanctuary landmark in north Pattaya/Naklua.",
+      "why_visit": "Intricate wooden temple visit.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "landmark"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-koh-larn",
+      "name": "Koh Larn (Coral Island)",
+      "name_ar": "كو لان",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "attraction",
+      "subcategory": "island",
+      "area": "Offshore day trip",
+      "area_note": "Island day trip from Pattaya",
+      "description": "Popular gulf island day trip for beaches and water sports. Not a separate Helm destination in V1.",
+      "why_visit": "Coral Island beach day.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "island"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-pattaya-park",
+      "name": "Pattaya Park Tower / family activity lead",
+      "name_ar": "باتايا بارك",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "activity",
+      "subcategory": "family_activity",
+      "area": "Southern outskirts",
+      "area_note": "Family activity lead",
+      "description": "Indicative family amusement/tower activity lead.",
+      "why_visit": "Family park activity.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "family"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-diving-pattaya",
+      "name": "Pattaya / Koh Larn Dive or Snorkel",
+      "name_ar": "غوص باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "activity",
+      "subcategory": "diving",
+      "area": "Pier departures",
+      "area_note": "Water sports lead",
+      "description": "Indicative dive/snorkel outing toward wrecks or Koh Larn.",
+      "why_visit": "Gulf snorkel or dive day.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "diving"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-alcazar",
+      "name": "Alcazar Cabaret Show",
+      "name_ar": "عرض ألكازار",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "activity",
+      "subcategory": "show",
+      "area": "Central Pattaya",
+      "area_note": "Cabaret theatre show",
+      "description": "Famous Pattaya cabaret show lead. Showtimes unverified in staging.",
+      "why_visit": "Classic cabaret night.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.alcazarthailand.com/"
+      ],
+      "tags": [
+        "show"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-cooking-pattaya",
+      "name": "Pattaya Thai Cooking Class",
+      "name_ar": "دورة طبخ باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "area": "City-wide",
+      "area_note": "Cooking class lead",
+      "description": "Indicative Thai cooking class activity in/near Pattaya.",
+      "why_visit": "Hands-on Thai cooking.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cooking"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-walking-street-bar",
+      "name": "Walking Street Club lead",
+      "name_ar": "نادي ووكينغ ستريت",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "area": "Walking Street",
+      "area_note": "Club lead on Walking Street",
+      "description": "Indicative Walking Street club/venue lead.",
+      "why_visit": "Walking Street club night.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-horizon",
+      "name": "Horizon Rooftop Bar lead",
+      "name_ar": "هورايزون رووف توب",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "bar",
+      "subcategory": "rooftop_bar",
+      "area": "Central / beach road hotels",
+      "area_note": "Rooftop bar lead",
+      "description": "Indicative Pattaya rooftop bar lead for skyline/sea views.",
+      "why_visit": "Rooftop sunset drinks.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "rooftop"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-jomtien-nightlife",
+      "name": "Jomtien Nightlife lead",
+      "name_ar": "سهرات جومتين",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "area": "Jomtien",
+      "area_note": "Quieter beach nightlife lead",
+      "description": "Indicative Jomtien beach-bar nightlife lead vs Walking Street intensity.",
+      "why_visit": "Laid-back Jomtien night.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "jomtien"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-tiffany",
+      "name": "Tiffany's Show vicinity nightlife lead",
+      "name_ar": "تيفاني شو",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "nightlife",
+      "subcategory": "cabaret_district",
+      "area": "North/central Pattaya",
+      "area_note": "Cabaret-district nightlife lead",
+      "description": "Cabaret-show district nightlife lead (complementary to Alcazar activity).",
+      "why_visit": "Cabaret district night out.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "show",
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "pattaya-hilton-pattaya",
+      "name": "Hilton Pattaya",
+      "name_ar": "هيلتون باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Central Beach Road",
+      "area_note": "Beachfront Hilton",
+      "description": "Hilton Pattaya on Central Beach Road.",
+      "why_visit": "Central beachfront Hilton.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.hilton.com/en/hotels/phhhihi-hilton-pattaya/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.hilton.com/en/hotels/phhhihi-hilton-pattaya/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-marriott-pattaya",
+      "name": "Pattaya Marriott Resort & Spa",
+      "name_ar": "ماريوت باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Wongamat / north",
+      "area_note": "North Pattaya Marriott resort",
+      "description": "Marriott resort on quieter north Pattaya/Wongamat beach.",
+      "why_visit": "North beach Marriott resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.marriott.com/en-us/hotels/pyxmz-pattaya-marriott-resort-and-spa/overview/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.marriott.com/en-us/hotels/pyxmz-pattaya-marriott-resort-and-spa/overview/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-intercontinental-pattaya",
+      "name": "InterContinental Pattaya Resort",
+      "name_ar": "إنتركونتيننتال باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "South / Cape",
+      "area_note": "Cliff/cove InterContinental",
+      "description": "InterContinental Pattaya Resort in a cove south of centre.",
+      "why_visit": "Cove InterContinental resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.ihg.com/intercontinental/hotels/us/en/pattaya/pyxha/hoteldetail"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.ihg.com/intercontinental/hotels/us/en/pattaya/pyxha/hoteldetail",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-woodlands",
+      "name": "Woodlands Resort Pattaya",
+      "name_ar": "وودلاندز",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Central/north gardens",
+      "area_note": "Garden resort lead",
+      "description": "Garden-set Woodlands Resort Pattaya lead.",
+      "why_visit": "Garden resort stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.woodland-resort.com/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.woodland-resort.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-amari-pattaya",
+      "name": "Amari Pattaya",
+      "name_ar": "أماري باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Beach Road",
+      "area_note": "Amari beach hotel",
+      "description": "Amari hotel on Pattaya Beach Road.",
+      "why_visit": "Beach Road Amari stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.amari.com/pattaya"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.amari.com/pattaya",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-centara-pattaya",
+      "name": "Centara Grand Mirage Beach Resort Pattaya",
+      "name_ar": "سينتارا ميراج",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Wongamat",
+      "area_note": "Family fantasy resort",
+      "description": "Family-oriented Centara Grand Mirage resort in Wongamat.",
+      "why_visit": "Family Mirage resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.centarahotelsresorts.com/centaragrand/cgmp"
+      ],
+      "tags": [
+        "resort",
+        "family"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.centarahotelsresorts.com/centaragrand/cgmp",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-pullman-pattaya",
+      "name": "Pullman Pattaya Hotel G",
+      "name_ar": "بولمان باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Central beach",
+      "area_note": "Pullman beach hotel",
+      "description": "Pullman Pattaya Hotel G on the central beachfront.",
+      "why_visit": "Central Pullman stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.pullmanpattayahotelg.com/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.pullmanpattayahotelg.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-avonova",
+      "name": "Avani+ Riverside Bangkok is wrong — Avani Pattaya Resort",
+      "name_ar": "أڤاني باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Wongamat",
+      "area_note": "Avani Pattaya resort",
+      "description": "Avani Pattaya Resort on Wongamat beach.",
+      "why_visit": "Wongamat Avani resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.avanihotels.com/en/pattaya"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.avanihotels.com/en/pattaya",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-hard-rock-pattaya",
+      "name": "Hard Rock Hotel Pattaya",
+      "name_ar": "هارد روك باتايا",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Beach Road",
+      "area_note": "Hard Rock beach hotel",
+      "description": "Hard Rock Hotel on Pattaya Beach Road.",
+      "why_visit": "Beach Road Hard Rock stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.hardrockhotels.com/pattaya/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.hardrockhotels.com/pattaya/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "pattaya-jomtien-hotel",
+      "name": "Seaview Jomtien Hotel lead",
+      "name_ar": "فندق جومتين",
+      "country_code": "TH",
+      "destination_slug": "pattaya",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Jomtien",
+      "area_note": "Jomtien hotel lead",
+      "description": "Practical Jomtien beach hotel staging lead.",
+      "why_visit": "Jomtien beach hotel.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "hotel",
+        "jomtien"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    }
+  ],
+  "mapping": {
+    "import_file": "pattaya-curated-v1.json",
+    "import_format": "helm.catalog.import.v1",
+    "external_key_rule": "editorial.external_key → import.externalKey id:pattaya:<suffix>"
+  }
+}

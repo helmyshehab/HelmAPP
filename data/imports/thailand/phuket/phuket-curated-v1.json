@@ -1,0 +1,939 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "phuket-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:phuket",
+      "slug": "phuket",
+      "nameEn": "Phuket",
+      "nameAr": "بوكيت",
+      "countryCode": "TH",
+      "summaryEn": "Andaman island hub spanning Patong, Kata/Karon, Phuket Old Town, and the quieter north-west beaches — not one walkable resort.",
+      "summaryAr": "مركز جزر أندامان عبر باتونغ وكاتا/كارون والبلدة القديمة والشواطئ الشمالية الغربية — ليست منتجعاً واحداً قابلاً للمشي.",
+      "shortDescriptionEn": "Andaman beach and island hub. Recommended stay 5–7 days.",
+      "tags": [
+        "beach",
+        "islands",
+        "dining",
+        "nightlife",
+        "diving",
+        "old_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Phuket destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Thailand geo (TH/THB) is an apply-time prerequisite.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:phuket:raya",
+      "destinationSlug": "phuket",
+      "category": "restaurant",
+      "subcategory": "southern_thai",
+      "slug": "phuket-raya",
+      "nameEn": "Raya Restaurant",
+      "nameAr": "رايا",
+      "shortDescriptionEn": "Old Town southern Thai dinner.",
+      "descriptionEn": "Southern Thai restaurant in a restored Phuket Old Town house. Staging lead.\n\nArea: Phuket Old Town. Sino-Portuguese house restaurant",
+      "tags": [
+        "thai",
+        "old_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "southern_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:gabba-gabba",
+      "destinationSlug": "phuket",
+      "category": "restaurant",
+      "subcategory": "grill",
+      "slug": "phuket-gabba-gabba",
+      "nameEn": "GB Grill & Bar / beach dining lead",
+      "nameAr": "جي بي جريل",
+      "shortDescriptionEn": "South Phuket grill dinner.",
+      "descriptionEn": "South Phuket grill/dining staging lead pending Admin pin to a single verified venue page.\n\nArea: Chalong / south. Grill dining lead",
+      "tags": [
+        "grill"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "grill"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:suay",
+      "destinationSlug": "phuket",
+      "category": "restaurant",
+      "subcategory": "modern_thai",
+      "slug": "phuket-suay",
+      "nameEn": "Suay Restaurant",
+      "nameAr": "سواي",
+      "shortDescriptionEn": "Modern Thai in Phuket Town.",
+      "descriptionEn": "Modern Thai restaurant lead in Phuket Town.\n\nArea: Phuket Town. Modern Thai in Phuket Town",
+      "tags": [
+        "thai",
+        "modern"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "modern_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:kra-na",
+      "destinationSlug": "phuket",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "slug": "phuket-kra-na",
+      "nameEn": "Ka Jok See",
+      "nameAr": "كا جوك سي",
+      "shortDescriptionEn": "Old Town Thai dinner.",
+      "descriptionEn": "Long-running Old Town Thai dinner venue lead.\n\nArea: Phuket Old Town. Old Town Thai dinner house",
+      "tags": [
+        "thai",
+        "old_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:catch",
+      "destinationSlug": "phuket",
+      "category": "restaurant",
+      "subcategory": "beach_dining",
+      "slug": "phuket-catch",
+      "nameEn": "Catch Beach Club dining",
+      "nameAr": "كاتش بيتش كلوب",
+      "shortDescriptionEn": "Bang Tao beachfront dining.",
+      "descriptionEn": "Beachfront dining lead associated with Catch Beach Club Bang Tao. Club nightlife is a separate record.\n\nArea: Bang Tao. Beach club dining (see nightlife record for club)",
+      "tags": [
+        "beach",
+        "bang_tao"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.catchbeachclub.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.catchbeachclub.com/",
+      "dining": {
+        "cuisineTypes": [
+          "beach_dining"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:bookhemian",
+      "destinationSlug": "phuket",
+      "category": "cafe",
+      "subcategory": "cafe_bookstore",
+      "slug": "phuket-bookhemian",
+      "nameEn": "Bookhemian",
+      "nameAr": "بوكهيميان",
+      "shortDescriptionEn": "Old Town café-bookstore.",
+      "descriptionEn": "Café and bookstore lead in Phuket Old Town.\n\nArea: Phuket Old Town. Café-bookstore",
+      "tags": [
+        "cafe",
+        "old_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe_bookstore"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:kopitiam",
+      "destinationSlug": "phuket",
+      "category": "cafe",
+      "subcategory": "local_cafe",
+      "slug": "phuket-kopitiam",
+      "nameEn": "One Chun Cafe & Restaurant",
+      "nameAr": "ون تشون كافيه",
+      "shortDescriptionEn": "Local Old Town café plates.",
+      "descriptionEn": "Local Phuket Town café/restaurant lead.\n\nArea: Phuket Old Town. Local Peranakan café lead",
+      "tags": [
+        "cafe",
+        "local"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "local_cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:amazon-cafe",
+      "destinationSlug": "phuket",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "slug": "phuket-amazon-cafe",
+      "nameEn": "Café Amazon Phuket lead",
+      "nameAr": "كافيه أمازون",
+      "shortDescriptionEn": "Easy coffee stop.",
+      "descriptionEn": "Café Amazon as a practical coffee-chain lead; pin a specific branch in Admin.\n\nArea: Island-wide. Ubiquitous Thai coffee chain lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.cafeamazon.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.cafeamazon.com/",
+      "dining": {
+        "cuisineTypes": [
+          "chain_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:taste-bar-cafe",
+      "destinationSlug": "phuket",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "phuket-taste-bar-cafe",
+      "nameEn": "Gallery Cafe Phuket Town lead",
+      "nameAr": "غاليري كافيه",
+      "shortDescriptionEn": "Artsy Old Town coffee.",
+      "descriptionEn": "Old Town gallery café staging lead.\n\nArea: Phuket Old Town. Gallery café lead",
+      "tags": [
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:phuket:big-buddha",
+      "destinationSlug": "phuket",
+      "category": "attraction",
+      "subcategory": "viewpoint_statue",
+      "slug": "phuket-big-buddha",
+      "nameEn": "Phuket Big Buddha",
+      "nameAr": "بيغ بودا بوكيت",
+      "shortDescriptionEn": "Island viewpoint statue.",
+      "descriptionEn": "Hilltop Big Buddha viewpoint above Chalong. Access notes unverified.\n\nArea: Nakkerd Hills / Chalong. Hilltop Buddha statue",
+      "tags": [
+        "viewpoint"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "viewpoint"
+      }
+    },
+    {
+      "externalKey": "id:phuket:old-town",
+      "destinationSlug": "phuket",
+      "category": "attraction",
+      "subcategory": "heritage_district",
+      "slug": "phuket-old-town",
+      "nameEn": "Phuket Old Town",
+      "nameAr": "بلدة بوكيت القديمة",
+      "shortDescriptionEn": "Heritage shophouse streets.",
+      "descriptionEn": "Heritage walking district with Sino-Portuguese shophouses. Not a ticketed single venue.\n\nArea: Phuket Town. Sino-Portuguese heritage streets",
+      "tags": [
+        "heritage"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:phuket:promthep",
+      "destinationSlug": "phuket",
+      "category": "attraction",
+      "subcategory": "viewpoint",
+      "slug": "phuket-promthep",
+      "nameEn": "Promthep Cape",
+      "nameAr": "رأس برومثيب",
+      "shortDescriptionEn": "Sunset cape views.",
+      "descriptionEn": "Southern Phuket cape viewpoint popular for sunsets.\n\nArea: Rawai. Sunset cape viewpoint",
+      "tags": [
+        "sunset"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "viewpoint"
+      }
+    },
+    {
+      "externalKey": "id:phuket:island-hopping",
+      "destinationSlug": "phuket",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "slug": "phuket-island-hopping",
+      "nameEn": "Phi Phi / James Bond day trip from Phuket",
+      "nameAr": "رحلة يومية إلى في في / جيمس بوند",
+      "shortDescriptionEn": "Andaman island day trip.",
+      "descriptionEn": "Indicative Andaman island day-trip category departing Phuket. Operator and pier to be pinned in Admin; not a Koh Phi Phi destination duplicate lodging record.\n\nArea: Pierrs / Chalong departure lead. Day-trip category from Phuket",
+      "tags": [
+        "islands"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:phuket:diving-phuket",
+      "destinationSlug": "phuket",
+      "category": "activity",
+      "subcategory": "diving",
+      "slug": "phuket-diving-phuket",
+      "nameEn": "Phuket Diving / Snorkel Outing",
+      "nameAr": "غوص أو سنوركل في بوكيت",
+      "shortDescriptionEn": "Reef dive or snorkel day.",
+      "descriptionEn": "Indicative diving/snorkel activity lead. Shop operator to be selected later.\n\nArea: West coast / Chalong. Dive activity category lead",
+      "tags": [
+        "diving"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:phuket:thai-cooking-phuket",
+      "destinationSlug": "phuket",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "slug": "phuket-thai-cooking-phuket",
+      "nameEn": "Phuket Thai Cooking Class",
+      "nameAr": "دورة طبخ تايلاندية في بوكيت",
+      "shortDescriptionEn": "Hands-on Thai cooking.",
+      "descriptionEn": "Indicative Thai cooking class activity for Phuket visitors. School to be pinned in Admin.\n\nArea: Island-wide. Cooking class category",
+      "tags": [
+        "cooking"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:phuket:spa-phuket",
+      "destinationSlug": "phuket",
+      "category": "activity",
+      "subcategory": "spa",
+      "slug": "phuket-spa-phuket",
+      "nameEn": "Phuket Spa Day",
+      "nameAr": "يوم سبا في بوكيت",
+      "shortDescriptionEn": "Resort spa reset day.",
+      "descriptionEn": "Indicative spa-day activity lead; property spa menus unverified.\n\nArea: West coast resorts belt. Spa activity category",
+      "tags": [
+        "spa"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "wellness"
+      }
+    },
+    {
+      "externalKey": "id:phuket:bangla",
+      "destinationSlug": "phuket",
+      "category": "nightlife",
+      "subcategory": "nightlife_strip",
+      "slug": "phuket-bangla",
+      "nameEn": "Bangla Road Nightlife",
+      "nameAr": "بانغلا رود",
+      "shortDescriptionEn": "Patong nightlife strip.",
+      "descriptionEn": "Patong’s Bangla Road nightlife corridor lead. Individual bars to be curated later in Admin.\n\nArea: Patong. Patong nightlife strip lead",
+      "tags": [
+        "patong",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:phuket:catch-club",
+      "destinationSlug": "phuket",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "slug": "phuket-catch-club",
+      "nameEn": "Catch Beach Club",
+      "nameAr": "كاتش بيتش كلوب",
+      "shortDescriptionEn": "Bang Tao beach club day.",
+      "descriptionEn": "Bang Tao beach club with daybeds and events. Distinct from dining-focused Catch mention.\n\nArea: Bang Tao. Bang Tao beach club",
+      "tags": [
+        "beach_club",
+        "bang_tao"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.catchbeachclub.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.catchbeachclub.com/"
+    },
+    {
+      "externalKey": "id:phuket:yona-beach",
+      "destinationSlug": "phuket",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "slug": "phuket-yona-beach",
+      "nameEn": "Yona Beach Club",
+      "nameAr": "يونا بيتش كلوب",
+      "shortDescriptionEn": "Standout Phuket beach club.",
+      "descriptionEn": "Clifftop beach club staging lead. Entry and pricing unverified.\n\nArea: Cape Panwa area lead. Clifftop/unique beach club lead associated with Yona brand on Phuket. Staging only.",
+      "tags": [
+        "beach_club"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://yonabeachclub.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://yonabeachclub.com/"
+    },
+    {
+      "externalKey": "id:phuket:karma-bar",
+      "destinationSlug": "phuket",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "slug": "phuket-karma-bar",
+      "nameEn": "Patong Beach Bar lead",
+      "nameAr": "بار شاطئ باتونغ",
+      "shortDescriptionEn": "Patong sunset beach bar.",
+      "descriptionEn": "Indicative Patong beach-bar lead for sunset drinks. Specific bar pin deferred.\n\nArea: Patong Beach. Beach bar category on Patong",
+      "tags": [
+        "bar",
+        "patong"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:phuket:trisara",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-trisara",
+      "nameEn": "Trisara",
+      "nameAr": "تريسارا",
+      "shortDescriptionEn": "Private-villa luxury resort.",
+      "descriptionEn": "Luxury north-west Phuket villa resort lead.\n\nArea: North-west coast. Luxury villa resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.trisara.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.trisara.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:amanpuri",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-amanpuri",
+      "nameEn": "Amanpuri",
+      "nameAr": "أمانبوري",
+      "shortDescriptionEn": "Aman beach resort stay.",
+      "descriptionEn": "Amanpuri luxury resort on Pansea Beach.\n\nArea: Pansea Beach. Aman resort Phuket",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.aman.com/resorts/amanpuri",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.aman.com/resorts/amanpuri",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:keemala",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-keemala",
+      "nameEn": "Keemala",
+      "nameAr": "كيمالا",
+      "shortDescriptionEn": "Design hillside resort.",
+      "descriptionEn": "Design-led Keemala resort above Kamala.\n\nArea: Kamala. Design resort in Kamala hills",
+      "tags": [
+        "resort",
+        "kamala"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.keemala.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.keemala.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:sri-panwa",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-sri-panwa",
+      "nameEn": "Sri Panwa Phuket Luxury Pool Villa Hotel",
+      "nameAr": "سري بانوا",
+      "shortDescriptionEn": "Cape Panwa villa resort.",
+      "descriptionEn": "Cape Panwa luxury pool-villa resort lead.\n\nArea: Cape Panwa. Cape Panwa villa resort",
+      "tags": [
+        "resort",
+        "panwa"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.sripanwa.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.sripanwa.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:paresa",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-paresa",
+      "nameEn": "Paresa Resort Phuket",
+      "nameAr": "باريسا",
+      "shortDescriptionEn": "Cliffside Kamala resort.",
+      "descriptionEn": "Cliffside Paresa resort above Kamala Bay.\n\nArea: Kamala cliffs. Cliffside Kamala resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.paresaresorts.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.paresaresorts.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:marriott-phuket",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-marriott-phuket",
+      "nameEn": "Phuket Marriott Resort & Spa, Merlin Beach",
+      "nameAr": "ماريوت ميرلين بيتش",
+      "shortDescriptionEn": "West-coast Marriott resort.",
+      "descriptionEn": "Marriott resort on Merlin Beach, Phuket.\n\nArea: Tri Trang / west. Marriott Merlin Beach resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.marriott.com/en-us/hotels/hktmb-phuket-marriott-resort-and-spa-merlin-beach/overview/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.marriott.com/en-us/hotels/hktmb-phuket-marriott-resort-and-spa-merlin-beach/overview/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:phuket:anantara-mai-khao",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "slug": "phuket-anantara-mai-khao",
+      "nameEn": "Anantara Mai Khao Phuket Villas",
+      "nameAr": "أنانتارا ماي خاو",
+      "shortDescriptionEn": "Mai Khao beach villas.",
+      "descriptionEn": "Anantara beach villas on Mai Khao. Quieter north coast vs Patong.\n\nArea: Mai Khao. North Phuket beach villas",
+      "tags": [
+        "villa"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.anantara.com/en/mai-khao-phuket",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.anantara.com/en/mai-khao-phuket",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:phuket:the-navee",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "phuket-the-navee",
+      "nameEn": "The Navee Naiyang Beach",
+      "nameAr": "ذا ناڤي نايانغ",
+      "shortDescriptionEn": "Nai Yang boutique stay.",
+      "descriptionEn": "Boutique hotel lead near Nai Yang / airport beach.\n\nArea: Nai Yang. Airport-beach boutique hotel lead",
+      "tags": [
+        "boutique_hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.thenavee.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.thenavee.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:phuket:casa-breeze",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "phuket-casa-breeze",
+      "nameEn": "Casa Blanca Boutique Hotel Phuket Town lead",
+      "nameAr": "كاسا بلانكا بوكيت",
+      "shortDescriptionEn": "Old Town boutique base.",
+      "descriptionEn": "Boutique Old Town lodging lead; confirm live brand site in Admin before publish.\n\nArea: Phuket Old Town. Old Town boutique lodging lead",
+      "tags": [
+        "boutique_hotel",
+        "old_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:phuket:katathani",
+      "destinationSlug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "phuket-katathani",
+      "nameEn": "Katathani Phuket Beach Resort",
+      "nameAr": "كاتاثاني",
+      "shortDescriptionEn": "Kata Noi beach resort.",
+      "descriptionEn": "Family-friendly Kata Noi beach resort lead.\n\nArea: Kata Noi. Kata Noi beach resort",
+      "tags": [
+        "resort",
+        "kata"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.katathani.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.katathani.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    }
+  ]
+}

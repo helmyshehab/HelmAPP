@@ -1,0 +1,925 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "koh-phi-phi-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:koh-phi-phi",
+      "slug": "koh-phi-phi",
+      "nameEn": "Koh Phi Phi",
+      "nameAr": "كو في في",
+      "countryCode": "TH",
+      "summaryEn": "Andaman island group centred on Phi Phi Don’s Tonsai/Ao Lo Dalam hub, with Maya Bay day visits — lodging here is not the same as Krabi mainland or Phuket.",
+      "summaryAr": "مجموعة جزر أندامان حول مركز تونساي/آو لو دالام في في في دون، مع زيارات لمايا باي — الإقامة هنا ليست كرابي البرية ولا بوكيت.",
+      "shortDescriptionEn": "Andaman island stay with beaches and boat days. Recommended stay 2–4 days.",
+      "tags": [
+        "islands",
+        "beach",
+        "snorkeling",
+        "nightlife",
+        "maya_bay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Koh Phi Phi destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Thailand geo (TH/THB) is an apply-time prerequisite.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:koh-phi-phi:tonsai-seafood",
+      "destinationSlug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "slug": "koh-phi-phi-tonsai-seafood",
+      "nameEn": "Tonsai Seafood Dining lead",
+      "nameAr": "مأكولات تونساي البحرية",
+      "shortDescriptionEn": "Casual Tonsai seafood.",
+      "descriptionEn": "Indicative Tonsai village seafood dining lead.\n\nArea: Tonsai. Village seafood dining",
+      "tags": [
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "seafood"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:unni",
+      "destinationSlug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "international",
+      "slug": "koh-phi-phi-unni",
+      "nameEn": "Unni's Restaurant lead",
+      "nameAr": "مطعم أوني",
+      "shortDescriptionEn": "Tonsai village dinner.",
+      "descriptionEn": "Popular Tonsai restaurant lead for mixed Thai/international plates.\n\nArea: Tonsai. Long-running Tonsai restaurant lead",
+      "tags": [
+        "tonsai"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:madam-chicken",
+      "destinationSlug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "slug": "koh-phi-phi-madam-chicken",
+      "nameEn": "Local Thai Eatery lead",
+      "nameAr": "مأكل تايلاندي محلي",
+      "shortDescriptionEn": "Simple Thai plates.",
+      "descriptionEn": "Indicative affordable Thai eatery lead in Tonsai.\n\nArea: Tonsai. Local Thai eatery lead",
+      "tags": [
+        "thai"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:beachfront-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "beach_dining",
+      "slug": "koh-phi-phi-beachfront-phi-phi",
+      "nameEn": "Ao Lo Dalam Beachfront Dining lead",
+      "nameAr": "طعام شاطئ آو لو دالام",
+      "shortDescriptionEn": "Dalam beachfront dinner.",
+      "descriptionEn": "Indicative Ao Lo Dalam beachfront dining lead.\n\nArea: Ao Lo Dalam. Beachfront dining lead",
+      "tags": [
+        "beach"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "beach_dining"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:le-grande",
+      "destinationSlug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "french_thai",
+      "slug": "koh-phi-phi-le-grande",
+      "nameEn": "Le Grand Bleu lead",
+      "nameAr": "لو غران بلو",
+      "shortDescriptionEn": "Hillside Tonsai dinner.",
+      "descriptionEn": "Tonsai dining lead often associated with hillside views. Confirm live status in Admin.\n\nArea: Tonsai. Hill/restaurant lead",
+      "tags": [
+        "dinner"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "french_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:coffee-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "koh-phi-phi-coffee-phi-phi",
+      "nameEn": "Tonsai Coffee lead",
+      "nameAr": "قهوة تونساي",
+      "shortDescriptionEn": "Tonsai coffee break.",
+      "descriptionEn": "Indicative Tonsai coffee shop lead.\n\nArea: Tonsai. Village coffee lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:bakery-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "bakery_cafe",
+      "slug": "koh-phi-phi-bakery-phi-phi",
+      "nameEn": "Phi Phi Bakery lead",
+      "nameAr": "مخبز في في",
+      "shortDescriptionEn": "Breakfast bakery stop.",
+      "descriptionEn": "Indicative bakery/breakfast café lead in Tonsai.\n\nArea: Tonsai. Bakery café lead",
+      "tags": [
+        "bakery"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "bakery_cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:smoothie-lead",
+      "destinationSlug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "koh-phi-phi-smoothie-lead",
+      "nameEn": "Beach Smoothie Cafe lead",
+      "nameAr": "عصائر الشاطئ",
+      "shortDescriptionEn": "Beach smoothie pause.",
+      "descriptionEn": "Indicative beach smoothie café lead.\n\nArea: Long Beach / Tonsai. Smoothie café lead",
+      "tags": [
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:amazon-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "slug": "koh-phi-phi-amazon-phi-phi",
+      "nameEn": "Island Coffee Chain lead",
+      "nameAr": "سلسلة قهوة الجزيرة",
+      "shortDescriptionEn": "Easy island coffee.",
+      "descriptionEn": "Practical coffee lead; pin exact shop in Admin.\n\nArea: Tonsai. Chain/island coffee lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.cafeamazon.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.cafeamazon.com/",
+      "dining": {
+        "cuisineTypes": [
+          "chain_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:maya-bay",
+      "destinationSlug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "bay",
+      "slug": "koh-phi-phi-maya-bay",
+      "nameEn": "Maya Bay",
+      "nameAr": "خليج مايا",
+      "shortDescriptionEn": "Iconic Maya Bay day visit.",
+      "descriptionEn": "World-famous bay on uninhabited Phi Phi Le, typically visited by day trip with conservation rules. Not a hotel base.\n\nArea: Koh Phi Phi Le. Famous bay on Phi Phi Le (day visit rules apply)",
+      "tags": [
+        "maya_bay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:viewpoint",
+      "destinationSlug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "viewpoint",
+      "slug": "koh-phi-phi-viewpoint",
+      "nameEn": "Phi Phi Viewpoint",
+      "nameAr": "نقطة مشاهدة في في",
+      "shortDescriptionEn": "Twin-bay island viewpoint.",
+      "descriptionEn": "Ridge viewpoint overlooking Tonsai and Ao Lo Dalam.\n\nArea: Phi Phi Don ridge. Island twin-bay viewpoint",
+      "tags": [
+        "viewpoint"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "viewpoint"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:long-beach",
+      "destinationSlug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "beach",
+      "slug": "koh-phi-phi-long-beach",
+      "nameEn": "Long Beach (Hat Yao)",
+      "nameAr": "لونغ بيتش",
+      "shortDescriptionEn": "Long Beach swim stop.",
+      "descriptionEn": "Long Beach swimming and sunbed area on Phi Phi Don.\n\nArea: Phi Phi Don west. Long Beach swimming strip",
+      "tags": [
+        "beach"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:snorkel-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "snorkel",
+      "slug": "koh-phi-phi-snorkel-phi-phi",
+      "nameEn": "Phi Phi Snorkeling Tour",
+      "nameAr": "سنوركل في في",
+      "shortDescriptionEn": "Half-day snorkel boat.",
+      "descriptionEn": "Indicative snorkel boat tour around Phi Phi. Operator pin deferred.\n\nArea: Tonsai piers. Snorkel boat tour",
+      "tags": [
+        "snorkel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:viking-cave-tour",
+      "destinationSlug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "slug": "koh-phi-phi-viking-cave-tour",
+      "nameEn": "Viking Cave / Bamboo Island Outing",
+      "nameAr": "كهف الفايكنغ / بامبو",
+      "shortDescriptionEn": "Classic Phi Phi boat day.",
+      "descriptionEn": "Indicative boat outing including common Phi Phi Le / Bamboo stops. Rules change; verify in Admin.\n\nArea: Day-boat circuit. Classic Phi Phi boat circuit lead",
+      "tags": [
+        "boat"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:diving-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "diving",
+      "slug": "koh-phi-phi-diving-phi-phi",
+      "nameEn": "Phi Phi Dive Experience",
+      "nameAr": "غوص في في",
+      "shortDescriptionEn": "Introductory island dive.",
+      "descriptionEn": "Indicative discover-dive or fun-dive lead from Tonsai shops.\n\nArea: Tonsai dive shops. Dive activity lead",
+      "tags": [
+        "diving"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:kayak-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "kayak",
+      "slug": "koh-phi-phi-kayak-phi-phi",
+      "nameEn": "Coastal Kayak Lead",
+      "nameAr": "كاياك ساحلي",
+      "shortDescriptionEn": "Paddle the bays.",
+      "descriptionEn": "Indicative coastal kayak hire/tour lead.\n\nArea: Long Beach / Loh Dalum. Kayak activity lead",
+      "tags": [
+        "kayak"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "outdoor"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:dalam-nightlife",
+      "destinationSlug": "koh-phi-phi",
+      "category": "nightlife",
+      "subcategory": "beach_party",
+      "slug": "koh-phi-phi-dalam-nightlife",
+      "nameEn": "Ao Lo Dalam Nightlife Strip",
+      "nameAr": "سهرات آو لو دالام",
+      "shortDescriptionEn": "Dalam beach party strip.",
+      "descriptionEn": "Ao Lo Dalam beach nightlife corridor lead (fire shows / beach bars). Individual venues to curate later.\n\nArea: Ao Lo Dalam. Beach nightlife corridor",
+      "tags": [
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:koh-phi-phi:carlito",
+      "destinationSlug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "slug": "koh-phi-phi-carlito",
+      "nameEn": "Carlito's lead",
+      "nameAr": "كارليتوز",
+      "shortDescriptionEn": "Dalam beach bar night.",
+      "descriptionEn": "Well-known Ao Lo Dalam beach bar lead.\n\nArea: Ao Lo Dalam. Beach bar lead",
+      "tags": [
+        "bar"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:koh-phi-phi:reggae-bar",
+      "destinationSlug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "bar",
+      "slug": "koh-phi-phi-reggae-bar",
+      "nameEn": "Reggae Bar lead",
+      "nameAr": "ريغي بار",
+      "shortDescriptionEn": "Tonsai bar night.",
+      "descriptionEn": "Tonsai village bar/muay Thai entertainment lead.\n\nArea: Tonsai. Tonsai village bar lead",
+      "tags": [
+        "bar"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:koh-phi-phi:sunflower",
+      "destinationSlug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "viewpoint_bar",
+      "slug": "koh-phi-phi-sunflower",
+      "nameEn": "Sunflower Bar lead",
+      "nameAr": "صن فلاور بار",
+      "shortDescriptionEn": "Sunset viewpoint bar.",
+      "descriptionEn": "Viewpoint-area bar lead above Tonsai.\n\nArea: Viewpoint trail. Hillside/viewpoint bar lead",
+      "tags": [
+        "bar"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:koh-phi-phi:zeavola",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-zeavola",
+      "nameEn": "Zeavola Resort",
+      "nameAr": "زيافولا",
+      "shortDescriptionEn": "Quiet-end Phi Phi luxury resort.",
+      "descriptionEn": "Upscale resort on quieter Laem Tong beach, Phi Phi Don.\n\nArea: Laem Tong. Quiet-end luxury resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.zeavola.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.zeavola.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:saii-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-saii-phi-phi",
+      "nameEn": "SAii Phi Phi Island Village",
+      "nameAr": "ساي في في",
+      "shortDescriptionEn": "Laem Tong SAii resort.",
+      "descriptionEn": "SAii Phi Phi Island Village resort lead.\n\nArea: Laem Tong area. SAii resort Phi Phi",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.saiiresorts.com/phi-phi-island-village/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.saiiresorts.com/phi-phi-island-village/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:phi-phi-island-cabana",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "koh-phi-phi-phi-phi-island-cabana",
+      "nameEn": "Phi Phi Island Cabana Hotel",
+      "nameAr": "كابانا في في",
+      "shortDescriptionEn": "Central island hotel base.",
+      "descriptionEn": "Central Phi Phi Don hotel lead near Tonsai amenities.\n\nArea: Tonsai / central. Central island hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.phiphi-cabana.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.phiphi-cabana.com/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:outhai",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-outhai",
+      "nameEn": "Outrigger Phi Phi Island Resort / beach resort lead",
+      "nameAr": "منتجع أوتريغر في في",
+      "shortDescriptionEn": "Beach resort stay.",
+      "descriptionEn": "Beach resort staging lead on Phi Phi Don.\n\nArea: Phi Phi Don. Beach resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:anjunabeach",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-anjunabeach",
+      "nameEn": "Anya Beach Resort & Spa lead",
+      "nameAr": "أنيا بيتش",
+      "shortDescriptionEn": "Midscale beach resort.",
+      "descriptionEn": "Anya Beach / similar midscale resort lead — confirm brand URL in Admin.\n\nArea: Phi Phi Don. Beach resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:villa-ibiza",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "koh-phi-phi-villa-ibiza",
+      "nameEn": "Villa Ibiza Phi Phi lead",
+      "nameAr": "ڤيلا إيبيزا",
+      "shortDescriptionEn": "Hillside boutique rooms.",
+      "descriptionEn": "Boutique hillside lodging lead above Tonsai.\n\nArea: Tonsai hills. Boutique hillside rooms lead",
+      "tags": [
+        "boutique_hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:the-cliff",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "koh-phi-phi-the-cliff",
+      "nameEn": "The Cliff View Resort lead",
+      "nameAr": "ذا كليف ڤيو",
+      "shortDescriptionEn": "Viewpoint-area hotel.",
+      "descriptionEn": "Hotel lead near the Phi Phi viewpoint trail.\n\nArea: Viewpoint area. Viewpoint-area hotel lead",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:pp-erawan",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-pp-erawan",
+      "nameEn": "PP Erawan Palms Resort lead",
+      "nameAr": "بي بي إيراوان",
+      "shortDescriptionEn": "Long Beach resort base.",
+      "descriptionEn": "Resort lead on/near Long Beach.\n\nArea: Long Beach side. Long Beach resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:holiday-inn-phi-phi",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "koh-phi-phi-holiday-inn-phi-phi",
+      "nameEn": "Holiday Inn Resort Phi Phi Island",
+      "nameAr": "هوليداي إن في في",
+      "shortDescriptionEn": "Laem Tong Holiday Inn stay.",
+      "descriptionEn": "Holiday Inn Resort on Phi Phi’s Laem Tong beach.\n\nArea: Laem Tong. IHG Phi Phi resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.ihg.com/holidayinnresorts/hotels/us/en/phi-phi-island/phypb/hoteldetail",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.ihg.com/holidayinnresorts/hotels/us/en/phi-phi-island/phypb/hoteldetail",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:koh-phi-phi:matanee",
+      "destinationSlug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "koh-phi-phi-matanee",
+      "nameEn": "Matanee Resort lead",
+      "nameAr": "ماتاني ريزورت",
+      "shortDescriptionEn": "Simple Tonsai hotel.",
+      "descriptionEn": "Practical Tonsai hotel staging lead.\n\nArea: Tonsai. Tonsai hotel lead",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    }
+  ]
+}

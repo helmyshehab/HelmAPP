@@ -21,6 +21,8 @@
     "dataset:canggu:validate": "node scripts/validate-canggu-dataset-v1.mjs",
     "dataset:seminyak:build": "node scripts/build-seminyak-dataset-v1.mjs",
     "dataset:seminyak:validate": "node scripts/validate-seminyak-dataset-v1.mjs",
+    "dataset:thailand:build": "node scripts/build-thailand-datasets-v1.mjs",
+    "dataset:thailand:validate": "node scripts/validate-thailand-datasets-v1.mjs",
     "test": "turbo run test"
   },
   "devDependencies": {

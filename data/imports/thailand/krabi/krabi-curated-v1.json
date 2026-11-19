@@ -1,0 +1,929 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "krabi-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:krabi",
+      "slug": "krabi",
+      "nameEn": "Krabi",
+      "nameAr": "كرابي",
+      "countryCode": "TH",
+      "summaryEn": "Andaman mainland gateway for Railay cliffs, Ao Nang, and island day trips — distinct from Phuket town and Koh Phi Phi lodging.",
+      "summaryAr": "بوابة أندامان البرية لمنحدرات رايلاي وآو نانغ ورحلات الجزر — متميزة عن بوكيت وعن الإقامة في كو في في.",
+      "shortDescriptionEn": "Cliff and beach gateway on the Andaman coast. Recommended stay 4–6 days.",
+      "tags": [
+        "beach",
+        "cliffs",
+        "islands",
+        "nature",
+        "railay",
+        "ao_nang"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Krabi destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Thailand geo (TH/THB) is an apply-time prerequisite.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:krabi:seafood-ao-nang",
+      "destinationSlug": "krabi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "slug": "krabi-seafood-ao-nang",
+      "nameEn": "Ao Nang Seafood Strip lead",
+      "nameAr": "مأكولات بحرية آو نانغ",
+      "shortDescriptionEn": "Beachfront seafood dinner.",
+      "descriptionEn": "Indicative Ao Nang beachfront seafood dining lead. Pin a specific restaurant in Admin.\n\nArea: Ao Nang beach road. Beach-road seafood dining lead",
+      "tags": [
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "seafood"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:krua-thara",
+      "destinationSlug": "krabi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "slug": "krabi-krua-thara",
+      "nameEn": "Krua Thara",
+      "nameAr": "كروا ثارا",
+      "shortDescriptionEn": "Ao Nang seafood institution.",
+      "descriptionEn": "Well-known Ao Nang seafood restaurant lead.\n\nArea: Ao Nang. Popular seafood restaurant lead",
+      "tags": [
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "seafood"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:railay-dining",
+      "destinationSlug": "krabi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "slug": "krabi-railay-dining",
+      "nameEn": "Railay Beach Dining lead",
+      "nameAr": "طعام رايلاي",
+      "shortDescriptionEn": "Casual Railay beach dinner.",
+      "descriptionEn": "Indicative Railay beach dining lead accessible by boat from Ao Nang.\n\nArea: Railay East/West. Railay beach dining lead",
+      "tags": [
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:gasebo",
+      "destinationSlug": "krabi",
+      "category": "restaurant",
+      "subcategory": "international_thai",
+      "slug": "krabi-gasebo",
+      "nameEn": "The Gasebo",
+      "nameAr": "الغازيبو",
+      "shortDescriptionEn": "Sea-view Ao Nang dinner.",
+      "descriptionEn": "Ao Nang sea-view dining lead.\n\nArea: Ao Nang. Cliff/sea-view dining lead",
+      "tags": [
+        "ao_nang"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "international_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:riverside-krabi",
+      "destinationSlug": "krabi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "slug": "krabi-riverside-krabi",
+      "nameEn": "Krabi Town Riverside Dining lead",
+      "nameAr": "طعام نهر كرابي",
+      "shortDescriptionEn": "Town riverside Thai plates.",
+      "descriptionEn": "Krabi Town riverside dining lead near the night market area.\n\nArea: Krabi Town. Town riverside dining",
+      "tags": [
+        "krabi_town"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:ao-nang-coffee",
+      "destinationSlug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "krabi-ao-nang-coffee",
+      "nameEn": "Ao Nang Coffee lead",
+      "nameAr": "قهوة آو نانغ",
+      "shortDescriptionEn": "Ao Nang coffee break.",
+      "descriptionEn": "Indicative Ao Nang specialty or brunch café lead.\n\nArea: Ao Nang. Beach-town café lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:krabi-town-cafe",
+      "destinationSlug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "krabi-krabi-town-cafe",
+      "nameEn": "Krabi Town Cafe lead",
+      "nameAr": "مقهى بلدة كرابي",
+      "shortDescriptionEn": "Town café pause.",
+      "descriptionEn": "Café lead in Krabi Town for pre-ferry downtime.\n\nArea: Krabi Town. Town café lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:railay-cafe",
+      "destinationSlug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "slug": "krabi-railay-cafe",
+      "nameEn": "Railay Beach Cafe lead",
+      "nameAr": "مقهى رايلاي",
+      "shortDescriptionEn": "Railay breakfast café.",
+      "descriptionEn": "Indicative Railay café/breakfast lead.\n\nArea: Railay. Beach café lead",
+      "tags": [
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:amazon-krabi",
+      "destinationSlug": "krabi",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "slug": "krabi-amazon-krabi",
+      "nameEn": "Café Amazon Krabi lead",
+      "nameAr": "كافيه أمازون كرابي",
+      "shortDescriptionEn": "Easy chain coffee.",
+      "descriptionEn": "Café Amazon as a practical coffee lead; pin branch later.\n\nArea: Ao Nang / town. Chain coffee convenience lead",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.cafeamazon.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.cafeamazon.com/",
+      "dining": {
+        "cuisineTypes": [
+          "chain_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:krabi:railay-beach",
+      "destinationSlug": "krabi",
+      "category": "attraction",
+      "subcategory": "beach",
+      "slug": "krabi-railay-beach",
+      "nameEn": "Railay Beach",
+      "nameAr": "شاطئ رايلاي",
+      "shortDescriptionEn": "Cliff-framed Railay beach.",
+      "descriptionEn": "Iconic boat-access beach framed by limestone cliffs. Not road-linked to Ao Nang.\n\nArea: Railay. Boat-access beach and cliffs",
+      "tags": [
+        "beach",
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:krabi:tiger-cave",
+      "destinationSlug": "krabi",
+      "category": "attraction",
+      "subcategory": "temple_viewpoint",
+      "slug": "krabi-tiger-cave",
+      "nameEn": "Tiger Cave Temple (Wat Tham Suea)",
+      "nameAr": "معبد كهف النمر",
+      "shortDescriptionEn": "Stair-climb temple viewpoint.",
+      "descriptionEn": "Temple and viewpoint with long stair climb inland from Krabi. Difficulty unverified for each visitor.\n\nArea: Krabi inland. Hilltop temple stairs",
+      "tags": [
+        "temple"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:krabi:hong-island",
+      "destinationSlug": "krabi",
+      "category": "attraction",
+      "subcategory": "island",
+      "slug": "krabi-hong-island",
+      "nameEn": "Hong Island",
+      "nameAr": "جزيرة هونغ",
+      "shortDescriptionEn": "Emerald lagoon island day.",
+      "descriptionEn": "Popular lagoon island day trip from Krabi/Ao Nang. Not a lodging destination record.\n\nArea: Than Bok Khorani area / day trip. Lagoon island day-trip target",
+      "tags": [
+        "island"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:krabi:rock-climbing",
+      "destinationSlug": "krabi",
+      "category": "activity",
+      "subcategory": "climbing",
+      "slug": "krabi-rock-climbing",
+      "nameEn": "Railay Rock Climbing",
+      "nameAr": "تسلق صخور رايلاي",
+      "shortDescriptionEn": "Limestone sport climbing.",
+      "descriptionEn": "Indicative Railay rock-climbing activity. Guide operator to be pinned in Admin.\n\nArea: Railay. Cliff climbing activity",
+      "tags": [
+        "climbing"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "adventure"
+      }
+    },
+    {
+      "externalKey": "id:krabi:four-islands",
+      "destinationSlug": "krabi",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "slug": "krabi-four-islands",
+      "nameEn": "Krabi Four Islands Tour",
+      "nameAr": "جولة الجزر الأربع",
+      "shortDescriptionEn": "Classic island-hopping day.",
+      "descriptionEn": "Indicative four-islands day tour category (e.g. Chicken, Tub, Poda). Operator pin deferred.\n\nArea: Ao Nang piers. Classic island-hopping tour",
+      "tags": [
+        "islands"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:krabi:kayak-mangrove",
+      "destinationSlug": "krabi",
+      "category": "activity",
+      "subcategory": "kayak",
+      "slug": "krabi-kayak-mangrove",
+      "nameEn": "Ao Thalane / Mangrove Kayak",
+      "nameAr": "كاياك المنغروف",
+      "shortDescriptionEn": "Mangrove kayak paddle.",
+      "descriptionEn": "Indicative mangrove kayaking activity near Krabi.\n\nArea: Ao Thalane. Mangrove kayak activity",
+      "tags": [
+        "kayak"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "outdoor"
+      }
+    },
+    {
+      "externalKey": "id:krabi:diving-krabi",
+      "destinationSlug": "krabi",
+      "category": "activity",
+      "subcategory": "snorkel",
+      "slug": "krabi-diving-krabi",
+      "nameEn": "Krabi Snorkel / Dive Outing",
+      "nameAr": "سنوركل أو غوص كرابي",
+      "shortDescriptionEn": "Reef snorkel outing.",
+      "descriptionEn": "Indicative snorkel/dive outing from Krabi coast.\n\nArea: Ao Nang / islands. Water activity lead",
+      "tags": [
+        "snorkel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:krabi:ao-nang-beach-bar",
+      "destinationSlug": "krabi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "slug": "krabi-ao-nang-beach-bar",
+      "nameEn": "Ao Nang Beach Bar lead",
+      "nameAr": "بار شاطئ آو نانغ",
+      "shortDescriptionEn": "Ao Nang sunset beach bar.",
+      "descriptionEn": "Indicative Ao Nang beach-bar lead for sunset drinks.\n\nArea: Ao Nang. Beach bar corridor lead",
+      "tags": [
+        "bar"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:krabi:railay-nightlife",
+      "destinationSlug": "krabi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "slug": "krabi-railay-nightlife",
+      "nameEn": "Railay Nightlife lead",
+      "nameAr": "سهرات رايلاي",
+      "shortDescriptionEn": "Laid-back Railay night.",
+      "descriptionEn": "Indicative low-key Railay beach nightlife lead (not Patong-scale).\n\nArea: Railay West. Low-key Railay nightlife lead",
+      "tags": [
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:krabi:ao-nang-club",
+      "destinationSlug": "krabi",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "slug": "krabi-ao-nang-club",
+      "nameEn": "Ao Nang Nightlife Venue lead",
+      "nameAr": "ملهى آو نانغ",
+      "shortDescriptionEn": "Ao Nang late night.",
+      "descriptionEn": "Indicative Ao Nang late venue lead.\n\nArea: Ao Nang. Small-town nightlife lead",
+      "tags": [
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:krabi:tubkaak-bar",
+      "destinationSlug": "krabi",
+      "category": "bar",
+      "subcategory": "lounge_bar",
+      "slug": "krabi-tubkaak-bar",
+      "nameEn": "Tubkaak / Klong Muang Lounge lead",
+      "nameAr": "لاونج توبكاك",
+      "shortDescriptionEn": "Quiet coast evening drinks.",
+      "descriptionEn": "Quieter west-coast lounge/bar lead away from Ao Nang strip.\n\nArea: Tubkaak / Klong Muang. Quiet west-coast lounge lead",
+      "tags": [
+        "lounge"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:krabi:rayavadee",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-rayavadee",
+      "nameEn": "Rayavadee",
+      "nameAr": "رايافادي",
+      "shortDescriptionEn": "Railay cliffside luxury resort.",
+      "descriptionEn": "Luxury resort set among Railay’s cliffs and beaches (boat access).\n\nArea: Railay. Iconic Railay luxury resort",
+      "tags": [
+        "resort",
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.rayavadee.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.rayavadee.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:centara-krabi",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-centara-krabi",
+      "nameEn": "Centara Grand Beach Resort & Villas Krabi",
+      "nameAr": "سينتارا كرابي",
+      "shortDescriptionEn": "Centara beach resort stay.",
+      "descriptionEn": "Centara Grand beach resort & villas in Krabi.\n\nArea: Krabi coastline. Centara beach resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.centarahotelsresorts.com/centaragrand/cgk",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.centarahotelsresorts.com/centaragrand/cgk",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:dusit-krabi",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-dusit-krabi",
+      "nameEn": "Dusit Thani Krabi Beach Resort",
+      "nameAr": "دوسيت ثاني كرابي",
+      "shortDescriptionEn": "Klong Muang Dusit resort.",
+      "descriptionEn": "Dusit Thani beach resort on Klong Muang.\n\nArea: Klong Muang. Dusit beach resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.dusit.com/dusitthani/krabibeachresort/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.dusit.com/dusitthani/krabibeachresort/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:anantara-golden-hills",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-anantara-golden-hills",
+      "nameEn": "Banyan Tree Krabi",
+      "nameAr": "بانيان تري كرابي",
+      "shortDescriptionEn": "West-coast Banyan Tree stay.",
+      "descriptionEn": "Banyan Tree Krabi luxury resort lead on the west coast.\n\nArea: Tubkaak area. Banyan Tree Krabi resort",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.banyantree.com/thailand/krabi",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.banyantree.com/thailand/krabi",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:railay-princess",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-railay-princess",
+      "nameEn": "Railay Princess Resort & Spa",
+      "nameAr": "رايلاي برينسيس",
+      "shortDescriptionEn": "Railay boat-access resort.",
+      "descriptionEn": "Railay East resort lead with boat access.\n\nArea: Railay East. Railay midscale resort lead",
+      "tags": [
+        "resort",
+        "railay"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:ao-nang-cliff",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-ao-nang-cliff",
+      "nameEn": "Ao Nang Cliff Beach Resort lead",
+      "nameAr": "منتجع منحدر آو نانغ",
+      "shortDescriptionEn": "Ao Nang cliff resort.",
+      "descriptionEn": "Ao Nang cliff/beach resort staging lead.\n\nArea: Ao Nang. Ao Nang cliff resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:krabi:holiday-inn-krabi",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "krabi-holiday-inn-krabi",
+      "nameEn": "Holiday Inn Resort Krabi Ao Nang Beach",
+      "nameAr": "هوليداي إن آو نانغ",
+      "shortDescriptionEn": "Ao Nang Holiday Inn stay.",
+      "descriptionEn": "Holiday Inn Resort on Ao Nang Beach.\n\nArea: Ao Nang. IHG Ao Nang resort",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.ihg.com/holidayinnresorts/hotels/us/en/krabi/krbbh/hoteldetail",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.ihg.com/holidayinnresorts/hotels/us/en/krabi/krbbh/hoteldetail",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:krabi:phoenix-krabi",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "krabi-phoenix-krabi",
+      "nameEn": "Phoenix Digital Krabi Resort / Ao Nang hotel lead",
+      "nameAr": "فينيكس كرابي",
+      "shortDescriptionEn": "Practical Ao Nang hotel.",
+      "descriptionEn": "Ao Nang hotel staging lead for midscale stays.\n\nArea: Ao Nang. Ao Nang hotel lead",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:krabi:tubkaak-resort",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "krabi-tubkaak-resort",
+      "nameEn": "The Tubkaak Resort Boutique Resort Krabi",
+      "nameAr": "توبكاك ريزورت",
+      "shortDescriptionEn": "Quiet Tubkaak boutique resort.",
+      "descriptionEn": "Boutique beach resort on quieter Tubkaak Beach.\n\nArea: Tubkaak Beach. Boutique Tubkaak beach resort",
+      "tags": [
+        "boutique_hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.tubkaakresort.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tubkaakresort.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:krabi:pavilion-krabi",
+      "destinationSlug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "krabi-pavilion-krabi",
+      "nameEn": "Pavilion Krabi Beach Resort lead",
+      "nameAr": "باڤيليون كرابي",
+      "shortDescriptionEn": "Beach resort base in Krabi.",
+      "descriptionEn": "Krabi beach resort staging lead.\n\nArea: Krabi beach belt. Beach resort lead",
+      "tags": [
+        "resort"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    }
+  ]
+}

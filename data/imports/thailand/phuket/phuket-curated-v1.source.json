@@ -1,0 +1,2170 @@
+{
+  "dataset": "phuket-curated-v1",
+  "format": "helm.catalog.editorial.v1",
+  "compiled_at": "2026-11-19",
+  "locale_primary": "en",
+  "locale_secondary": "ar",
+  "research_status": "Staging research leads for Thailand catalogue foundation. Not a verified inventory. Prefer Helm Admin editorial curation before publish.",
+  "country": {
+    "name": "Thailand",
+    "iso2": "TH",
+    "currency": "THB",
+    "note": "Apply-time prerequisite: geo.countries must include TH and pricing.currencies must include THB (not present in default seed.sql as of this dataset)."
+  },
+  "destination": {
+    "name": "Phuket",
+    "name_ar": "بوكيت",
+    "slug": "phuket",
+    "external_key": "id:phuket",
+    "type": "destination_area",
+    "type_note": "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    "region": "Andaman coast / Southern Thailand",
+    "parent": "Thailand",
+    "parent_note": "Editorial parent label. Import format does not set parent_id; countryCode TH is required at apply time.",
+    "country_code": "TH",
+    "recommended_duration": "5–7 days",
+    "tags": [
+      "beach",
+      "islands",
+      "dining",
+      "nightlife",
+      "diving",
+      "old_town"
+    ],
+    "data_status": "curated_needs_verification",
+    "publication_status": "draft",
+    "unpublished": true,
+    "summary_en": "Andaman island hub spanning Patong, Kata/Karon, Phuket Old Town, and the quieter north-west beaches — not one walkable resort.",
+    "summary_ar": "مركز جزر أندامان عبر باتونغ وكاتا/كارون والبلدة القديمة والشواطئ الشمالية الغربية — ليست منتجعاً واحداً قابلاً للمشي."
+  },
+  "category_distribution": {
+    "restaurant": 5,
+    "cafe": 4,
+    "attraction": 3,
+    "activity": 4,
+    "bar_beach_club_nightlife": 4,
+    "accommodation": 10
+  },
+  "geography_note": "Patong, Kata/Karon, Rawai/Nai Harn, Kamala/Surin/Bang Tao, and Phuket Town are separate clusters. Do not treat the island as one walkable beach strip.",
+  "integrity": {
+    "do_not_invent": [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified"
+    ],
+    "accommodation_import": "Only accommodationType mapped; starRating and amenities omitted until verified",
+    "lifecycle": "all_records_draft_curated_needs_verification"
+  },
+  "places": [
+    {
+      "external_key": "phuket-raya",
+      "name": "Raya Restaurant",
+      "name_ar": "رايا",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "restaurant",
+      "subcategory": "southern_thai",
+      "area": "Phuket Old Town",
+      "area_note": "Sino-Portuguese house restaurant",
+      "description": "Southern Thai restaurant in a restored Phuket Old Town house. Staging lead.",
+      "why_visit": "Old Town southern Thai dinner.",
+      "best_for": [
+        "dinner",
+        "southern_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai",
+        "old_town"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-gabba-gabba",
+      "name": "GB Grill & Bar / beach dining lead",
+      "name_ar": "جي بي جريل",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "restaurant",
+      "subcategory": "grill",
+      "area": "Chalong / south",
+      "area_note": "Grill dining lead",
+      "description": "South Phuket grill/dining staging lead pending Admin pin to a single verified venue page.",
+      "why_visit": "South Phuket grill dinner.",
+      "best_for": [
+        "dinner",
+        "grill"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "grill"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-suay",
+      "name": "Suay Restaurant",
+      "name_ar": "سواي",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "restaurant",
+      "subcategory": "modern_thai",
+      "area": "Phuket Town",
+      "area_note": "Modern Thai in Phuket Town",
+      "description": "Modern Thai restaurant lead in Phuket Town.",
+      "why_visit": "Modern Thai in Phuket Town.",
+      "best_for": [
+        "dinner",
+        "modern_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai",
+        "modern"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-kra-na",
+      "name": "Ka Jok See",
+      "name_ar": "كا جوك سي",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "area": "Phuket Old Town",
+      "area_note": "Old Town Thai dinner house",
+      "description": "Long-running Old Town Thai dinner venue lead.",
+      "why_visit": "Old Town Thai dinner.",
+      "best_for": [
+        "dinner",
+        "thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai",
+        "old_town"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-catch",
+      "name": "Catch Beach Club dining",
+      "name_ar": "كاتش بيتش كلوب",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "restaurant",
+      "subcategory": "beach_dining",
+      "area": "Bang Tao",
+      "area_note": "Beach club dining (see nightlife record for club)",
+      "description": "Beachfront dining lead associated with Catch Beach Club Bang Tao. Club nightlife is a separate record.",
+      "why_visit": "Bang Tao beachfront dining.",
+      "best_for": [
+        "dinner",
+        "beach_dining"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.catchbeachclub.com/"
+      ],
+      "tags": [
+        "beach",
+        "bang_tao"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-bookhemian",
+      "name": "Bookhemian",
+      "name_ar": "بوكهيميان",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "cafe",
+      "subcategory": "cafe_bookstore",
+      "area": "Phuket Old Town",
+      "area_note": "Café-bookstore",
+      "description": "Café and bookstore lead in Phuket Old Town.",
+      "why_visit": "Old Town café-bookstore.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cafe",
+        "old_town"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-kopitiam",
+      "name": "One Chun Cafe & Restaurant",
+      "name_ar": "ون تشون كافيه",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "cafe",
+      "subcategory": "local_cafe",
+      "area": "Phuket Old Town",
+      "area_note": "Local Peranakan café lead",
+      "description": "Local Phuket Town café/restaurant lead.",
+      "why_visit": "Local Old Town café plates.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cafe",
+        "local"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-amazon-cafe",
+      "name": "Café Amazon Phuket lead",
+      "name_ar": "كافيه أمازون",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "area": "Island-wide",
+      "area_note": "Ubiquitous Thai coffee chain lead",
+      "description": "Café Amazon as a practical coffee-chain lead; pin a specific branch in Admin.",
+      "why_visit": "Easy coffee stop.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.cafeamazon.com/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-taste-bar-cafe",
+      "name": "Gallery Cafe Phuket Town lead",
+      "name_ar": "غاليري كافيه",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Phuket Old Town",
+      "area_note": "Gallery café lead",
+      "description": "Old Town gallery café staging lead.",
+      "why_visit": "Artsy Old Town coffee.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cafe"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-big-buddha",
+      "name": "Phuket Big Buddha",
+      "name_ar": "بيغ بودا بوكيت",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "attraction",
+      "subcategory": "viewpoint_statue",
+      "area": "Nakkerd Hills / Chalong",
+      "area_note": "Hilltop Buddha statue",
+      "description": "Hilltop Big Buddha viewpoint above Chalong. Access notes unverified.",
+      "why_visit": "Island viewpoint statue.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "viewpoint"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-old-town",
+      "name": "Phuket Old Town",
+      "name_ar": "بلدة بوكيت القديمة",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "attraction",
+      "subcategory": "heritage_district",
+      "area": "Phuket Town",
+      "area_note": "Sino-Portuguese heritage streets",
+      "description": "Heritage walking district with Sino-Portuguese shophouses. Not a ticketed single venue.",
+      "why_visit": "Heritage shophouse streets.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "heritage"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-promthep",
+      "name": "Promthep Cape",
+      "name_ar": "رأس برومثيب",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "attraction",
+      "subcategory": "viewpoint",
+      "area": "Rawai",
+      "area_note": "Sunset cape viewpoint",
+      "description": "Southern Phuket cape viewpoint popular for sunsets.",
+      "why_visit": "Sunset cape views.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "sunset"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-island-hopping",
+      "name": "Phi Phi / James Bond day trip from Phuket",
+      "name_ar": "رحلة يومية إلى في في / جيمس بوند",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "area": "Pierrs / Chalong departure lead",
+      "area_note": "Day-trip category from Phuket",
+      "description": "Indicative Andaman island day-trip category departing Phuket. Operator and pier to be pinned in Admin; not a Koh Phi Phi destination duplicate lodging record.",
+      "why_visit": "Andaman island day trip.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "islands"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-diving-phuket",
+      "name": "Phuket Diving / Snorkel Outing",
+      "name_ar": "غوص أو سنوركل في بوكيت",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "activity",
+      "subcategory": "diving",
+      "area": "West coast / Chalong",
+      "area_note": "Dive activity category lead",
+      "description": "Indicative diving/snorkel activity lead. Shop operator to be selected later.",
+      "why_visit": "Reef dive or snorkel day.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "diving"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-thai-cooking-phuket",
+      "name": "Phuket Thai Cooking Class",
+      "name_ar": "دورة طبخ تايلاندية في بوكيت",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "area": "Island-wide",
+      "area_note": "Cooking class category",
+      "description": "Indicative Thai cooking class activity for Phuket visitors. School to be pinned in Admin.",
+      "why_visit": "Hands-on Thai cooking.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cooking"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-spa-phuket",
+      "name": "Phuket Spa Day",
+      "name_ar": "يوم سبا في بوكيت",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "activity",
+      "subcategory": "spa",
+      "area": "West coast resorts belt",
+      "area_note": "Spa activity category",
+      "description": "Indicative spa-day activity lead; property spa menus unverified.",
+      "why_visit": "Resort spa reset day.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "spa"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-bangla",
+      "name": "Bangla Road Nightlife",
+      "name_ar": "بانغلا رود",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "nightlife",
+      "subcategory": "nightlife_strip",
+      "area": "Patong",
+      "area_note": "Patong nightlife strip lead",
+      "description": "Patong’s Bangla Road nightlife corridor lead. Individual bars to be curated later in Admin.",
+      "why_visit": "Patong nightlife strip.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "patong",
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-catch-club",
+      "name": "Catch Beach Club",
+      "name_ar": "كاتش بيتش كلوب",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "area": "Bang Tao",
+      "area_note": "Bang Tao beach club",
+      "description": "Bang Tao beach club with daybeds and events. Distinct from dining-focused Catch mention.",
+      "why_visit": "Bang Tao beach club day.",
+      "best_for": [
+        "beach_club"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.catchbeachclub.com/"
+      ],
+      "tags": [
+        "beach_club",
+        "bang_tao"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-yona-beach",
+      "name": "Yona Beach Club",
+      "name_ar": "يونا بيتش كلوب",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "area": "Cape Panwa area lead",
+      "area_note": "Clifftop/unique beach club lead associated with Yona brand on Phuket. Staging only.",
+      "description": "Clifftop beach club staging lead. Entry and pricing unverified.",
+      "why_visit": "Standout Phuket beach club.",
+      "best_for": [
+        "beach_club"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://yonabeachclub.com/"
+      ],
+      "tags": [
+        "beach_club"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-karma-bar",
+      "name": "Patong Beach Bar lead",
+      "name_ar": "بار شاطئ باتونغ",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "area": "Patong Beach",
+      "area_note": "Beach bar category on Patong",
+      "description": "Indicative Patong beach-bar lead for sunset drinks. Specific bar pin deferred.",
+      "why_visit": "Patong sunset beach bar.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bar",
+        "patong"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "phuket-trisara",
+      "name": "Trisara",
+      "name_ar": "تريسارا",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "North-west coast",
+      "area_note": "Luxury villa resort",
+      "description": "Luxury north-west Phuket villa resort lead.",
+      "why_visit": "Private-villa luxury resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.trisara.com/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.trisara.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-amanpuri",
+      "name": "Amanpuri",
+      "name_ar": "أمانبوري",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Pansea Beach",
+      "area_note": "Aman resort Phuket",
+      "description": "Amanpuri luxury resort on Pansea Beach.",
+      "why_visit": "Aman beach resort stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.aman.com/resorts/amanpuri"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.aman.com/resorts/amanpuri",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-keemala",
+      "name": "Keemala",
+      "name_ar": "كيمالا",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Kamala",
+      "area_note": "Design resort in Kamala hills",
+      "description": "Design-led Keemala resort above Kamala.",
+      "why_visit": "Design hillside resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.keemala.com/"
+      ],
+      "tags": [
+        "resort",
+        "kamala"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.keemala.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-sri-panwa",
+      "name": "Sri Panwa Phuket Luxury Pool Villa Hotel",
+      "name_ar": "سري بانوا",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Cape Panwa",
+      "area_note": "Cape Panwa villa resort",
+      "description": "Cape Panwa luxury pool-villa resort lead.",
+      "why_visit": "Cape Panwa villa resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.sripanwa.com/"
+      ],
+      "tags": [
+        "resort",
+        "panwa"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.sripanwa.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-paresa",
+      "name": "Paresa Resort Phuket",
+      "name_ar": "باريسا",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Kamala cliffs",
+      "area_note": "Cliffside Kamala resort",
+      "description": "Cliffside Paresa resort above Kamala Bay.",
+      "why_visit": "Cliffside Kamala resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.paresaresorts.com/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.paresaresorts.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-marriott-phuket",
+      "name": "Phuket Marriott Resort & Spa, Merlin Beach",
+      "name_ar": "ماريوت ميرلين بيتش",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Tri Trang / west",
+      "area_note": "Marriott Merlin Beach resort",
+      "description": "Marriott resort on Merlin Beach, Phuket.",
+      "why_visit": "West-coast Marriott resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.marriott.com/en-us/hotels/hktmb-phuket-marriott-resort-and-spa-merlin-beach/overview/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.marriott.com/en-us/hotels/hktmb-phuket-marriott-resort-and-spa-merlin-beach/overview/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-anantara-mai-khao",
+      "name": "Anantara Mai Khao Phuket Villas",
+      "name_ar": "أنانتارا ماي خاو",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "area": "Mai Khao",
+      "area_note": "North Phuket beach villas",
+      "description": "Anantara beach villas on Mai Khao. Quieter north coast vs Patong.",
+      "why_visit": "Mai Khao beach villas.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.anantara.com/en/mai-khao-phuket"
+      ],
+      "tags": [
+        "villa"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "villa",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.anantara.com/en/mai-khao-phuket",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-the-navee",
+      "name": "The Navee Naiyang Beach",
+      "name_ar": "ذا ناڤي نايانغ",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Nai Yang",
+      "area_note": "Airport-beach boutique hotel lead",
+      "description": "Boutique hotel lead near Nai Yang / airport beach.",
+      "why_visit": "Nai Yang boutique stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.thenavee.com/"
+      ],
+      "tags": [
+        "boutique_hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.thenavee.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-casa-breeze",
+      "name": "Casa Blanca Boutique Hotel Phuket Town lead",
+      "name_ar": "كاسا بلانكا بوكيت",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Phuket Old Town",
+      "area_note": "Old Town boutique lodging lead",
+      "description": "Boutique Old Town lodging lead; confirm live brand site in Admin before publish.",
+      "why_visit": "Old Town boutique base.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "boutique_hotel",
+        "old_town"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "phuket-katathani",
+      "name": "Katathani Phuket Beach Resort",
+      "name_ar": "كاتاثاني",
+      "country_code": "TH",
+      "destination_slug": "phuket",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Kata Noi",
+      "area_note": "Kata Noi beach resort",
+      "description": "Family-friendly Kata Noi beach resort lead.",
+      "why_visit": "Kata Noi beach resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.katathani.com/"
+      ],
+      "tags": [
+        "resort",
+        "kata"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.katathani.com/",
+        "booking_url": null
+      }
+    }
+  ],
+  "mapping": {
+    "import_file": "phuket-curated-v1.json",
+    "import_format": "helm.catalog.import.v1",
+    "external_key_rule": "editorial.external_key → import.externalKey id:phuket:<suffix>"
+  }
+}
