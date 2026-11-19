@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { MeResponse } from "@helm/api-client-ts";
-import { isStaffPrincipal, primaryStaffRole } from "../lib/auth/staff";
+import {
+  isAdminPrincipal,
+  isStaffPrincipal,
+  primaryStaffRole,
+} from "../lib/auth/staff";
 
 function me(partial: Partial<MeResponse>): MeResponse {
   return {
@@ -62,5 +66,20 @@ describe("primaryStaffRole", () => {
 
   it("returns null for non-staff", () => {
     assert.equal(primaryStaffRole(me({ roles: ["customer"] })), null);
+  });
+});
+
+describe("isAdminPrincipal", () => {
+  it("true for administrator and super-administrator", () => {
+    assert.equal(isAdminPrincipal(me({ roles: ["administrator"] })), true);
+    assert.equal(
+      isAdminPrincipal(me({ roles: ["super-administrator"] })),
+      true,
+    );
+  });
+
+  it("false for operators and non-staff", () => {
+    assert.equal(isAdminPrincipal(me({ roles: ["operator"] })), false);
+    assert.equal(isAdminPrincipal(me({ roles: ["customer"] })), false);
   });
 });

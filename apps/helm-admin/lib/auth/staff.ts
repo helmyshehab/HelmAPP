@@ -28,3 +28,11 @@ export function primaryStaffRole(me: MeResponse): StaffRole | null {
   }
   return null;
 }
+
+/** Administrator or super-administrator (database-resolved). */
+export function isAdminPrincipal(me: MeResponse | null | undefined): boolean {
+  if (!isStaffPrincipal(me)) return false;
+  return me!.roles.some(
+    (role) => role === "administrator" || role === "super-administrator",
+  );
+}
