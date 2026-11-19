@@ -1,0 +1,1145 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "seminyak-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:seminyak",
+      "slug": "seminyak",
+      "nameEn": "Seminyak",
+      "nameAr": "سيمنياق",
+      "countryCode": "ID",
+      "summaryEn": "Upscale southwest Bali beach and dining destination spanning Seminyak Beach, Kayu Aya (Oberoi), and Petitenget — distinct from Legian and Kuta.",
+      "summaryAr": "وجهة شاطئية وتذوق راقية في جنوب غرب بالي عبر شاطئ سيمنياق وكايو آيا (أوبروي) وبيتيتينغيت — متميزة عن ليجيان وكوتا.",
+      "shortDescriptionEn": "Upscale southwest Bali beach and dining destination spanning Seminyak Beach, Kayu Aya, and Petitenget. Distinct from Legian and Kuta. Recommended stay 3–5 days.",
+      "tags": [
+        "beach",
+        "dining",
+        "beach_clubs",
+        "nightlife",
+        "shopping",
+        "wellness",
+        "petitenget",
+        "kayu_aya",
+        "seminyak_beach"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Seminyak destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Seminyak is not interchangeable with Legian or Kuta.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:seminyak:la-lucciola",
+      "destinationSlug": "seminyak",
+      "category": "restaurant",
+      "subcategory": "italian_mediterranean",
+      "slug": "seminyak-la-lucciola",
+      "nameEn": "La Lucciola",
+      "nameAr": "لا لوتشيولا",
+      "shortDescriptionEn": "Beachfront Italian dining on Petitenget.",
+      "descriptionEn": "Long-running beachfront Italian and Mediterranean restaurant on Petitenget Beach known for ocean views and all-day dining. Official brand presents it as a Seminyak Petitenget institution; Helm has not verified rates or hours.\n\nArea: Petitenget. Pantai Petitenget / Jl. Kayu Aya foreshore — beside Pura Petitenget (not Legian or Kuta Beach)",
+      "tags": [
+        "italian",
+        "petitenget",
+        "beachfront"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://lalucciolabali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://lalucciolabali.com/booking/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://lalucciolabali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "italian",
+          "mediterranean"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:mama-san",
+      "destinationSlug": "seminyak",
+      "category": "restaurant",
+      "subcategory": "southeast_asian",
+      "slug": "seminyak-mama-san",
+      "nameEn": "Mama San",
+      "nameAr": "ماما سان",
+      "shortDescriptionEn": "Bold Southeast Asian sharing plates in Seminyak.",
+      "descriptionEn": "Modern Southeast Asian restaurant and bar in Seminyak/Kerobokan with dim sum, curries, grilled proteins, and a late lounge. Official site places it on Jalan Raya Kerobokan as a long-running Seminyak dining destination.\n\nArea: Kerobokan / Seminyak. Jl. Raya Kerobokan No.135, Kerobokan Kelod — Seminyak dining strip edge (not Canggu Berawa)",
+      "tags": [
+        "southeast_asian",
+        "kerobokan",
+        "dinner"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://mamasanbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://mamasanbali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "southeast_asian",
+          "indonesian_inspired"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:barbacoa",
+      "destinationSlug": "seminyak",
+      "category": "restaurant",
+      "subcategory": "latin_american_grill",
+      "slug": "seminyak-barbacoa",
+      "nameEn": "Barbacoa",
+      "nameAr": "بارباكووا",
+      "shortDescriptionEn": "Open-flame Latin American grilling in Seminyak.",
+      "descriptionEn": "Fire-driven Latin American restaurant in Seminyak focused on asado pits, charcoal grill, and wood-fired cooking, with steaks, whole-pig roasts, and seafood. Brand describes a warehouse-style dining room; Helm has not verified prices.\n\nArea: Seminyak. Central Seminyak — open-flame Latin American asado and grill house (opened 2013 per brand)",
+      "tags": [
+        "latin_american",
+        "grill",
+        "seminyak"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://barbacoa-bali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://barbacoa-bali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "latin_american",
+          "grill"
+        ],
+        "mealTypes": [
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:ultimo",
+      "destinationSlug": "seminyak",
+      "category": "restaurant",
+      "subcategory": "italian",
+      "slug": "seminyak-ultimo",
+      "nameEn": "Ultimo",
+      "nameAr": "أولتيمو",
+      "shortDescriptionEn": "Relaxed Italian dinner on Kayu Aya.",
+      "descriptionEn": "Italian restaurant on Seminyak’s Kayu Aya (Oberoi) strip serving fuss-free authentic Italian plates in a contemporary dining room with live music. Official site lists the Seminyak Kayu Aya address.\n\nArea: Kayu Aya / Oberoi. Jl. Kayu Aya No.78 (Oberoi / Eat Street strip) — Seminyak, not Legian Beach Road",
+      "tags": [
+        "italian",
+        "kayu_aya",
+        "dinner"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://ultimorestaurant.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://ultimorestaurant.com/",
+      "dining": {
+        "cuisineTypes": [
+          "italian"
+        ],
+        "mealTypes": [
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:motel-mexicola",
+      "destinationSlug": "seminyak",
+      "category": "restaurant",
+      "subcategory": "mexican",
+      "slug": "seminyak-motel-mexicola",
+      "nameEn": "Motel Mexicola Seminyak",
+      "nameAr": "موتيل مكسيكولا سيمنياق",
+      "shortDescriptionEn": "High-energy Mexican dining in Seminyak.",
+      "descriptionEn": "Vibrant Mexican restaurant and bar in Seminyak with hand-pressed tortillas, taqueria plates, and a large festive courtyard. Official Seminyak page distinguishes this original outpost from later Canggu and Uluwatu locations.\n\nArea: Seminyak. Jl. Kayu Jati No.9X, Seminyak — original Mexicola Seminyak outpost (distinct from Motel Mexicola Canggu/Uluwatu brands)",
+      "tags": [
+        "mexican",
+        "seminyak",
+        "dinner"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://motelmexicola.info/seminyak/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://motelmexicola.info/seminyak/",
+      "dining": {
+        "cuisineTypes": [
+          "mexican"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:sisterfields",
+      "destinationSlug": "seminyak",
+      "category": "cafe",
+      "subcategory": "brunch_specialty_coffee",
+      "slug": "seminyak-sisterfields",
+      "nameEn": "Sisterfields",
+      "nameAr": "سيستر فيلدز",
+      "shortDescriptionEn": "Go-to Seminyak brunch and coffee stop.",
+      "descriptionEn": "Popular all-day café bringing Australian brunch culture to Seminyak with specialty coffee, brunch plates, and evening cocktails. Official site lists walk-in breakfast/lunch service on Kayu Cendana.\n\nArea: Seminyak / Kerobokan Kelod. Jl. Kayu Cendana No.7 — Australian-style brunch café in central Seminyak",
+      "tags": [
+        "brunch",
+        "coffee",
+        "seminyak"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://sisterfieldsbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://sisterfieldsbali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "brunch",
+          "australian_inspired"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:revolver",
+      "destinationSlug": "seminyak",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "slug": "seminyak-revolver",
+      "nameEn": "Revolver Seminyak",
+      "nameAr": "ريفولفر سيمنياق",
+      "shortDescriptionEn": "Specialty coffee and casual plates on Kayu Aya.",
+      "descriptionEn": "Specialty coffee café and casual bar on Kayu Aya serving comfort food, coffee, and cocktails. Official Revolver Bali Seminyak page identifies this Kayu Aya site.\n\nArea: Kayu Aya / Oberoi. Jl. Kayu Aya No.51 — boutique café-bar on the Oberoi strip (Seminyak location page)",
+      "tags": [
+        "coffee",
+        "kayu_aya",
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://revolverbali.com/pages/seminyak",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://revolverbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://revolverbali.com/pages/seminyak",
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:kynd",
+      "destinationSlug": "seminyak",
+      "category": "cafe",
+      "subcategory": "plant_forward_cafe",
+      "slug": "seminyak-kynd",
+      "nameEn": "KYND Seminyak",
+      "nameAr": "كايند سيمنياق",
+      "shortDescriptionEn": "Bright plant-forward café in Seminyak.",
+      "descriptionEn": "Plant-forward café and community brand flagship in Seminyak with indoor/outdoor seating and retail. Official KYND Community site lists Seminyak as the original and largest Bali café location.\n\nArea: Seminyak. Original KYND Café Seminyak (est. 2017 per brand) — distinct from KYND Canggu and KYND Uluwatu",
+      "tags": [
+        "plant_forward",
+        "seminyak",
+        "brunch"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.kyndcommunity.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.kyndcommunity.com/pages/kyndcafe",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.kyndcommunity.com/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "plant_forward"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": [
+          "vegetarian_friendly"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:seminyak:corner-house",
+      "destinationSlug": "seminyak",
+      "category": "cafe",
+      "subcategory": "all_day_casual",
+      "slug": "seminyak-corner-house",
+      "nameEn": "Corner House Bali",
+      "nameAr": "كورنر هاوس بالي",
+      "shortDescriptionEn": "All-day casual dining on Eat Street.",
+      "descriptionEn": "All-day casual café and dining room on Seminyak’s Kayu Aya Eat Street with breakfast through late plates and cocktails. Official site places the venue at Jl. Kayu Aya No.10.\n\nArea: Kayu Aya / Eat Street. Jl. Kayu Aya No.10 — top of Eat Street / Oberoi strip, Seminyak",
+      "tags": [
+        "cafe",
+        "eat_street",
+        "kayu_aya"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://cornerhousebali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://cornerhousebali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "international"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:pura-petitenget",
+      "destinationSlug": "seminyak",
+      "category": "attraction",
+      "subcategory": "hindu_temple_cultural_site",
+      "slug": "seminyak-pura-petitenget",
+      "nameEn": "Pura Petitenget",
+      "nameAr": "بورا بيتيتينغيت",
+      "shortDescriptionEn": "A working sea temple at Petitenget Beach.",
+      "descriptionEn": "Compact coastal Hindu temple at the north end of the Seminyak–Petitenget beach strip, traditionally linked to Dang Hyang Nirartha. Visitors should follow temple dress and attendant guidance. Distinct from Uluwatu and Tanah Lot.\n\nArea: Petitenget. Beach-end temple at Petitenget / Kerobokan Kelod — working sea temple; not Tanah Lot and not Uluwatu",
+      "tags": [
+        "temple",
+        "petitenget",
+        "culture"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / cultural / destination listing",
+          "url": "https://www.indonesia.travel/id/en/destination/bali-nusa-tenggara/bali/seminyak-the-truly-best-experiences-on-the-enchanting-island-of-bali",
+          "notes": "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "other",
+          "name": "Official tourism / cultural / destination listing",
+          "url": "https://lovebali.baliprov.go.id/destination/detail/254/pantai-peti-tenget",
+          "notes": "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.indonesia.travel/id/en/destination/bali-nusa-tenggara/bali/seminyak-the-truly-best-experiences-on-the-enchanting-island-of-bali",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:petitenget-beach",
+      "destinationSlug": "seminyak",
+      "category": "attraction",
+      "subcategory": "beach_natural",
+      "slug": "seminyak-petitenget-beach",
+      "nameEn": "Petitenget Beach",
+      "nameAr": "شاطئ بيتيتينغيت",
+      "shortDescriptionEn": "Sunset beach stretch at Seminyak’s northern end.",
+      "descriptionEn": "West-facing beach at Petitenget known for sunset views and proximity to beach clubs and Pura Petitenget. Official Love Bali listing describes wide sloping sand and larger waves. Treat as a named beach locality, not a ticketed attraction.\n\nArea: Petitenget. Northern Seminyak coastal sand (Desa Kerobokan / Kuta Utara) — quieter than central Seminyak access lanes; not Kuta Beach",
+      "tags": [
+        "beach",
+        "petitenget",
+        "sunset"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / cultural / destination listing",
+          "url": "https://lovebali.baliprov.go.id/destination/detail/254/pantai-peti-tenget",
+          "notes": "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "other",
+          "name": "Official tourism / cultural / destination listing",
+          "url": "https://www.indonesia.travel/id/en/destination/bali-nusa-tenggara/bali/seminyak-the-truly-best-experiences-on-the-enchanting-island-of-bali",
+          "notes": "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://lovebali.baliprov.go.id/destination/detail/254/pantai-peti-tenget",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:seminyak-beach",
+      "destinationSlug": "seminyak",
+      "category": "attraction",
+      "subcategory": "beach_natural",
+      "slug": "seminyak-seminyak-beach",
+      "nameEn": "Seminyak Beach",
+      "nameAr": "شاطئ سيمنياق",
+      "shortDescriptionEn": "Core Seminyak beach for surf and sunset.",
+      "descriptionEn": "Seminyak’s main beach strip for surfing and sunsets, quieter by day than Kuta yet part of the same continuous southwest coast sand. Official Indonesia Travel notes Seminyak Beach as favored for surfable waves and ocean panoramas. Not interchangeable with Legian or Kuta village centers.\n\nArea: Seminyak. Central Seminyak beach access (e.g. near Jl. Dhyana Pura / Camplung Tanduk) — continuous sand south toward Legian/Kuta but not the same destination as Kuta Beach village",
+      "tags": [
+        "beach",
+        "seminyak",
+        "surf"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / cultural / destination listing",
+          "url": "https://www.indonesia.travel/id/en/destination/bali-nusa-tenggara/bali/seminyak-the-truly-best-experiences-on-the-enchanting-island-of-bali",
+          "notes": "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.indonesia.travel/id/en/destination/bali-nusa-tenggara/bali/seminyak-the-truly-best-experiences-on-the-enchanting-island-of-bali",
+      "attraction": {
+        "attractionType": "natural"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:da-waves-surf",
+      "destinationSlug": "seminyak",
+      "category": "activity",
+      "subcategory": "surf_lesson",
+      "slug": "seminyak-da-waves-surf",
+      "nameEn": "Da Waves Surf School",
+      "nameAr": "مدرسة دا ويفز لركوب الأمواج",
+      "shortDescriptionEn": "Bookable surf lessons on Seminyak’s southern beach edge.",
+      "descriptionEn": "Surf school offering beginner and intermediate lessons, guiding, and board rental from Jalan Double Six in Seminyak. Official site lists the Double Six Seminyak base; lesson prices on the site are not treated as Helm supplier quotes.\n\nArea: Double Six / southern Seminyak. Jl. Double Six, Seminyak — southern Seminyak edge toward Legian; not Kuta Beach school strip",
+      "tags": [
+        "surf",
+        "double_six",
+        "lessons"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://dawavessurf.com/surf-lesson/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://dawavessurf.com/contact-us/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://dawavessurf.com/surf-lesson/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:jiwa-yoga",
+      "destinationSlug": "seminyak",
+      "category": "activity",
+      "subcategory": "yoga_studio",
+      "slug": "seminyak-jiwa-yoga",
+      "nameEn": "Jiwa Bali Yoga",
+      "nameAr": "يوغا جيوا بالي",
+      "shortDescriptionEn": "Heated yoga classes in Petitenget.",
+      "descriptionEn": "Yoga studio in North Seminyak / Petitenget offering heated Bikram and Sumits classes plus yin, pilates, and flow. Official site places the studio on Jalan Petitenget near Seminyak shopping and beach clubs.\n\nArea: Petitenget. Jl. Petitenget (studio contact lists No.78 / North Seminyak Petitenget hub)",
+      "tags": [
+        "yoga",
+        "petitenget",
+        "wellness"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://jiwabali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://jiwabali.com/the-yoga",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://jiwabali.com/contact-us",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://jiwabali.com/",
+      "activity": {
+        "activityType": "wellness"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:bodyworks-spa",
+      "destinationSlug": "seminyak",
+      "category": "activity",
+      "subcategory": "spa_wellness",
+      "slug": "seminyak-bodyworks-spa",
+      "nameEn": "Bodyworks Spa",
+      "nameAr": "بودي ووركس سبا",
+      "shortDescriptionEn": "Established day-spa treatments in Petitenget.",
+      "descriptionEn": "Family-owned day spa in Petitenget offering massages, facials, and wellness treatments. Official About page places the spa on Jalan Lebak Sari in Petitenget, Seminyak.\n\nArea: Petitenget. Jl. Lebak Sari No.3, Petitenget — day spa (founded 1994 per brand)",
+      "tags": [
+        "spa",
+        "petitenget",
+        "wellness"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.bodyworksbali.com/about",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.bodyworksbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.bodyworksbali.com/",
+      "activity": {
+        "activityType": "wellness"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:potato-head-yoga",
+      "destinationSlug": "seminyak",
+      "category": "activity",
+      "subcategory": "yoga_class",
+      "slug": "seminyak-potato-head-yoga",
+      "nameEn": "Yoga at Desa Potato Head",
+      "nameAr": "يوغا في ديسا بوتيتو هيد",
+      "shortDescriptionEn": "Campus yoga sessions at Desa Potato Head.",
+      "descriptionEn": "All-level yoga sessions hosted at Desa Potato Head Seminyak (Merasa / Sunset Park venues per brand wellbeing page). Distinct from overnight Potato Head Suites lodging; this record covers the bookable yoga activity offering.\n\nArea: Petitenget. Desa Potato Head, Jl. Petitenget No.51B — scheduled all-level yoga sessions on campus",
+      "tags": [
+        "yoga",
+        "potato_head",
+        "wellness"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/wellbeing/yoga",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://seminyak.potatohead.co/wellbeing/yoga",
+      "activity": {
+        "activityType": "wellness"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:potato-head-beach-club",
+      "destinationSlug": "seminyak",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "slug": "seminyak-potato-head-beach-club",
+      "nameEn": "Potato Head Beach Club",
+      "nameAr": "بوتيتو هيد بيتش كلوب",
+      "shortDescriptionEn": "Signature Petitenget beach-club sunset scene.",
+      "descriptionEn": "Iconic Petitenget beach club within Desa Potato Head with infinity pool, dining, and sunset sessions. Official Seminyak Potato Head pages market the Beach Club as the original good-times beachfront venue.\n\nArea: Petitenget. Jl. Petitenget No.51B — Desa Potato Head Seminyak beachfront club",
+      "tags": [
+        "beach_club",
+        "petitenget",
+        "potato_head"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/feast/beach-club/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://seminyak.potatohead.co/feast/beach-club/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:ku-de-ta",
+      "destinationSlug": "seminyak",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "slug": "seminyak-ku-de-ta",
+      "nameEn": "Ku De Ta",
+      "nameAr": "كو دي تا",
+      "shortDescriptionEn": "Classic Seminyak beach-club day-to-night.",
+      "descriptionEn": "Long-running Seminyak beach club and restaurant on Kayu Aya with ocean views, daybeds, dining, and evening events. Official site positions Ku De Ta as a Seminyak beachfront destination from sunrise through late.\n\nArea: Kayu Aya / Seminyak Beach. Jl. Kayu Aya No.9 — Seminyak beachfront club (not Petitenget Potato Head)",
+      "tags": [
+        "beach_club",
+        "seminyak",
+        "kayu_aya"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://kudeta.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://kudeta.com/menu",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://kudeta.com/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:woobar",
+      "destinationSlug": "seminyak",
+      "category": "beach_club",
+      "subcategory": "beach_club",
+      "slug": "seminyak-woobar",
+      "nameEn": "Woobar Bali",
+      "nameAr": "ووبار بالي",
+      "shortDescriptionEn": "W Seminyak beach club into nightlife.",
+      "descriptionEn": "Beachfront club at W Bali Seminyak transitioning from daytime beach club to evening nightlife. Official Woobar Bali site lists Seminyak beach-club hours and reservations via the W property.\n\nArea: Petitenget. Beach club at W Bali – Seminyak, Jl. Petitenget — hotel-linked beachfront venue",
+      "tags": [
+        "beach_club",
+        "w_bali",
+        "petitenget"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.woobarbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.woobarbali.com/restaurant",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.woobarbali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "international"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:seminyak:red-carpet",
+      "destinationSlug": "seminyak",
+      "category": "bar",
+      "subcategory": "champagne_bar",
+      "slug": "seminyak-red-carpet",
+      "nameEn": "Red Carpet Champagne Bar",
+      "nameAr": "ريد كاربت شامبين بار",
+      "shortDescriptionEn": "Champagne and classic-hits nightlife on Kayu Aya.",
+      "descriptionEn": "Champagne-focused bar on Kayu Aya with an extensive bubbly list, cocktails, food, and live music. Official site places the bar at Jalan Kayu Aya 42 in Seminyak.\n\nArea: Kayu Aya / Oberoi. Jl. Kayu Aya No.42, Seminyak — champagne and cocktail bar on the Oberoi strip",
+      "tags": [
+        "bar",
+        "champagne",
+        "kayu_aya"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.redcarpetchampagnebar.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.redcarpetchampagnebar.com/"
+    },
+    {
+      "externalKey": "id:seminyak:alila-seminyak",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-alila-seminyak",
+      "nameEn": "Alila Seminyak",
+      "nameAr": "أليلا سيمنياق",
+      "shortDescriptionEn": "Design-led beach resort in Petitenget.",
+      "descriptionEn": "Alila brand oceanfront beach resort in Seminyak / Petitenget with rooms and suites from deluxe through beach suite and penthouse categories on the official property page. Helm has not verified rates or amenity inventories. Distinct from Alila Ubud and Alila Villas Uluwatu already in other destination datasets.\n\nArea: Petitenget. Jl. Taman Ganesha / Petitenget — Alila beach resort (distinct from Alila Ubud / Alila Villas Uluwatu)",
+      "tags": [
+        "resort",
+        "petitenget",
+        "alila"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alilahotels.com/seminyak",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alilahotels.com/seminyak/dining/beach-bar/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.alilahotels.com/seminyak",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:the-legian",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "seminyak-the-legian",
+      "nameEn": "The Legian Seminyak",
+      "nameAr": "ذا ليجيان سيمنياق",
+      "shortDescriptionEn": "All-suite beachfront stay on Seminyak Beach.",
+      "descriptionEn": "All-suite beachfront hotel on Seminyak Beach with studio through multi-bedroom suites and club-style services. Official LHM Hotels page markets The Legian Seminyak as a Seminyak beach property.\n\nArea: Seminyak Beach. Beachfront Seminyak suites hotel (LHM Hotels) — name references Legian brand lineage but property is Seminyak beachfront, not Legian village",
+      "tags": [
+        "boutique_hotel",
+        "seminyak_beach",
+        "suites"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.lhm-hotels.com/en/the-legian-seminyak-bali",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.lhm-hotels.com/en/the-legian-seminyak-bali",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:w-bali",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-w-bali",
+      "nameEn": "W Bali - Seminyak",
+      "nameAr": "دبليو بالي سيمنياق",
+      "shortDescriptionEn": "Energetic beach resort base in Petitenget.",
+      "descriptionEn": "W Hotels beach resort in Seminyak with rooms, suites, and villas plus on-site dining and Woobar. Official Marriott page lists the Petitenget address; amenity and rate claims are not verified by Helm.\n\nArea: Petitenget. Jl. Petitenget, Kerobokan / Seminyak — Marriott W beach resort",
+      "tags": [
+        "resort",
+        "petitenget",
+        "w_hotels"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.marriott.com/en-us/hotels/dpswh-w-bali-seminyak/overview/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.marriott.com/en-us/hotels/dpswh-w-bali-seminyak/overview/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:potato-head-suites",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "seminyak-potato-head-suites",
+      "nameEn": "Potato Head Suites",
+      "nameAr": "بوتيتو هيد سويتس",
+      "shortDescriptionEn": "Design-led suites inside Desa Potato Head.",
+      "descriptionEn": "Boutique suite hotel within Desa Potato Head Seminyak designed with Indonesian craft materials, with guest access to campus dining and Beach Club products per brand. Distinct from the Beach Club venue record.\n\nArea: Petitenget. Desa Potato Head, Jl. Petitenget No.51B — boutique suites beside the Beach Club",
+      "tags": [
+        "boutique_hotel",
+        "potato_head",
+        "petitenget"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/art-design/andra-matin-potato-head-suites",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.potatohead.co/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://seminyak.potatohead.co/art-design/andra-matin-potato-head-suites",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:the-samaya",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "slug": "seminyak-the-samaya",
+      "nameEn": "The Samaya Seminyak",
+      "nameAr": "ذا سامايا سيمنياق",
+      "shortDescriptionEn": "Private-pool villas on Seminyak Beach.",
+      "descriptionEn": "Beachfront villa resort on Seminyak Beach with one- to three-bedroom pool villas across beachside and Royal Courtyard settings. Official Samaya Seminyak site markets private-pool villas; pool and rate details are not verified inventory for Helm.\n\nArea: Seminyak Beach / Laksmana. Jl. Laksmana, Seminyak Beach — beachfront and courtyard private-pool villas",
+      "tags": [
+        "villa",
+        "seminyak_beach",
+        "samaya"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://thesamaya.com/seminyak",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://thesamaya.com/seminyak",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:oberoi-bali",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-oberoi-bali",
+      "nameEn": "The Oberoi, Bali",
+      "nameAr": "ذا أوبروي بالي",
+      "shortDescriptionEn": "Garden pavilion resort on Seminyak Beach.",
+      "descriptionEn": "Pavilion-style beach resort set in tropical gardens on Seminyak Beach with ocean-facing dining and cultural amphitheatre performances. Official Oberoi Bali page places the resort on Seminyak Beach / Jalan Kayu Aya.\n\nArea: Seminyak Beach / Kayu Aya. Jl. Kayu Aya — pavilion-style resort on Seminyak Beach (Oberoi Hotels)",
+      "tags": [
+        "resort",
+        "seminyak_beach",
+        "oberoi"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.oberoihotels.com/hotels-in-bali/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.oberoihotels.com/hotels-in-bali/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:peppers",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "slug": "seminyak-peppers",
+      "nameEn": "Peppers Seminyak",
+      "nameAr": "بيبرز سيمنياق",
+      "shortDescriptionEn": "Private-pool villa resort in Seminyak.",
+      "descriptionEn": "Villa resort in Seminyak offering one- to multi-bedroom private-pool villas with living/dining kitchens and tropical gardens. Official Peppers Seminyak site markets villa categories; amenity inventories remain unverified for Helm.\n\nArea: Petitenget / Seminyak. Private-pool villa resort in Seminyak (Peppers brand)",
+      "tags": [
+        "villa",
+        "seminyak",
+        "peppers"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.peppersseminyak.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.peppersseminyak.com/",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:hotel-indigo",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-hotel-indigo",
+      "nameEn": "Hotel Indigo Bali Seminyak Beach",
+      "nameAr": "هوتيل إنديجو بالي سيمنياق بيتش",
+      "shortDescriptionEn": "Neighborhood-styled beach resort in central Seminyak.",
+      "descriptionEn": "Beachfront Seminyak resort with rooms, suites, and private-pool villas plus destination dining and Sava Spa. Official Hotel Indigo Seminyak site lists the Camplung Tanduk beach address.\n\nArea: Seminyak Beach / Camplung Tanduk. Jl. Camplung Tanduk No.10 — beachfront Seminyak resort (IHG Hotel Indigo)",
+      "tags": [
+        "resort",
+        "seminyak_beach",
+        "hotel_indigo"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://seminyak.hotelindigo.com/en",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://seminyak.hotelindigo.com/en",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:the-seminyak-beach-resort",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-the-seminyak-beach-resort",
+      "nameEn": "The Seminyak Beach Resort & Spa",
+      "nameAr": "ذا سيمنياق بيتش ريزورت آند سبا",
+      "shortDescriptionEn": "Beachfront resort & spa stay in Seminyak.",
+      "descriptionEn": "Independent beachfront resort and villas on Seminyak Beach with rooms, ocean suites, and pool villas plus spa and dining. Official theseminyak.com markets beachfront lodging; rates and amenity lists are not Helm-verified.\n\nArea: Seminyak Beach. Beachfront Seminyak resort and villas with spa and infinity pool (brand site)",
+      "tags": [
+        "resort",
+        "seminyak_beach",
+        "spa"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.theseminyak.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.theseminyak.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:seminyak:amadea",
+      "destinationSlug": "seminyak",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "seminyak-amadea",
+      "nameEn": "Amadea Resort & Villas Seminyak",
+      "nameAr": "أماديا ريزورت وفيلات سيمنياق",
+      "shortDescriptionEn": "Central Seminyak resort on Eat Street.",
+      "descriptionEn": "Tropical resort on Seminyak’s Eat Street with rooms, suites, and private-pool villas near dining and shopping. Official Amadea / Prime Plaza pages place the property at Jl. Kayu Aya 55; amenity and rate claims are not Helm-verified.\n\nArea: Kayu Aya / Eat Street. Jl. Kayu Aya No.55, Seminyak — resort on Eat Street / Oberoi strip (Prime Plaza)",
+      "tags": [
+        "resort",
+        "kayu_aya",
+        "amadea"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://arvs.pphotels.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://arvs.pphotels.com/helpful-info/contact-us/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://arvs.pphotels.com/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    }
+  ]
+}
