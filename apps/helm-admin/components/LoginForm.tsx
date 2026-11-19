@@ -2,30 +2,30 @@
 
 import { useMemo, useState, useTransition, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createBrowserSupabaseClient } from "../lib/supabase/client";
+import { clearSessionAndRetryAction } from "../app/actions/auth";
+import {
+  mapLoginError,
+  shouldOfferSessionRecovery,
+} from "../lib/auth/login-recovery";
 import { safeNextPath } from "../lib/auth/paths";
+import { createBrowserSupabaseClient } from "../lib/supabase/client";
 import styles from "./LoginForm.module.css";
-
-function mapLoginError(code: string | null): string | null {
-  if (code === "staff_required") {
-    return "This account is signed in but is not staff. Use an operator or administrator account.";
-  }
-  if (code === "authz_unavailable") {
-    return "Could not verify staff authorization with the API. Check that the backend is running with AUTH_PROVIDER=supabase_jwt.";
-  }
-  return null;
-}
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const errorCode = searchParams.get("error");
   const nextPath = useMemo(
     () => safeNextPath(searchParams.get("next")),
     [searchParams],
   );
   const bootstrapError = useMemo(
-    () => mapLoginError(searchParams.get("error")),
-    [searchParams],
+    () => mapLoginError(errorCode),
+    [errorCode],
+  );
+  const offerRecovery = useMemo(
+    () => shouldOfferSessionRecovery(errorCode),
+    [errorCode],
   );
 
   const [email, setEmail] = useState("");
@@ -67,42 +67,59 @@ export function LoginForm() {
   }
 
   return (
-    <form className={styles.form} onSubmit={onSubmit} noValidate>
-      <label className={styles.field}>
-        <span>Email</span>
-        <input
-          className={styles.input}
-          type="email"
-          name="email"
-          autoComplete="username"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          disabled={pending}
-        />
-      </label>
-      <label className={styles.field}>
-        <span>Password</span>
-        <input
-          className={styles.input}
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-          disabled={pending}
-        />
-      </label>
-      {error ? (
-        <p className={styles.error} role="alert">
-          {error}
-        </p>
+    <div className={styles.stack}>
+      <form className={styles.form} onSubmit={onSubmit} noValidate>
+        <label className={styles.field}>
+          <span>Email</span>
+          <input
+            className={styles.input}
+            type="email"
+            name="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={pending}
+          />
+        </label>
+        <label className={styles.field}>
+          <span>Password</span>
+          <input
+            className={styles.input}
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            disabled={pending}
+          />
+        </label>
+        {error ? (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        ) : null}
+        <button className={styles.submit} type="submit" disabled={pending}>
+          {pending ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+      {offerRecovery ? (
+        <form action={clearSessionAndRetryAction} className={styles.recovery}>
+          <p className={styles.recoveryCopy}>
+            If you are stuck with an old session while the API is unavailable,
+            clear it before retrying.
+          </p>
+          <button
+            type="submit"
+            className={styles.recoveryButton}
+            disabled={pending}
+          >
+            Clear session and retry
+          </button>
+        </form>
       ) : null}
-      <button className={styles.submit} type="submit" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
-      </button>
-    </form>
+    </div>
   );
 }

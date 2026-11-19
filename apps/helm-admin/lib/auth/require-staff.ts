@@ -3,6 +3,7 @@ import type { MeResponse } from "@helm/api-client-ts";
 import { createAuthedHelmClient } from "../api/helm-client";
 import { createServerSupabaseClient } from "../supabase/server";
 import { isStaffPrincipal } from "./staff";
+import { bindAccessTokenToVerifiedUser } from "./verified-session";
 
 export type StaffContext = {
   me: MeResponse;
@@ -10,7 +11,7 @@ export type StaffContext = {
 };
 
 /**
- * Server-side staff gate: Supabase session + Nest /v1/me database roles.
+ * Server-side staff gate: verified Supabase user + bound access token + Nest /v1/me.
  * Fail closed on any auth or authorization error.
  */
 export async function requireStaff(): Promise<StaffContext> {
@@ -24,29 +25,37 @@ export async function requireStaff(): Promise<StaffContext> {
     redirect("/login");
   }
 
+  // Token comes from cookie session storage; identity was proven by getUser() above.
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  const accessToken = session?.access_token?.trim();
-  if (!accessToken) {
+
+  const bound = bindAccessTokenToVerifiedUser({ user, session });
+  if (!bound.ok) {
+    // Inconsistent or incomplete auth state — clear cookies before login.
+    await supabase.auth.signOut();
     redirect("/login");
   }
 
   let me: MeResponse;
   try {
-    const client = createAuthedHelmClient(accessToken);
-    me = await client.getMe(accessToken);
+    const client = createAuthedHelmClient(bound.accessToken);
+    me = await client.getMe(bound.accessToken);
   } catch {
-    // Keep session so the operator can retry when the API is back; login page
-    // is allowed to render with ?error= while a session exists.
+    // Keep session so staff can recover from a transient API outage via login UI.
     redirect("/login?error=authz_unavailable");
   }
 
   if (!isStaffPrincipal(me)) {
-    // Clear non-staff session to avoid middleware bouncing between /login and staff routes.
     await supabase.auth.signOut();
     redirect("/login?error=staff_required");
   }
 
-  return { me, accessToken };
+  // Defense in depth: Nest principal must match the verified Supabase user.
+  if (me.userId !== bound.userId) {
+    await supabase.auth.signOut();
+    redirect("/login");
+  }
+
+  return { me, accessToken: bound.accessToken };
 }

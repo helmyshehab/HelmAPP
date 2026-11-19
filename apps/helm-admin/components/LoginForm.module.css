@@ -1,3 +1,8 @@
+.stack {
+  display: grid;
+  gap: 1.15rem;
+}
+
 .form {
   display: grid;
   gap: 1rem;
@@ -55,6 +60,41 @@
 }
 
 .submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.recovery {
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--helm-border);
+}
+
+.recoveryCopy {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--helm-ink-soft);
+  font-weight: 500;
+}
+
+.recoveryButton {
+  border: 1px solid var(--helm-border);
+  background: #fff;
+  color: var(--helm-ink);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.recoveryButton:hover:not(:disabled) {
+  border-color: var(--helm-sea);
+  background: rgba(31, 122, 108, 0.06);
+}
+
+.recoveryButton:disabled {
   opacity: 0.7;
   cursor: wait;
 }
