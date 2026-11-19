@@ -30,7 +30,7 @@ supabase db reset          # migrations + seed.sql
 docker compose -f docker/docker-compose.yml up -d postgres
 DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres SEED=true ./scripts/apply-migrations.sh
 
-# API (AUTH_PROVIDER=mock by default)
+# API (AUTH_PROVIDER=mock by default — backend unit tests only)
 pnpm --filter @helm/helm-backend dev
 # Public:  http://127.0.0.1:8080/v1/health | /v1/ready | /v1/meta
 # Authed:  http://127.0.0.1:8080/v1/me  (Bearer mock JWT from tests / MockAuthAdapter)
@@ -38,6 +38,33 @@ pnpm --filter @helm/helm-backend dev
 # Web / admin
 pnpm --filter helm-web dev             # :3000
 pnpm --filter helm-admin dev           # :3001
+
+## helm-admin auth (Step 6.4)
+
+Admin UI login uses **Supabase email/password + SSR cookies**. It does **not** use `AUTH_PROVIDER=mock`.
+
+1. After `supabase db reset`, create Auth users pinned to seed account UUIDs:
+
+```bash
+DEMO_STAFF_PASSWORD='choose-a-local-only-password' \
+SUPABASE_URL=http://127.0.0.1:54321 \
+SUPABASE_SERVICE_ROLE_KEY=... \
+node scripts/seed-local-staff-auth.mjs
+```
+
+2. Run the API with JWT verification against local Supabase:
+
+```bash
+AUTH_PROVIDER=supabase_jwt \
+SUPABASE_URL=http://127.0.0.1:54321 \
+SUPABASE_ANON_KEY=... \
+SUPABASE_JWT_SECRET=... \
+pnpm --filter @helm/helm-backend dev
+```
+
+3. Open `http://127.0.0.1:3001/login` and sign in as `demo.operator@helm.local` / `demo.admin@helm.local` / `demo.super@helm.local` using `DEMO_STAFF_PASSWORD`.
+
+Staff authorization still comes from `identity.user_roles` via `GET /v1/me` (`rolesSource=database`). Customer demo Auth users must not enter the staff shell.
 
 # Mobile
 cd apps/helm_mobile && flutter pub get && flutter run

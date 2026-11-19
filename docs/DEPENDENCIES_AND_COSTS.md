@@ -66,6 +66,8 @@ Recorded at Step 2 scaffold (2026-11-18). Versions are pinned in package manifes
 | `@types/react` | 19.1.13 | Free | Dev |
 | `@types/react-dom` | 19.1.9 | Free | Dev |
 | `@helm/api-client-ts` | workspace | Free | Generated — do not edit |
+| `@supabase/ssr` | 0.12.7 | Free (MIT) | **helm-admin only** — cookie SSR sessions (D4) |
+| `@supabase/supabase-js` | 2.119.1 | Free (MIT) | **helm-admin only** — peer of `@supabase/ssr` |
 
 ### `packages/openapi`
 
