@@ -109,6 +109,14 @@ for (const [i, p] of editorialPlaces.entries()) {
   check(p.opening_hours === null, `places[${i}] opening_hours must remain null`);
   check(p.address === null, `places[${i}] address must remain null until verified`);
   check(Array.isArray(p.source_urls), `places[${i}] source_urls missing`);
+  check(
+    p.visit_duration_minutes === null,
+    `places[${i}] visit_duration_minutes must be null until verified`,
+  );
+  check(
+    p.booking_recommended === null,
+    `places[${i}] booking_recommended must be null until verified`,
+  );
 }
 
 for (const [i, p] of importDoc.places.entries()) {
@@ -133,6 +141,24 @@ for (const [i, p] of importDoc.places.entries()) {
       typeof p.descriptionEn === "string" &&
         p.descriptionEn.includes("not a confirmed supplier quote"),
       `import activity places[${i}] must disclose indicative price is not a quote`,
+    );
+    check(
+      p.activity?.typicalDurationMinutes === undefined,
+      `import activity places[${i}] must omit unverified typicalDurationMinutes`,
+    );
+    check(
+      p.activity?.bookingRequired === undefined,
+      `import activity places[${i}] must omit unverified bookingRequired`,
+    );
+  }
+  if (p.category === "attraction") {
+    check(
+      p.attraction?.typicalDurationMinutes === undefined,
+      `import attraction places[${i}] must omit unverified typicalDurationMinutes`,
+    );
+    check(
+      p.attraction?.bookingRequired === undefined,
+      `import attraction places[${i}] must omit unverified bookingRequired`,
     );
   }
 }

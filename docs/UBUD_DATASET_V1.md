@@ -135,8 +135,8 @@ pnpm dataset:ubud:validate
 | `coordinates` null | omitted | Do not invent lat/lng |
 | `opening_hours` null | omitted | Dining detail import has no hours field |
 | `address` null | omitted | |
-| `booking_recommended` | `attraction|activity.bookingRequired` when known | Otherwise omitted |
-| `visit_duration_minutes` | `typicalDurationMinutes` on attraction/activity | |
+| `booking_recommended` | omitted (`bookingRequired` not set) | Null until verified — do not invent estimates |
+| `visit_duration_minutes` | omitted (`typicalDurationMinutes` not set) | Null until verified — do not invent estimates |
 | `data_status` / `publication_status` | import always creates **draft** lifecycle | Never verified/published by import |
 | `ranking_support` | **not imported** | Staging only |
 | destination `type` / `parent` | **not imported** | No `destination_type`; import has no `parent_id` |
@@ -180,6 +180,17 @@ These exist in the editorial JSON (or brief) but are **not** first-class import 
 - No composite ranking while confidence is low.  
 - Dataset is for **testing / staging**, not live inventory.
 
+### Visit duration and booking fields
+
+Attraction/activity `visit_duration_minutes`, `booking_recommended`, and the matching import detail fields (`typicalDurationMinutes`, `bookingRequired`) are **not verified** for Dataset v1.
+
+**Treatment (post M1 remediation):** all of these are set to **`null` in the editorial source** and **omitted from import detail blocks**. The import contract allows omitting optional detail scalars; omission does not invent a false “no booking required” or a false duration.
+
+Do **not** reintroduce estimated durations or booking flags unless either:
+
+1. a verified operational source exists, or  
+2. the editorial record explicitly labels the value as an unverified estimate **and** the import path cannot present it as a confirmed fact.
+
 ### Unknown / missing field summary
 
 | Field | Status across 20 places |
@@ -191,7 +202,9 @@ These exist in the editorial JSON (or brief) but are **not** first-class import 
 | `price.amount_*` (non-activity) | null |
 | `price.tier` (attractions, bars/nightlife) | null |
 | `last_verified_at` | all null |
-| `booking_recommended` | set only where clearly implied (fine dining / activities); else null |
+| `visit_duration_minutes` | all null |
+| `booking_recommended` | all null |
+| Import `typicalDurationMinutes` / `bookingRequired` | omitted |
 | Cafe rating provider | unspecified |
 | Attraction/activity rating provider | unspecified |
 

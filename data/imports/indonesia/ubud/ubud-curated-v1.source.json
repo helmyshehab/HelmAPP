@@ -52,8 +52,13 @@
       "booking_urls",
       "confirmed_supplier_prices",
       "google_maps_place_ids",
-      "provider_ids"
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired"
     ],
+    "visit_duration_and_booking": "Null/omitted until verified. Curated estimates must not be written as facts.",
     "activity_prices": "indicative_advertised_starting_price_only",
     "lifecycle": "all_records_draft_curated_needs_verification"
   },
@@ -164,7 +169,7 @@
       },
       "opening_hours": null,
       "visit_duration_minutes": null,
-      "booking_recommended": true,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "fine_dining",
@@ -356,7 +361,7 @@
       },
       "opening_hours": null,
       "visit_duration_minutes": null,
-      "booking_recommended": true,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "fine_dining",
@@ -673,8 +678,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 90,
-      "booking_recommended": false,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "nature",
@@ -738,8 +743,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 60,
-      "booking_recommended": false,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "walk",
@@ -802,8 +807,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 90,
-      "booking_recommended": false,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "temple",
@@ -868,8 +873,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 360,
-      "booking_recommended": true,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "trek",
@@ -934,8 +939,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 180,
-      "booking_recommended": true,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "atv",
@@ -999,8 +1004,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 240,
-      "booking_recommended": true,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "rafting",
@@ -1066,8 +1071,8 @@
         "verified_at": null
       },
       "opening_hours": null,
-      "visit_duration_minutes": 240,
-      "booking_recommended": true,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
       "source_urls": [],
       "tags": [
         "cooking_class",
@@ -1357,7 +1362,8 @@
       "coordinates when null (omitted)",
       "ranking_support block",
       "data_status curated_needs_verification (import creates draft lifecycle)",
-      "indicative activity USD amounts as first-class price rows"
+      "indicative activity USD amounts as first-class price rows",
+      "visit_duration_minutes / booking_recommended when null (omitted from detail blocks)"
     ]
   }
 }

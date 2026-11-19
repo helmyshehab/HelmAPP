@@ -470,8 +470,6 @@
       },
       "attraction": {
         "attractionType": "natural",
-        "typicalDurationMinutes": 90,
-        "bookingRequired": false,
         "suitableFor": [
           "families",
           "first_time_visitors"
@@ -512,8 +510,6 @@
       },
       "attraction": {
         "attractionType": "viewpoint",
-        "typicalDurationMinutes": 60,
-        "bookingRequired": false,
         "suitableFor": [
           "walkers",
           "sunrise"
@@ -554,8 +550,6 @@
       },
       "attraction": {
         "attractionType": "cultural",
-        "typicalDurationMinutes": 90,
-        "bookingRequired": false,
         "suitableFor": [
           "culture",
           "day_trip"
@@ -596,9 +590,7 @@
         "observedAt": "2026-11-19"
       },
       "activity": {
-        "activityType": "adventure",
-        "typicalDurationMinutes": 360,
-        "bookingRequired": true
+        "activityType": "adventure"
       }
     },
     {
@@ -634,9 +626,7 @@
         "observedAt": "2026-11-19"
       },
       "activity": {
-        "activityType": "adventure",
-        "typicalDurationMinutes": 180,
-        "bookingRequired": true
+        "activityType": "adventure"
       }
     },
     {
@@ -673,9 +663,7 @@
         "observedAt": "2026-11-19"
       },
       "activity": {
-        "activityType": "water_sports",
-        "typicalDurationMinutes": 240,
-        "bookingRequired": true
+        "activityType": "water_sports"
       }
     },
     {
@@ -711,9 +699,7 @@
         "observedAt": "2026-11-19"
       },
       "activity": {
-        "activityType": "tour",
-        "typicalDurationMinutes": 240,
-        "bookingRequired": true
+        "activityType": "tour"
       }
     },
     {
