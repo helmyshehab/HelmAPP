@@ -1,11 +1,31 @@
-export default function HomePage() {
-  return (
-    <main style={{ padding: "3rem 1.5rem", maxWidth: 720, margin: "0 auto" }}>
-      <p style={{ letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.7 }}>
-        Helm حلم
-      </p>
-      <h1 style={{ fontSize: "2.5rem", margin: "0.5rem 0" }}>Helm حلم — Web</h1>
-      <p>Step 2 project skeleton only. No product features yet.</p>
-    </main>
-  );
+import { DiscoverScreen } from "@/components/discover/DiscoverScreen";
+import { StatusPanel } from "@/components/discover/StatusPanel";
+import { createPublicHelmClient } from "@/lib/api/helm-client";
+
+export default async function DiscoverPage() {
+  try {
+    const client = createPublicHelmClient();
+    const result = await client.listDestinations({ limit: 50 });
+    return (
+      <DiscoverScreen
+        destinations={result.items ?? []}
+        total={result.total ?? 0}
+        locale="en"
+      />
+    );
+  } catch {
+    return (
+      <main className="shell">
+        <p className="eyebrow">Traveler · Discover</p>
+        <h1 className="brand-mark">
+          Helm
+          <span>حلم · Discover</span>
+        </h1>
+        <StatusPanel
+          title="Discover unavailable"
+          body="We could not reach the public Helm catalog. Confirm the local API is running and NEXT_PUBLIC_API_BASE_URL points at it."
+        />
+      </main>
+    );
+  }
 }
