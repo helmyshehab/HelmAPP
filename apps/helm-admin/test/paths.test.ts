@@ -8,10 +8,12 @@ import {
 } from "../lib/auth/paths";
 
 describe("staff and login path helpers", () => {
-  it("treats /, /destinations, /import as staff paths (not the (staff) folder name)", () => {
+  it("treats /, /destinations, /places, /import as staff paths (not the (staff) folder name)", () => {
     assert.equal(isStaffPath("/"), true);
     assert.equal(isStaffPath("/destinations"), true);
     assert.equal(isStaffPath("/destinations/abc"), true);
+    assert.equal(isStaffPath("/places"), true);
+    assert.equal(isStaffPath("/places/ubud-sacred-monkey-forest"), true);
     assert.equal(isStaffPath("/import"), true);
     assert.equal(isStaffPath("/import/jobs"), true);
     assert.equal(isStaffPath("/(staff)/destinations"), false);
