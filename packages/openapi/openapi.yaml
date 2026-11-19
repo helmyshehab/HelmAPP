@@ -132,6 +132,16 @@ paths:
           in: query
           schema:
             type: string
+        - name: destinationSlug
+          in: query
+          description: >
+            Optional exact match on the place's destination slug. When omitted,
+            destination filtering is unchanged. When provided, must be nonblank
+            and at most 120 characters.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 120
         - name: category
           in: query
           schema:

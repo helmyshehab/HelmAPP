@@ -19,6 +19,7 @@ const listPlacesQuery = z.object({
   country: z.string().length(2).optional(),
   city: z.string().max(120).optional(),
   area: z.string().max(120).optional(),
+  destinationSlug: z.string().min(1).max(120).optional(),
   category: z.string().max(40).optional(),
   subcategory: z.string().max(80).optional(),
   minRating: z.coerce.number().min(0).max(10).optional(),
