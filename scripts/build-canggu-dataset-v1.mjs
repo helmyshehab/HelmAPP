@@ -1,0 +1,1093 @@
+#!/usr/bin/env node
+/**
+ * Builds Canggu curated dataset v1 (30 places):
+ * - data/imports/indonesia/canggu/canggu-curated-v1.source.json
+ * - data/imports/indonesia/canggu/canggu-curated-v1.json (helm.catalog.import.v1)
+ *
+ * Research leads ≠ verified facts. Unknown ratings/prices/coords/amenities stay null/omitted.
+ * Localities (Batu Bolong, Berawa, Echo Beach, Pererenan, etc.) are not treated as one walkable area.
+ */
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const OUT_DIR = join(ROOT, "data/imports/indonesia/canggu");
+const COMPILED_AT = "2026-11-19";
+const DATASET_VERSION = "canggu-curated-v1";
+
+function nullCoords() {
+  return { lat: null, lng: null, source: null, verified_at: null };
+}
+
+function unknownPrice(currency = "IDR") {
+  return {
+    tier: null,
+    amount_min: null,
+    amount_max: null,
+    currency,
+    basis: null,
+    status: "unknown",
+  };
+}
+
+function nullRating() {
+  return {
+    value: null,
+    scale: 5,
+    review_count: null,
+    provider: null,
+    verified_at: null,
+    scope: null,
+  };
+}
+
+function rankingSupport(p) {
+  return {
+    rating_score: p.rating?.value ?? null,
+    review_volume: p.rating?.review_count ?? null,
+    price_tier: p.price?.tier ?? null,
+    experience_quality: null,
+    distance_to_destination_center: null,
+    data_confidence: "low_curated_needs_verification",
+    composite_rank: null,
+    composite_rank_note:
+      "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing.",
+  };
+}
+
+function priceTierToLevel(tier) {
+  if (!tier) return null;
+  switch (tier) {
+    case "budget":
+      return 1;
+    case "budget_mid_range":
+    case "mid_range":
+      return 2;
+    case "upscale":
+      return 3;
+    case "luxury":
+      return 4;
+    default:
+      return null;
+  }
+}
+
+/** @param {string} officialWebsite @param {string} propertyType */
+function accommodationEditorial(officialWebsite, propertyType) {
+  return {
+    property_type: propertyType,
+    verified_star_classification: null,
+    marketplace_star_claim: null,
+    guest_rating: null,
+    price_per_night: null,
+    currency: "IDR",
+    date_checked: null,
+    room_categories: null,
+    maximum_occupancy: null,
+    private_pool: null,
+    shared_pool: null,
+    breakfast_inclusion: null,
+    wifi: null,
+    parking: null,
+    air_conditioning: null,
+    beach_access: null,
+    verified_distance_to_beaches: null,
+    adults_only: null,
+    family_friendly: null,
+    honeymoon_suitability: null,
+    official_website: officialWebsite,
+    booking_url: null,
+  };
+}
+
+/** Exactly 30 research-lead places. */
+const PLACES = [
+  {
+    external_key: "canggu-billy-ho",
+    name: "Billy Ho",
+    name_ar: "بيلي هو",
+    category: "restaurant",
+    subcategory: "modern_japanese",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong — Batu Bolong beach road cluster (not walkable to Pererenan or Berawa as a single stroll)",
+    description: "Modern Japanese restaurant and cocktail bar by chef Will Meyrick on Batu Bolong beach road, serving sushi, dim sum, ramen, and East Asian share plates.",
+    why_visit: "A polished Japanese dinner stop in the Batu Bolong dining strip.",
+    best_for: ["dinner", "japanese", "cocktails"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://billyho.co/menus/"],
+    websiteUrl: "https://billyho.co/menus/",
+    tags: ["japanese", "batu_bolong", "dinner"],
+    dining: {"cuisineTypes": ["japanese", "east_asian"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-sazon",
+    name: "Sazón",
+    name_ar: "سازون",
+    category: "restaurant",
+    subcategory: "mediterranean",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong — Batu Bolong strip",
+    description: "Mediterranean restaurant on Batu Bolong known for paella, share plates, and cocktails. Brand pages describe interactive paella experiences; Helm has not verified rates or hours.",
+    why_visit: "Mediterranean share plates and paella in the Batu Bolong dining cluster.",
+    best_for: ["dinner", "mediterranean", "groups"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://sazonbali.com/menu-selection/"],
+    websiteUrl: "https://sazonbali.com/menu-selection/",
+    tags: ["mediterranean", "paella", "batu_bolong"],
+    dining: {"cuisineTypes": ["mediterranean", "spanish_inspired"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-masonry",
+    name: "MASONRY. Canggu",
+    name_ar: "ماسونري كانغو",
+    category: "restaurant",
+    subcategory: "mediterranean_grill",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong — wood-fired Mediterranean grill (brand formerly styled MASON.)",
+    description: "Wood-fired Mediterranean grill and bar in Canggu focusing on handcrafted plates, house-cured meats, and cocktails. Official brand presents the Canggu courtyard venue as a long-running local dining destination.",
+    why_visit: "Wood-fired Mediterranean cooking on Batu Bolong.",
+    best_for: ["dinner", "grill", "wine"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://masonrybali.com/canggu", "https://masonrybali.com/canggu/about-us"],
+    websiteUrl: "https://masonrybali.com/canggu",
+    tags: ["mediterranean", "grill", "batu_bolong"],
+    dining: {"cuisineTypes": ["mediterranean", "grill"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-zai-cafe",
+    name: "Zai Cafe",
+    name_ar: "زاي كافيه",
+    category: "restaurant",
+    subcategory: "mediterranean_middle_eastern",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong — all-day dining with a strong dinner menu",
+    description: "Modern Mediterranean and Middle Eastern restaurant on Batu Bolong with an extended dinner menu (mezze, seafood, grilled meats, pasta). Brand markets itself as café-named but operates full dining service.",
+    why_visit: "Mediterranean / Middle Eastern dinner on the Batu Bolong strip.",
+    best_for: ["dinner", "middle_eastern", "mediterranean"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://cafezai.com/dinner"],
+    websiteUrl: "https://cafezai.com/dinner",
+    tags: ["mediterranean", "middle_eastern", "batu_bolong"],
+    dining: {"cuisineTypes": ["mediterranean", "middle_eastern"], "mealTypes": ["breakfast", "lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-deus-cafe",
+    name: "Deus Cafe",
+    name_ar: "ديوس كافيه",
+    category: "restaurant",
+    subcategory: "casual_all_day",
+    area: "Echo Beach",
+    area_note: "Jl. Pantai Batu Mejan No. 8 — Temple of Enthusiasm campus (Echo Beach / Batu Mejan; distinct from Batu Bolong strip)",
+    description: "All-day café and restaurant at Deus Ex Machina’s Temple of Enthusiasm on Batu Mejan / Echo Beach, serving casual plates alongside the brand’s retail and surf culture campus.",
+    why_visit: "Casual eats on the Deus Echo Beach campus.",
+    best_for: ["lunch", "casual", "surf_culture"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://deuscustoms.co.id/pages/deus-cafe", "https://deuscustoms.co.id/pages/the-temple-of-enthusiasm-1"],
+    websiteUrl: "https://deuscustoms.co.id/pages/deus-cafe",
+    tags: ["casual", "echo_beach", "deus"],
+    dining: {"cuisineTypes": ["international", "casual"], "mealTypes": ["breakfast", "lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-milk-madu-beach-road",
+    name: "Milk & Madu Beach Road",
+    name_ar: "ميلك آند مادو بيتش رود",
+    category: "cafe",
+    subcategory: "brunch_specialty_coffee",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong No.92 — Milk & Madu Canggu Beach Road location (distinct from Berawa branch)",
+    description: "Australian-style brunch café on Batu Bolong Beach Road serving breakfast through dinner with specialty coffee. One of several Milk & Madu Bali locations; this record is the Beach Road / Batu Bolong site only.",
+    why_visit: "Reliable brunch and coffee on Batu Bolong Beach Road.",
+    best_for: ["brunch", "coffee", "families"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://milkandmadu.com/location/", "https://milkandmadu.com/"],
+    websiteUrl: "https://milkandmadu.com/location/",
+    tags: ["brunch", "coffee", "batu_bolong", "milk_and_madu"],
+    dining: {"cuisineTypes": ["cafe", "brunch", "australian_inspired"], "mealTypes": ["breakfast", "lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-milk-madu-berawa",
+    name: "Milk & Madu Berawa",
+    name_ar: "ميلك آند مادو بيراوا",
+    category: "cafe",
+    subcategory: "brunch_specialty_coffee",
+    area: "Berawa",
+    area_note: "Jl. Pantai Berawa No. 52, Tegal Gundul, Tibubeneng — Berawa branch (not the Beach Road site)",
+    description: "Milk & Madu’s Berawa café location for brunch, pizza nights, and sunset sessions as described on the brand locations page. Distinct entity from the Beach Road Canggu site.",
+    why_visit: "Brunch and evening pizza sessions on Berawa beach road.",
+    best_for: ["brunch", "pizza", "berawa"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://milkandmadu.com/location/"],
+    websiteUrl: "https://milkandmadu.com/location/",
+    tags: ["brunch", "berawa", "milk_and_madu"],
+    dining: {"cuisineTypes": ["cafe", "brunch", "pizza"], "mealTypes": ["breakfast", "lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-crate-cafe",
+    name: "Crate Cafe",
+    name_ar: "كريت كافيه",
+    category: "cafe",
+    subcategory: "specialty_coffee",
+    area: "Pererenan",
+    area_note: "Jl. Sempol 8, Pererenan, Mengwi — Pererenan village (northwest of Batu Bolong; not a short walk from Berawa)",
+    description: "Community café and gallery in Pererenan opened in 2014, focused on coffee, food, and monthly art exhibitions. Distinct Pererenan location outside the Batu Bolong beach strip.",
+    why_visit: "Coffee and community vibes in Pererenan.",
+    best_for: ["coffee", "laptop_friendly", "pererenan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://lifescrate.com/"],
+    websiteUrl: "https://lifescrate.com/",
+    tags: ["coffee", "pererenan", "gallery"],
+    dining: {"cuisineTypes": ["cafe", "coffee"], "mealTypes": ["breakfast", "lunch"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-house-of-sunday",
+    name: "House of Sunday",
+    name_ar: "هاوس أوف صانداي",
+    category: "cafe",
+    subcategory: "healthy_brunch",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong No. 60a — healthy brunch / lunch café",
+    description: "Healthy brunch and lunch café on Batu Bolong emphasizing fresh ingredients and all-day plates.",
+    why_visit: "Healthy brunch plates on Batu Bolong.",
+    best_for: ["brunch", "healthy", "lunch"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.house-of-sunday.com/lunch"],
+    websiteUrl: "https://www.house-of-sunday.com/lunch",
+    tags: ["brunch", "healthy", "batu_bolong"],
+    dining: {"cuisineTypes": ["cafe", "healthy", "brunch"], "mealTypes": ["breakfast", "lunch"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-pura-batu-bolong",
+    name: "Pura Batu Bolong",
+    name_ar: "بورا باتو بولونغ",
+    category: "attraction",
+    subcategory: "hindu_temple_cultural_site",
+    area: "Batu Bolong",
+    area_note: "Sea temple at Batu Bolong Beach, Desa Canggu — working Hindu temple; visitor access rules apply",
+    description: "Working Hindu sea temple on the Canggu coast at Batu Bolong Beach. Local cultural sources associate it with Danghyang Nirartha traditions; visitors should follow temple dress and attendant guidance. Distinct from the Batu Bolong temple near Tanah Lot in Tabanan.",
+    why_visit: "A compact coastal temple stop at Canggu’s busiest beach.",
+    best_for: ["culture", "sunset", "temple"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://budayabali.com/id/pura-batu-bolong-canggu-sumur-suci-danghyang-nirartha-dan-pelinggih-diatas-batu-karang", "https://diskominfo.badungkab.go.id/kab/berita/70740-pujawali-mejelihan-di-pura-luhur-bhujangga-waisnawa-batu-bolong"],
+    tags: ["temple", "batu_bolong", "culture"],
+    attraction: {"attractionType": "cultural"},
+  },
+  {
+    external_key: "canggu-echo-beach",
+    name: "Echo Beach",
+    name_ar: "إيكو بيتش",
+    category: "attraction",
+    subcategory: "beach_natural",
+    area: "Echo Beach",
+    area_note: "Also called Batu Mejan — reef-break beach west of Batu Bolong; better for surfing/sunset watching than swimming",
+    description: "Canggu’s Echo Beach (Batu Mejan) stretch — dark-sand coastline known for reef breaks and sunset beach clubs. Not a single ticketed attraction; treat as a named beach locality. Swimming can be hazardous.",
+    why_visit: "Sunset and surf-watching on Canggu’s western beach strip.",
+    best_for: ["sunset", "surf_watching", "beach"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://balihandbook.com/locations/canggu/"],
+    tags: ["beach", "echo_beach", "surf"],
+    attraction: {"attractionType": "natural"},
+  },
+  {
+    external_key: "canggu-berawa-beach",
+    name: "Berawa Beach",
+    name_ar: "شاطئ بيراوا",
+    category: "attraction",
+    subcategory: "beach_natural",
+    area: "Berawa",
+    area_note: "Eastern Canggu beach neighbourhood (Tibubeneng / Berawa) — separate from Batu Bolong and Pererenan",
+    description: "Berawa Beach on the eastern side of the Canggu coastal strip, known for intermediate surf and nearby beach clubs. Distinct locality from Batu Bolong and Echo Beach; not walking-equivalent to Pererenan.",
+    why_visit: "Surf and beach-club access on Canggu’s Berawa end.",
+    best_for: ["surf", "beach", "berawa"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://balihandbook.com/locations/canggu/"],
+    tags: ["beach", "berawa", "surf"],
+    attraction: {"attractionType": "natural"},
+  },
+  {
+    external_key: "canggu-turtle-surf-school",
+    name: "Turtle Surf School Bali",
+    name_ar: "مدرسة تيرتل لركوب الأمواج",
+    category: "activity",
+    subcategory: "surf_lesson",
+    area: "Batu Bolong",
+    area_note: "Lessons held at Batu Bolong Beach — identifiable local surf school",
+    description: "Canggu surf school offering private and package lessons at Batu Bolong Beach with ASI-certified instructor claims on the official site. Prices and certifications are brand-stated; Helm has not independently verified.",
+    why_visit: "Beginner-friendly surf lessons on Batu Bolong’s sandy-bottom waves.",
+    best_for: ["surf", "beginners", "lessons"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://turtlesurfbali.com/", "https://turtlesurfbali.com/book-now"],
+    websiteUrl: "https://turtlesurfbali.com/",
+    tags: ["surf", "lessons", "batu_bolong"],
+    activity: {"activityType": "water_sports"},
+  },
+  {
+    external_key: "canggu-bali-surf-school",
+    name: "Bali Surf School (SURFISUPBALI)",
+    name_ar: "مدرسة بالي لركوب الأمواج",
+    category: "activity",
+    subcategory: "surf_lesson",
+    area: "Canggu",
+    area_note: "Canggu-focused private and semi-private lessons with pickup in Canggu as described by the school",
+    description: "Surf school operating private and semi-private lessons in the Canggu area under the SURFISUPBALI / Bali Surf School brand. Distinct from Turtle Surf School; treat as a separate provider.",
+    why_visit: "Private or semi-private surf coaching with Canggu pickup.",
+    best_for: ["surf", "private_lessons"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://balisurfschool.com/"],
+    websiteUrl: "https://balisurfschool.com/",
+    tags: ["surf", "lessons", "canggu"],
+    activity: {"activityType": "water_sports"},
+  },
+  {
+    external_key: "canggu-the-practice-yoga",
+    name: "The Practice",
+    name_ar: "ذا براكتيس",
+    category: "activity",
+    subcategory: "yoga_studio",
+    area: "Batu Bolong",
+    area_note: "Jl. Batu Bolong 94A — lineage-based Hatha yoga institute",
+    description: "Traditional Hatha yoga institute on Batu Bolong offering scheduled classes and teacher training. Identifiable studio entity with published class schedule.",
+    why_visit: "Structured Hatha yoga classes in central Canggu.",
+    best_for: ["yoga", "wellness"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.thepracticebali.com/", "https://www.thepracticebali.com/practice-with-us/schedule/"],
+    websiteUrl: "https://www.thepracticebali.com/",
+    tags: ["yoga", "wellness", "batu_bolong"],
+    activity: {"activityType": "wellness"},
+  },
+  {
+    external_key: "canggu-serenity-yoga",
+    name: "Serenity Yoga Canggu",
+    name_ar: "سيرينيتي يوجا كانغو",
+    category: "activity",
+    subcategory: "yoga_studio",
+    area: "Canggu / Nelayan",
+    area_note: "Jl. Nelayan, Banjar Canggu — open-air yoga studio with a large weekly schedule",
+    description: "Canggu yoga studio on Jl. Nelayan offering Vinyasa, Hatha, aerial, Yin and related classes with published drop-in pricing on the official site. Distinct from The Practice.",
+    why_visit: "Daily drop-in yoga classes near Nelayan / Canggu.",
+    best_for: ["yoga", "aerial", "wellness"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.serenitybali.com/yoga-schedule"],
+    websiteUrl: "https://www.serenitybali.com/yoga-schedule",
+    tags: ["yoga", "nelayan", "wellness"],
+    activity: {"activityType": "wellness"},
+  },
+  {
+    external_key: "canggu-la-brisa",
+    name: "La Brisa Bali",
+    name_ar: "لا بريزا بالي",
+    category: "beach_club",
+    subcategory: "beach_club",
+    area: "Echo Beach",
+    area_note: "Jl. Pantai Batu Mejan — foreshore of Echo Beach",
+    description: "Eco-styled beach club on Echo Beach built with reclaimed boat timber, offering daybeds, dining, and sunset sessions. Entry and minimum-spend rules vary by seating product; Helm has not verified current fees.",
+    why_visit: "Sunset beach club experience on Echo Beach.",
+    best_for: ["sunset", "beach_club", "cocktails"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://labrisa-bali.com/"],
+    websiteUrl: "https://labrisa-bali.com/",
+    tags: ["beach_club", "echo_beach", "sunset"],
+    dining: {"cuisineTypes": ["international", "seafood"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-finns-beach-club",
+    name: "FINNS Beach Club",
+    name_ar: "فينز بيتش كلوب",
+    category: "beach_club",
+    subcategory: "beach_club",
+    area: "Berawa",
+    area_note: "Jalan Pantai Berawa — large beachfront club on Berawa (eastern Canggu)",
+    description: "Large beachfront beach club on Berawa with daybeds, pools, dining, and daily events. Official site markets free entry with paid daybed/event products; Helm has not verified pricing.",
+    why_visit: "All-day beach-club party scene on Berawa.",
+    best_for: ["beach_club", "party", "berawa"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://finnsbeachclub.com/", "https://finnsbeachclub.com/location/"],
+    websiteUrl: "https://finnsbeachclub.com/",
+    tags: ["beach_club", "berawa", "party"],
+    dining: {"cuisineTypes": ["international"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-old-mans",
+    name: "Old Man's",
+    name_ar: "أولد مانز",
+    category: "bar",
+    subcategory: "beach_bar",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong No.117X — beach bar named after the local surf break",
+    description: "Long-running Batu Bolong beach bar and casual dining venue with live music and weekly events. Named after the Old Man’s surf break at Batu Bolong Beach.",
+    why_visit: "Classic Canggu beach-bar energy on Batu Bolong.",
+    best_for: ["sunset", "live_music", "casual"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.oldmans.net/", "https://www.oldmans.net/contact", "https://www.oldmans.net/about"],
+    websiteUrl: "https://www.oldmans.net/",
+    tags: ["bar", "batu_bolong", "live_music"],
+    dining: {"cuisineTypes": ["casual", "international"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-atlas-beach-club",
+    name: "Atlas Beach Club",
+    name_ar: "أطلس بيتش كلوب",
+    category: "beach_club",
+    subcategory: "beach_club",
+    area: "Berawa / Tibubeneng",
+    area_note: "Jl. Pantai Berawa No. 88, Desa Tibubeneng — large Berawa beach club (Atlas Beach Fest)",
+    description: "Large Berawa beach club marketed as Atlas Beach Club / Atlas Beach Fest, with daybeds, dining, pool bar, and events. Distinct from FINNS on the same Berawa coastline.",
+    why_visit: "High-capacity beach-club day and night on Berawa.",
+    best_for: ["beach_club", "events", "berawa"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.atlasbeachfest.com/beach-club", "https://www.atlasbeachfest.com/beach-club/contact"],
+    websiteUrl: "https://www.atlasbeachfest.com/beach-club",
+    tags: ["beach_club", "berawa", "atlas"],
+    dining: {"cuisineTypes": ["international"], "mealTypes": ["lunch", "dinner"], "dietaryOptions": []},
+  },
+  {
+    external_key: "canggu-como-canggu",
+    name: "COMO Canggu",
+    name_ar: "كومو كانغو",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Echo Beach",
+    area_note: "Jl. Pantai Batu Mejan, Echo Beach — beachfront resort near Echo Beach / Batu Mejan",
+    description: "COMO branded beachfront resort with rooms, suites, residences, and penthouses at Echo Beach. Brand marketing references pools and wellness facilities; Helm has not verified rates or amenity inventories.",
+    why_visit: "Beachfront luxury base on Echo Beach.",
+    best_for: ["stay", "resort", "echo_beach"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.comohotels.com/bali/como-canggu", "https://www.comohotels.com/bali/como-canggu/accommodation"],
+    websiteUrl: "https://www.comohotels.com/bali/como-canggu",
+    tags: ["resort", "echo_beach", "como", "luxury"],
+    accommodation_editorial: accommodationEditorial("https://www.comohotels.com/bali/como-canggu", "resort"),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "canggu-hotel-tugu",
+    name: "Hotel Tugu Bali",
+    name_ar: "فندق توغو بالي",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Batu Bolong",
+    area_note: "Jl. Pantai Batu Bolong, Canggu Beach — boutique heritage hotel on Batu Bolong",
+    description: "Boutique heritage hotel on Canggu / Batu Bolong beach road known for antique-filled rooms and Indonesian cultural storytelling. Star claims are brand-facing only and not Helm-verified.",
+    why_visit: "Design-led boutique stay on Batu Bolong.",
+    best_for: ["stay", "boutique_hotel", "batu_bolong"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://tuguhotels.com/hotels/bali/"],
+    websiteUrl: "https://tuguhotels.com/hotels/bali/",
+    tags: ["boutique_hotel", "batu_bolong", "heritage"],
+    accommodation_editorial: accommodationEditorial("https://tuguhotels.com/hotels/bali/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-the-slow",
+    name: "The Slow",
+    name_ar: "ذا سلو",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Batu Bolong",
+    area_note: "Jl. Batu Bolong 97 — boutique hotel in the heart of Canggu",
+    description: "Boutique hotel on Batu Bolong with suite categories including pool suites as marketed on the official site. Private-pool claims are brand-stated; editorial pool fields remain null until Helm-verified.",
+    why_visit: "Boutique design stay on Batu Bolong.",
+    best_for: ["stay", "boutique_hotel", "batu_bolong"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://theslow.com/", "https://theslow.com/suites/pool-suite/"],
+    websiteUrl: "https://theslow.com/",
+    tags: ["boutique_hotel", "batu_bolong", "design"],
+    accommodation_editorial: accommodationEditorial("https://theslow.com/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-masmara-resort",
+    name: "Masmara Resort",
+    name_ar: "ماسمارا ريزورت",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Pererenan",
+    area_note: "Jl. Pantai Pererenan 170 — boutique resort near Pererenan Beach",
+    description: "Boutique resort in Pererenan steps from Pererenan Beach, offering rooms and family suites. Distinct northwest locality from Batu Bolong / Berawa.",
+    why_visit: "Quiet Pererenan resort near the beach.",
+    best_for: ["stay", "resort", "pererenan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://masmararesort.com/"],
+    websiteUrl: "https://masmararesort.com/",
+    tags: ["resort", "pererenan"],
+    accommodation_editorial: accommodationEditorial("https://masmararesort.com/", "resort"),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "canggu-kayu-village",
+    name: "Kayu Village Resort",
+    name_ar: "كايو فيلدج ريزورت",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Pererenan",
+    area_note: "Jl. Pantai Pererenan No.133 — wooden bungalows near Pererenan Beach",
+    description: "Boutique resort of traditional-style wooden bungalows in Pererenan, a short walk from Pererenan Beach per the brand.",
+    why_visit: "Garden bungalow stay in Pererenan.",
+    best_for: ["stay", "boutique_hotel", "pererenan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://kayuvillage.com/"],
+    websiteUrl: "https://kayuvillage.com/",
+    tags: ["boutique_hotel", "pererenan", "bungalow"],
+    accommodation_editorial: accommodationEditorial("https://kayuvillage.com/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-further-hotel",
+    name: "Further Hotel",
+    name_ar: "فيرذر هوتيل",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Pererenan",
+    area_note: "Jl. Pantai Pererenan No.84 — diffused boutique hotel concept across Pererenan sites",
+    description: "Diffused boutique hotel in Pererenan with suites paired to common spaces woven through the village. Brand describes multiple sites as one concept.",
+    why_visit: "Design-forward boutique stay in Pererenan.",
+    best_for: ["stay", "boutique_hotel", "pererenan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://furtherhotel.com/boutique-hotel-canggu/"],
+    websiteUrl: "https://furtherhotel.com/boutique-hotel-canggu/",
+    tags: ["boutique_hotel", "pererenan", "design"],
+    accommodation_editorial: accommodationEditorial("https://furtherhotel.com/boutique-hotel-canggu/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-ivy-canggu",
+    name: "Ivy Canggu",
+    name_ar: "آيفي كانغو",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Pererenan",
+    area_note: "Pererenan — brand places it about a 10-minute walk from Pererenan Beach",
+    description: "15-room Mediterranean-inspired boutique hotel in Pererenan with pool-view and ocean-view rooms as marketed by the brand.",
+    why_visit: "Compact boutique hotel in Pererenan.",
+    best_for: ["stay", "boutique_hotel", "pererenan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://ivycanggu.com/"],
+    websiteUrl: "https://ivycanggu.com/",
+    tags: ["boutique_hotel", "pererenan"],
+    accommodation_editorial: accommodationEditorial("https://ivycanggu.com/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-white-goose",
+    name: "White Goose Boutique Hotel",
+    name_ar: "وايت غوس بوتيك هوتيل",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Berawa",
+    area_note: "Berawa Canggu — brand places it near Berawa Beach and nearby beach clubs",
+    description: "Boutique hotel in Berawa marketing studio and suite rooms near Berawa Beach and major beach clubs. Marketplace-style price bands on the site are not treated as Helm supplier quotes.",
+    why_visit: "Berawa boutique base near the beach clubs.",
+    best_for: ["stay", "boutique_hotel", "berawa"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://whitegoosehotel.com/"],
+    websiteUrl: "https://whitegoosehotel.com/",
+    tags: ["boutique_hotel", "berawa"],
+    accommodation_editorial: accommodationEditorial("https://whitegoosehotel.com/", "boutique_hotel"),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "canggu-solaya-villas",
+    name: "Solaya Villas",
+    name_ar: "سولايا فيلات",
+    category: "accommodation",
+    subcategory: "villa",
+    area: "Canggu",
+    area_note: "Jl. Kubu Manyar No.37 — private-pool villa compound in Canggu",
+    description: "Collection of designer private-pool villas in Canggu (one- and three-bedroom inventory per brand). Pool claims are brand-stated; editorial private_pool remains null until verified.",
+    why_visit: "Private villa stay minutes from Canggu beaches and cafés.",
+    best_for: ["stay", "villa", "canggu"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.solayavillas.com/"],
+    websiteUrl: "https://www.solayavillas.com/",
+    tags: ["villa", "canggu", "private_pool_marketing"],
+    accommodation_editorial: accommodationEditorial("https://www.solayavillas.com/", "villa"),
+    accommodation: { accommodationType: "villa" },
+  },
+  {
+    external_key: "canggu-zin-canggu",
+    name: "ZIN Canggu Resort & Villas",
+    name_ar: "زين كانغو ريزورت وفيلات",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Canggu / Nelayan",
+    area_note: "Jl. Nelayan No.78 — resort and villas near Canggu Beach (distinct from ZIN Berawa)",
+    description: "ZIN Canggu resort with rooms, suites, and private-pool villas near Canggu Beach. Separate from ZIN Berawa; this record covers the Nelayan / Canggu property only.",
+    why_visit: "Boutique resort & villas near Canggu Beach.",
+    best_for: ["stay", "resort", "canggu_nelayan"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://zin.world/zin-canggu/", "https://zin.world/zin-canggu-rooms/"],
+    websiteUrl: "https://zin.world/zin-canggu/",
+    tags: ["resort", "nelayan", "zin"],
+    accommodation_editorial: accommodationEditorial("https://zin.world/zin-canggu/", "resort"),
+    accommodation: { accommodationType: "resort" },
+  },
+];
+
+function toEditorialRecord(p) {
+  const record = {
+    external_key: p.external_key,
+    name: p.name,
+    name_ar: p.name_ar,
+    country_code: "ID",
+    destination_slug: "canggu",
+    category: p.category,
+    subcategory: p.subcategory,
+    area: p.area,
+    area_note: p.area_note,
+    description: p.description,
+    why_visit: p.why_visit,
+    best_for: p.best_for,
+    rating: p.rating,
+    price: p.price,
+    address: p.address,
+    coordinates: p.coordinates,
+    opening_hours: p.opening_hours,
+    visit_duration_minutes: p.visit_duration_minutes,
+    booking_recommended: p.booking_recommended,
+    source_urls: p.source_urls,
+    tags: p.tags,
+    data_status: "curated_needs_verification",
+    publication_status: "draft",
+    last_verified_at: null,
+    ranking_support: rankingSupport(p),
+  };
+  if (p.accommodation_editorial) {
+    record.accommodation = p.accommodation_editorial;
+  }
+  return record;
+}
+
+function importExternalKey(editorialKey) {
+  const local = editorialKey.startsWith("canggu-")
+    ? editorialKey.slice("canggu-".length)
+    : editorialKey;
+  return `id:canggu:${local}`;
+}
+
+function isTourismListingUrl(url) {
+  return /lovebali\.baliprov|indonesia\.travel|sisparnas\.kemenpar|disparda\.baliprov|budayabali\.com|badungkab\.go\.id/.test(
+    url,
+  );
+}
+
+function isSecondaryGuideUrl(url) {
+  return /balihandbook\.com/.test(url);
+}
+
+function sourceForPlace(p) {
+  if (p.source_urls?.length) {
+    return p.source_urls.map((url) => {
+      if (isTourismListingUrl(url)) {
+        return {
+          sourceType: "other",
+          name: "Official tourism / cultural / destination listing",
+          url,
+          notes:
+            "Destination or cultural listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          collectedAt: COMPILED_AT,
+        };
+      }
+      if (isSecondaryGuideUrl(url)) {
+        return {
+          sourceType: "other",
+          name: "Secondary destination guide",
+          url,
+          notes:
+            "Secondary guide (Bali Handbook), not an official tourism source. Captured for locality identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          collectedAt: COMPILED_AT,
+        };
+      }
+      return {
+        sourceType: "official_website",
+        name: "Official / brand website reference",
+        url,
+        notes:
+          "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+        collectedAt: COMPILED_AT,
+      };
+    });
+  }
+  return [
+    {
+      sourceType: "manual_research",
+      name: "Helm curated Canggu dataset v1 research lead",
+      notes:
+        "Curated research lead for staging. Ratings, prices, amenities, and coordinates intentionally null until verified. Not Helm-verified.",
+      collectedAt: COMPILED_AT,
+    },
+  ];
+}
+
+function toImportPlace(p) {
+  const level = priceTierToLevel(p.price?.tier);
+  /** @type {Record<string, unknown>} */
+  const place = {
+    externalKey: importExternalKey(p.external_key),
+    destinationSlug: "canggu",
+    category: p.category,
+    subcategory: p.subcategory,
+    slug: p.external_key,
+    nameEn: p.name,
+    nameAr: p.name_ar,
+    shortDescriptionEn: p.why_visit.slice(0, 500),
+    descriptionEn: [`${p.description}`, `Area: ${p.area}. ${p.area_note}`].join(
+      "\n\n",
+    ),
+    tags: p.tags,
+    updateIfExists: false,
+    sources: sourceForPlace(p),
+  };
+
+  if (
+    p.rating &&
+    typeof p.rating.value === "number" &&
+    typeof p.rating.review_count === "number"
+  ) {
+    place.rating = {
+      value: p.rating.value,
+      scale: p.rating.scale ?? 5,
+      reviewCount: p.rating.review_count,
+      platform: p.rating.provider || "provider_unspecified",
+      observedAt: COMPILED_AT,
+    };
+  }
+
+  if (p.category !== "accommodation" && level != null) place.priceLevel = level;
+  if (p.websiteUrl) place.websiteUrl = p.websiteUrl;
+
+  if (p.dining) place.dining = p.dining;
+  if (p.attraction) place.attraction = p.attraction;
+  if (p.activity) place.activity = p.activity;
+  if (p.nightlife) place.nightlife = p.nightlife;
+  if (p.accommodation) {
+    place.accommodation = {
+      accommodationType: p.accommodation.accommodationType,
+    };
+  }
+
+  return place;
+}
+
+if (PLACES.length !== 30) {
+  throw new Error(`Expected 30 places, got ${PLACES.length}`);
+}
+
+const editorial = {
+  dataset: DATASET_VERSION,
+  format: "helm.catalog.editorial.v1",
+  compiled_at: COMPILED_AT,
+  locale_primary: "en",
+  locale_secondary: "ar",
+  research_status:
+    "Research leads for staging. Not a verified inventory. Replace unsuitable/closed/unverifiable leads before publish.",
+  country: {
+    name: "Indonesia",
+    iso2: "ID",
+    currency: "IDR",
+    note:
+      "Apply-time prerequisite: geo.countries must include ID and pricing.currencies must include IDR (not present in default seed.sql as of this dataset).",
+  },
+  destination: {
+    name: "Canggu",
+    name_ar: "كانغو",
+    slug: "canggu",
+    external_key: "id:canggu",
+    type: "destination_area",
+    type_note:
+      "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    region: "Southwest Bali / Badung",
+    parent: "Indonesia",
+    parent_note:
+      "Editorial parent label. Import format does not set parent_id; no Indonesia destination row is required for countryCode ID.",
+    country_code: "ID",
+    recommended_duration: "3–5 days",
+    tags: [
+      "surf",
+      "beach",
+      "cafes",
+      "beach_clubs",
+      "nightlife",
+      "wellness",
+      "batu_bolong",
+      "berawa",
+      "pererenan",
+    ],
+    data_status: "curated_needs_verification",
+    publication_status: "draft",
+    unpublished: true,
+    summary_en:
+      "Southwest Bali surf and café strip spanning Berawa, Batu Bolong, Echo Beach, and Pererenan — not one uniformly walkable village.",
+    summary_ar:
+      "شريط ركوب الأمواج والمقاهي في جنوب غرب بالي عبر بيراوا وباتو بولونغ وإيكو بيتش وبيريرينان — ليست قرية واحدة قابلة للمشي بالكامل.",
+  },
+  category_distribution: {
+    restaurant: 5,
+    cafe: 4,
+    attraction: 3,
+    activity: 4,
+    bar_beach_club_nightlife: 4,
+    accommodation: 10,
+  },
+  geography_note:
+    "Canggu localities (Berawa, Batu Bolong, Echo Beach/Batu Mejan, Pererenan, Padonan, Babakan, Tibubeneng) are separate clusters. Do not imply walking-distance equivalence across the strip. Tanah Lot (Tabanan) is outside this destination dataset.",
+  integrity: {
+    do_not_invent: [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified",
+    ],
+    accommodation_import:
+      "Only accommodationType mapped; starRating and amenities omitted until verified",
+    accommodation_fields:
+      "Rich accommodation editorial block stays in source JSON; import only sends category accommodation + accommodation.accommodationType",
+    lifecycle: "all_records_draft_curated_needs_verification",
+  },
+  places: PLACES.map(toEditorialRecord),
+  mapping: {
+    import_file: "canggu-curated-v1.json",
+    import_format: "helm.catalog.import.v1",
+    external_key_rule:
+      "editorial.external_key (e.g. canggu-billy-ho) → import.externalKey id:canggu:<suffix>; import.slug keeps editorial key",
+    unsupported_in_import: [
+      "destination.type / destination_area",
+      "destination.parent hierarchy",
+      "why_visit / best_for (folded into shortDescriptionEn / tags where useful)",
+      "opening_hours",
+      "structured price amounts (only priceLevel 1–4 when tier known)",
+      "coordinates when null (omitted)",
+      "ranking_support block",
+      "accommodation starRating / amenities / price_per_night when unverified",
+    ],
+  },
+};
+
+const importPayload = {
+  formatVersion: "helm.catalog.import.v1",
+  sourceLabel: DATASET_VERSION,
+  destinations: [
+    {
+      externalKey: "id:canggu",
+      slug: "canggu",
+      nameEn: "Canggu",
+      nameAr: "كانغو",
+      countryCode: "ID",
+      summaryEn: editorial.destination.summary_en,
+      summaryAr: editorial.destination.summary_ar,
+      shortDescriptionEn:
+        "Southwest Bali surf and café destination spanning Berawa, Batu Bolong, Echo Beach, and Pererenan. Recommended stay 3–5 days.",
+      tags: editorial.destination.tags,
+      updateIfExists: false,
+      sources: [
+        {
+          sourceType: "manual_research",
+          name: "Helm curated Canggu destination notes",
+          notes:
+            "Draft curated destination. Unpublished. Needs verification before publish. Localities are not one walkable area.",
+          collectedAt: COMPILED_AT,
+        },
+      ],
+    },
+  ],
+  places: PLACES.map(toImportPlace),
+};
+
+mkdirSync(OUT_DIR, { recursive: true });
+const sourcePath = join(OUT_DIR, "canggu-curated-v1.source.json");
+const importPath = join(OUT_DIR, "canggu-curated-v1.json");
+writeFileSync(sourcePath, `${JSON.stringify(editorial, null, 2)}\n`);
+writeFileSync(importPath, `${JSON.stringify(importPayload, null, 2)}\n`);
+console.log(`Wrote ${sourcePath}`);
+console.log(`Wrote ${importPath}`);
+console.log(`Places: ${importPayload.places.length}`);

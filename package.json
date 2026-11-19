@@ -17,6 +17,8 @@
     "dataset:ubud:validate": "node scripts/validate-ubud-dataset-v1.mjs",
     "dataset:uluwatu:build": "node scripts/build-uluwatu-dataset-v1.mjs",
     "dataset:uluwatu:validate": "node scripts/validate-uluwatu-dataset-v1.mjs",
+    "dataset:canggu:build": "node scripts/build-canggu-dataset-v1.mjs",
+    "dataset:canggu:validate": "node scripts/validate-canggu-dataset-v1.mjs",
     "test": "turbo run test"
   },
   "devDependencies": {
