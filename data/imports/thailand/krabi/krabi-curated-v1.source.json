@@ -1,0 +1,2160 @@
+{
+  "dataset": "krabi-curated-v1",
+  "format": "helm.catalog.editorial.v1",
+  "compiled_at": "2026-11-19",
+  "locale_primary": "en",
+  "locale_secondary": "ar",
+  "research_status": "Staging research leads for Thailand catalogue foundation. Not a verified inventory. Prefer Helm Admin editorial curation before publish.",
+  "country": {
+    "name": "Thailand",
+    "iso2": "TH",
+    "currency": "THB",
+    "note": "Apply-time prerequisite: geo.countries must include TH and pricing.currencies must include THB (not present in default seed.sql as of this dataset)."
+  },
+  "destination": {
+    "name": "Krabi",
+    "name_ar": "كرابي",
+    "slug": "krabi",
+    "external_key": "id:krabi",
+    "type": "destination_area",
+    "type_note": "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    "region": "Andaman coast / Southern Thailand",
+    "parent": "Thailand",
+    "parent_note": "Editorial parent label. Import format does not set parent_id; countryCode TH is required at apply time.",
+    "country_code": "TH",
+    "recommended_duration": "4–6 days",
+    "tags": [
+      "beach",
+      "cliffs",
+      "islands",
+      "nature",
+      "railay",
+      "ao_nang"
+    ],
+    "data_status": "curated_needs_verification",
+    "publication_status": "draft",
+    "unpublished": true,
+    "summary_en": "Andaman mainland gateway for Railay cliffs, Ao Nang, and island day trips — distinct from Phuket town and Koh Phi Phi lodging.",
+    "summary_ar": "بوابة أندامان البرية لمنحدرات رايلاي وآو نانغ ورحلات الجزر — متميزة عن بوكيت وعن الإقامة في كو في في."
+  },
+  "category_distribution": {
+    "restaurant": 5,
+    "cafe": 4,
+    "attraction": 3,
+    "activity": 4,
+    "bar_beach_club_nightlife": 4,
+    "accommodation": 10
+  },
+  "geography_note": "Ao Nang, Railay (boat access), Krabi Town, and Tubkaak/Klong Muang are separate clusters. Island day trips do not make Phi Phi part of this destination’s lodging inventory.",
+  "integrity": {
+    "do_not_invent": [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified"
+    ],
+    "accommodation_import": "Only accommodationType mapped; starRating and amenities omitted until verified",
+    "lifecycle": "all_records_draft_curated_needs_verification"
+  },
+  "places": [
+    {
+      "external_key": "krabi-seafood-ao-nang",
+      "name": "Ao Nang Seafood Strip lead",
+      "name_ar": "مأكولات بحرية آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "area": "Ao Nang beach road",
+      "area_note": "Beach-road seafood dining lead",
+      "description": "Indicative Ao Nang beachfront seafood dining lead. Pin a specific restaurant in Admin.",
+      "why_visit": "Beachfront seafood dinner.",
+      "best_for": [
+        "dinner",
+        "seafood"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-krua-thara",
+      "name": "Krua Thara",
+      "name_ar": "كروا ثارا",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "area": "Ao Nang",
+      "area_note": "Popular seafood restaurant lead",
+      "description": "Well-known Ao Nang seafood restaurant lead.",
+      "why_visit": "Ao Nang seafood institution.",
+      "best_for": [
+        "dinner",
+        "seafood"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-railay-dining",
+      "name": "Railay Beach Dining lead",
+      "name_ar": "طعام رايلاي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "area": "Railay East/West",
+      "area_note": "Railay beach dining lead",
+      "description": "Indicative Railay beach dining lead accessible by boat from Ao Nang.",
+      "why_visit": "Casual Railay beach dinner.",
+      "best_for": [
+        "dinner",
+        "thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-gasebo",
+      "name": "The Gasebo",
+      "name_ar": "الغازيبو",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "restaurant",
+      "subcategory": "international_thai",
+      "area": "Ao Nang",
+      "area_note": "Cliff/sea-view dining lead",
+      "description": "Ao Nang sea-view dining lead.",
+      "why_visit": "Sea-view Ao Nang dinner.",
+      "best_for": [
+        "dinner",
+        "international_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "ao_nang"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-riverside-krabi",
+      "name": "Krabi Town Riverside Dining lead",
+      "name_ar": "طعام نهر كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "area": "Krabi Town",
+      "area_note": "Town riverside dining",
+      "description": "Krabi Town riverside dining lead near the night market area.",
+      "why_visit": "Town riverside Thai plates.",
+      "best_for": [
+        "dinner",
+        "thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "krabi_town"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-ao-nang-coffee",
+      "name": "Ao Nang Coffee lead",
+      "name_ar": "قهوة آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Ao Nang",
+      "area_note": "Beach-town café lead",
+      "description": "Indicative Ao Nang specialty or brunch café lead.",
+      "why_visit": "Ao Nang coffee break.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-krabi-town-cafe",
+      "name": "Krabi Town Cafe lead",
+      "name_ar": "مقهى بلدة كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Krabi Town",
+      "area_note": "Town café lead",
+      "description": "Café lead in Krabi Town for pre-ferry downtime.",
+      "why_visit": "Town café pause.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-railay-cafe",
+      "name": "Railay Beach Cafe lead",
+      "name_ar": "مقهى رايلاي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Railay",
+      "area_note": "Beach café lead",
+      "description": "Indicative Railay café/breakfast lead.",
+      "why_visit": "Railay breakfast café.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-amazon-krabi",
+      "name": "Café Amazon Krabi lead",
+      "name_ar": "كافيه أمازون كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "area": "Ao Nang / town",
+      "area_note": "Chain coffee convenience lead",
+      "description": "Café Amazon as a practical coffee lead; pin branch later.",
+      "why_visit": "Easy chain coffee.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.cafeamazon.com/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-railay-beach",
+      "name": "Railay Beach",
+      "name_ar": "شاطئ رايلاي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "attraction",
+      "subcategory": "beach",
+      "area": "Railay",
+      "area_note": "Boat-access beach and cliffs",
+      "description": "Iconic boat-access beach framed by limestone cliffs. Not road-linked to Ao Nang.",
+      "why_visit": "Cliff-framed Railay beach.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "beach",
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-tiger-cave",
+      "name": "Tiger Cave Temple (Wat Tham Suea)",
+      "name_ar": "معبد كهف النمر",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "attraction",
+      "subcategory": "temple_viewpoint",
+      "area": "Krabi inland",
+      "area_note": "Hilltop temple stairs",
+      "description": "Temple and viewpoint with long stair climb inland from Krabi. Difficulty unverified for each visitor.",
+      "why_visit": "Stair-climb temple viewpoint.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "temple"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-hong-island",
+      "name": "Hong Island",
+      "name_ar": "جزيرة هونغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "attraction",
+      "subcategory": "island",
+      "area": "Than Bok Khorani area / day trip",
+      "area_note": "Lagoon island day-trip target",
+      "description": "Popular lagoon island day trip from Krabi/Ao Nang. Not a lodging destination record.",
+      "why_visit": "Emerald lagoon island day.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "island"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-rock-climbing",
+      "name": "Railay Rock Climbing",
+      "name_ar": "تسلق صخور رايلاي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "activity",
+      "subcategory": "climbing",
+      "area": "Railay",
+      "area_note": "Cliff climbing activity",
+      "description": "Indicative Railay rock-climbing activity. Guide operator to be pinned in Admin.",
+      "why_visit": "Limestone sport climbing.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "climbing"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-four-islands",
+      "name": "Krabi Four Islands Tour",
+      "name_ar": "جولة الجزر الأربع",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "area": "Ao Nang piers",
+      "area_note": "Classic island-hopping tour",
+      "description": "Indicative four-islands day tour category (e.g. Chicken, Tub, Poda). Operator pin deferred.",
+      "why_visit": "Classic island-hopping day.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "islands"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-kayak-mangrove",
+      "name": "Ao Thalane / Mangrove Kayak",
+      "name_ar": "كاياك المنغروف",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "activity",
+      "subcategory": "kayak",
+      "area": "Ao Thalane",
+      "area_note": "Mangrove kayak activity",
+      "description": "Indicative mangrove kayaking activity near Krabi.",
+      "why_visit": "Mangrove kayak paddle.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "kayak"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-diving-krabi",
+      "name": "Krabi Snorkel / Dive Outing",
+      "name_ar": "سنوركل أو غوص كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "activity",
+      "subcategory": "snorkel",
+      "area": "Ao Nang / islands",
+      "area_note": "Water activity lead",
+      "description": "Indicative snorkel/dive outing from Krabi coast.",
+      "why_visit": "Reef snorkel outing.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "snorkel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-ao-nang-beach-bar",
+      "name": "Ao Nang Beach Bar lead",
+      "name_ar": "بار شاطئ آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "area": "Ao Nang",
+      "area_note": "Beach bar corridor lead",
+      "description": "Indicative Ao Nang beach-bar lead for sunset drinks.",
+      "why_visit": "Ao Nang sunset beach bar.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bar"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-railay-nightlife",
+      "name": "Railay Nightlife lead",
+      "name_ar": "سهرات رايلاي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "area": "Railay West",
+      "area_note": "Low-key Railay nightlife lead",
+      "description": "Indicative low-key Railay beach nightlife lead (not Patong-scale).",
+      "why_visit": "Laid-back Railay night.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-ao-nang-club",
+      "name": "Ao Nang Nightlife Venue lead",
+      "name_ar": "ملهى آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "area": "Ao Nang",
+      "area_note": "Small-town nightlife lead",
+      "description": "Indicative Ao Nang late venue lead.",
+      "why_visit": "Ao Nang late night.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-tubkaak-bar",
+      "name": "Tubkaak / Klong Muang Lounge lead",
+      "name_ar": "لاونج توبكاك",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "bar",
+      "subcategory": "lounge_bar",
+      "area": "Tubkaak / Klong Muang",
+      "area_note": "Quiet west-coast lounge lead",
+      "description": "Quieter west-coast lounge/bar lead away from Ao Nang strip.",
+      "why_visit": "Quiet coast evening drinks.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "lounge"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "krabi-rayavadee",
+      "name": "Rayavadee",
+      "name_ar": "رايافادي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Railay",
+      "area_note": "Iconic Railay luxury resort",
+      "description": "Luxury resort set among Railay’s cliffs and beaches (boat access).",
+      "why_visit": "Railay cliffside luxury resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.rayavadee.com/"
+      ],
+      "tags": [
+        "resort",
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.rayavadee.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-centara-krabi",
+      "name": "Centara Grand Beach Resort & Villas Krabi",
+      "name_ar": "سينتارا كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Krabi coastline",
+      "area_note": "Centara beach resort",
+      "description": "Centara Grand beach resort & villas in Krabi.",
+      "why_visit": "Centara beach resort stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.centarahotelsresorts.com/centaragrand/cgk"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.centarahotelsresorts.com/centaragrand/cgk",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-dusit-krabi",
+      "name": "Dusit Thani Krabi Beach Resort",
+      "name_ar": "دوسيت ثاني كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Klong Muang",
+      "area_note": "Dusit beach resort",
+      "description": "Dusit Thani beach resort on Klong Muang.",
+      "why_visit": "Klong Muang Dusit resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.dusit.com/dusitthani/krabibeachresort/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.dusit.com/dusitthani/krabibeachresort/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-anantara-golden-hills",
+      "name": "Banyan Tree Krabi",
+      "name_ar": "بانيان تري كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Tubkaak area",
+      "area_note": "Banyan Tree Krabi resort",
+      "description": "Banyan Tree Krabi luxury resort lead on the west coast.",
+      "why_visit": "West-coast Banyan Tree stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.banyantree.com/thailand/krabi"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.banyantree.com/thailand/krabi",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-railay-princess",
+      "name": "Railay Princess Resort & Spa",
+      "name_ar": "رايلاي برينسيس",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Railay East",
+      "area_note": "Railay midscale resort lead",
+      "description": "Railay East resort lead with boat access.",
+      "why_visit": "Railay boat-access resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort",
+        "railay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-ao-nang-cliff",
+      "name": "Ao Nang Cliff Beach Resort lead",
+      "name_ar": "منتجع منحدر آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Ao Nang",
+      "area_note": "Ao Nang cliff resort lead",
+      "description": "Ao Nang cliff/beach resort staging lead.",
+      "why_visit": "Ao Nang cliff resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-holiday-inn-krabi",
+      "name": "Holiday Inn Resort Krabi Ao Nang Beach",
+      "name_ar": "هوليداي إن آو نانغ",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Ao Nang",
+      "area_note": "IHG Ao Nang resort",
+      "description": "Holiday Inn Resort on Ao Nang Beach.",
+      "why_visit": "Ao Nang Holiday Inn stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.ihg.com/holidayinnresorts/hotels/us/en/krabi/krbbh/hoteldetail"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.ihg.com/holidayinnresorts/hotels/us/en/krabi/krbbh/hoteldetail",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-phoenix-krabi",
+      "name": "Phoenix Digital Krabi Resort / Ao Nang hotel lead",
+      "name_ar": "فينيكس كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Ao Nang",
+      "area_note": "Ao Nang hotel lead",
+      "description": "Ao Nang hotel staging lead for midscale stays.",
+      "why_visit": "Practical Ao Nang hotel.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-tubkaak-resort",
+      "name": "The Tubkaak Resort Boutique Resort Krabi",
+      "name_ar": "توبكاك ريزورت",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Tubkaak Beach",
+      "area_note": "Boutique Tubkaak beach resort",
+      "description": "Boutique beach resort on quieter Tubkaak Beach.",
+      "why_visit": "Quiet Tubkaak boutique resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tubkaakresort.com/"
+      ],
+      "tags": [
+        "boutique_hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tubkaakresort.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "krabi-pavilion-krabi",
+      "name": "Pavilion Krabi Beach Resort lead",
+      "name_ar": "باڤيليون كرابي",
+      "country_code": "TH",
+      "destination_slug": "krabi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Krabi beach belt",
+      "area_note": "Beach resort lead",
+      "description": "Krabi beach resort staging lead.",
+      "why_visit": "Beach resort base in Krabi.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    }
+  ],
+  "mapping": {
+    "import_file": "krabi-curated-v1.json",
+    "import_format": "helm.catalog.import.v1",
+    "external_key_rule": "editorial.external_key → import.externalKey id:krabi:<suffix>"
+  }
+}

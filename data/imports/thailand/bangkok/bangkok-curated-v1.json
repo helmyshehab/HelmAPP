@@ -1,0 +1,945 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "bangkok-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:bangkok",
+      "slug": "bangkok",
+      "nameEn": "Bangkok",
+      "nameAr": "بانكوك",
+      "countryCode": "TH",
+      "summaryEn": "Thailand’s capital — temples, street food, river life, and nightlife across Rattanakosin, Sukhumvit, Silom, and riverside districts.",
+      "summaryAr": "عاصمة تايلاند — معابد وطعام شوارع وحياة نهرية وسهرات عبر راتاناكوسين وسوخومفيت وسيلوم وضفاف النهر.",
+      "shortDescriptionEn": "Capital city break with temples, dining, and nightlife. Recommended stay 4–6 days.",
+      "tags": [
+        "city",
+        "food",
+        "culture",
+        "nightlife",
+        "shopping",
+        "temples"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Bangkok destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish. Thailand geo (TH/THB) is an apply-time prerequisite.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:bangkok:thip-samai",
+      "destinationSlug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_street_food",
+      "slug": "bangkok-thip-samai",
+      "nameEn": "Thip Samai",
+      "nameAr": "ثيب ساماي",
+      "shortDescriptionEn": "Classic Bangkok pad thai stop.",
+      "descriptionEn": "Long-running Bangkok pad thai institution near the old city. Staging research lead; hours and wait times unverified.\n\nArea: Rattanakosin. Famous pad thai shop near Democracy Monument",
+      "tags": [
+        "thai",
+        "street_food"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai_street_food"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:jay-fai",
+      "destinationSlug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_street_fine",
+      "slug": "bangkok-jay-fai",
+      "nameEn": "Jay Fai",
+      "nameAr": "جاي فاي",
+      "shortDescriptionEn": "Iconic Bangkok wok dinner.",
+      "descriptionEn": "Celebrated Bangkok wok restaurant known for seafood omelettes and night queues. Staging lead only.\n\nArea: Old Town. Street-side crab omelette and wok cooking landmark",
+      "tags": [
+        "thai",
+        "seafood"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "thai_street_fine"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:sorn",
+      "destinationSlug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "southern_thai",
+      "slug": "bangkok-sorn",
+      "nameEn": "Sorn",
+      "nameAr": "سورن",
+      "shortDescriptionEn": "Southern Thai fine dining in Sukhumvit.",
+      "descriptionEn": "Southern Thai tasting-menu restaurant in Bangkok. Official brand presence used as identity lead only.\n\nArea: Sukhumvit. Southern Thai fine dining (brand site)",
+      "tags": [
+        "thai",
+        "fine_dining"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.sorn-bangkok.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.sorn-bangkok.com/",
+      "dining": {
+        "cuisineTypes": [
+          "southern_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:le-du",
+      "destinationSlug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "modern_thai",
+      "slug": "bangkok-le-du",
+      "nameEn": "Le Du",
+      "nameAr": "لو دو",
+      "shortDescriptionEn": "Modern Thai dinner in Silom.",
+      "descriptionEn": "Modern Thai restaurant in Bangkok’s Silom/Sathorn dining corridor. Staging research lead.\n\nArea: Silom / Sathorn. Modern Thai restaurant",
+      "tags": [
+        "thai",
+        "modern"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://ledubkk.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://ledubkk.com/",
+      "dining": {
+        "cuisineTypes": [
+          "modern_thai"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:blue-elephant",
+      "destinationSlug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_royal",
+      "slug": "bangkok-blue-elephant",
+      "nameEn": "Blue Elephant Cooking School & Restaurant Bangkok",
+      "nameAr": "بلو إليفانت بانكوك",
+      "shortDescriptionEn": "Thai dining and cooking campus.",
+      "descriptionEn": "Established Thai restaurant and cooking school brand in Bangkok. Staging lead; class schedules unverified.\n\nArea: Phra Khanong / Sukhumvit. Colonial Thai restaurant and cooking school campus",
+      "tags": [
+        "thai",
+        "cooking_school"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.blueelephant.com/bangkok/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.blueelephant.com/bangkok/",
+      "dining": {
+        "cuisineTypes": [
+          "thai_royal"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:factory-coffee",
+      "destinationSlug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "slug": "bangkok-factory-coffee",
+      "nameEn": "Factory Coffee",
+      "nameAr": "فاكتوري كوفي",
+      "shortDescriptionEn": "Specialty coffee in Ari.",
+      "descriptionEn": "Specialty coffee café in Bangkok’s Ari neighbourhood. Staging lead.\n\nArea: Ari. Specialty coffee shop in Ari",
+      "tags": [
+        "coffee",
+        "ari"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.factorycoffee.co/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.factorycoffee.co/",
+      "dining": {
+        "cuisineTypes": [
+          "specialty_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:casa-lapin",
+      "destinationSlug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "slug": "bangkok-casa-lapin",
+      "nameEn": "Casa Lapin",
+      "nameAr": "كاسا لابين",
+      "shortDescriptionEn": "Specialty coffee brand stop.",
+      "descriptionEn": "Bangkok specialty coffee brand; this record is a city dining lead for Casa Lapin cafés. Exact branch to be pinned in Admin later.\n\nArea: Multiple / Thonglor area lead. Specialty coffee brand with Bangkok cafés",
+      "tags": [
+        "coffee"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://casalapin.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://casalapin.com/",
+      "dining": {
+        "cuisineTypes": [
+          "specialty_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:roast",
+      "destinationSlug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "slug": "bangkok-roast",
+      "nameEn": "ROAST Coffee & Eatery",
+      "nameAr": "روست كوفي",
+      "shortDescriptionEn": "Coffee and light plates in Thonglor.",
+      "descriptionEn": "Coffee and eatery lead in Bangkok’s Thonglor scene. Staging only.\n\nArea: Thonglor. Coffee and light meals",
+      "tags": [
+        "coffee",
+        "thonglor"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "dining": {
+        "cuisineTypes": [
+          "specialty_coffee"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:after-you",
+      "destinationSlug": "bangkok",
+      "category": "cafe",
+      "subcategory": "dessert_cafe",
+      "slug": "bangkok-after-you",
+      "nameEn": "After You Dessert Cafe",
+      "nameAr": "أفتر يو",
+      "shortDescriptionEn": "Dessert café favourite.",
+      "descriptionEn": "Popular Thai dessert café brand with Bangkok locations. Branch pin deferred to Admin.\n\nArea: Siam / multiple. Popular dessert café brand",
+      "tags": [
+        "dessert",
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.afteryoudessertcafe.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.afteryoudessertcafe.com/",
+      "dining": {
+        "cuisineTypes": [
+          "dessert_cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:bangkok:grand-palace",
+      "destinationSlug": "bangkok",
+      "category": "attraction",
+      "subcategory": "royal_palace_temple",
+      "slug": "bangkok-grand-palace",
+      "nameEn": "Grand Palace & Wat Phra Kaew",
+      "nameAr": "القصر الكبير ووات فرا كايو",
+      "shortDescriptionEn": "Must-see royal temple complex.",
+      "descriptionEn": "Bangkok’s primary royal and temple complex. Treat dress codes and ticket rules as unverified until Admin confirms.\n\nArea: Rattanakosin. Royal historic complex",
+      "tags": [
+        "temple",
+        "landmark"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/Attraction/The-Grand-Palace",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/Attraction/The-Grand-Palace",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:wat-arun",
+      "destinationSlug": "bangkok",
+      "category": "attraction",
+      "subcategory": "temple",
+      "slug": "bangkok-wat-arun",
+      "nameEn": "Wat Arun",
+      "nameAr": "وات أرون",
+      "shortDescriptionEn": "Chao Phraya temple landmark.",
+      "descriptionEn": "Riverside temple landmark opposite Rattanakosin. Staging attraction lead.\n\nArea: Thonburi riverside. Temple of Dawn on Chao Phraya",
+      "tags": [
+        "temple",
+        "riverside"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "cultural"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:chatuchak",
+      "destinationSlug": "bangkok",
+      "category": "attraction",
+      "subcategory": "market",
+      "slug": "bangkok-chatuchak",
+      "nameEn": "Chatuchak Weekend Market",
+      "nameAr": "سوق شاتوتشاك",
+      "shortDescriptionEn": "Vast weekend market browse.",
+      "descriptionEn": "Bangkok’s large weekend market for shopping and street snacks. Opening cadence unverified in this staging pass.\n\nArea: Chatuchak. Large weekend market",
+      "tags": [
+        "market",
+        "shopping"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "attraction": {
+        "attractionType": "other"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:chao-phraya-cruise",
+      "destinationSlug": "bangkok",
+      "category": "activity",
+      "subcategory": "river_cruise",
+      "slug": "bangkok-chao-phraya-cruise",
+      "nameEn": "Chao Phraya Dinner Cruise",
+      "nameAr": "رحلة عشاء على نهر تشاو فرايا",
+      "shortDescriptionEn": "Evening river cruise experience.",
+      "descriptionEn": "Indicative river dinner-cruise activity category for Bangkok riverside. Specific operator to be selected in Helm Admin; no supplier quote invented.\n\nArea: Riverside. Generic dinner-cruise category lead — pin operator in Admin",
+      "tags": [
+        "river",
+        "cruise"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:muay-thai-rajadamnern",
+      "destinationSlug": "bangkok",
+      "category": "activity",
+      "subcategory": "spectator_sport",
+      "slug": "bangkok-muay-thai-rajadamnern",
+      "nameEn": "Muay Thai at Rajadamnern Stadium",
+      "nameAr": "مواي تاي في راجادامنيرن",
+      "shortDescriptionEn": "Live Muay Thai night.",
+      "descriptionEn": "Historic Bangkok Muay Thai stadium experience lead. Bout schedules and ticket products unverified.\n\nArea: Ratchadamnoen. Historic Muay Thai stadium",
+      "tags": [
+        "muay_thai"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.rajadamnern.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.rajadamnern.com/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:blue-elephant-cooking",
+      "destinationSlug": "bangkok",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "slug": "bangkok-blue-elephant-cooking",
+      "nameEn": "Blue Elephant Bangkok Cooking Class",
+      "nameAr": "دورة طبخ بلو إليفانت",
+      "shortDescriptionEn": "Learn Thai cooking in Bangkok.",
+      "descriptionEn": "Hands-on Thai cooking class offering associated with Blue Elephant Bangkok. Distinct from the restaurant dining record for Admin curation.\n\nArea: Phra Khanong. Cooking class at Blue Elephant Bangkok",
+      "tags": [
+        "cooking",
+        "class"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.blueelephant.com/bangkok/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.blueelephant.com/bangkok/",
+      "activity": {
+        "activityType": "other"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:longtail-or-bike",
+      "destinationSlug": "bangkok",
+      "category": "activity",
+      "subcategory": "local_tour",
+      "slug": "bangkok-longtail-or-bike",
+      "nameEn": "Bangkok Canal / Local Bike Tour",
+      "nameAr": "جولة قنوات أو دراجات في بانكوك",
+      "shortDescriptionEn": "Local canals or bike exploration.",
+      "descriptionEn": "Indicative canal or neighbourhood bike tour category. Operator to be pinned later; no booking URL invented.\n\nArea: Thonburi / old city. Generic local tour lead",
+      "tags": [
+        "tour"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/",
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:sky-bar",
+      "destinationSlug": "bangkok",
+      "category": "bar",
+      "subcategory": "rooftop_bar",
+      "slug": "bangkok-sky-bar",
+      "nameEn": "Sky Bar at Lebua",
+      "nameAr": "سكاي بار ليبوا",
+      "shortDescriptionEn": "Skyline rooftop cocktails.",
+      "descriptionEn": "Famous Sathon rooftop bar lead. Dress codes and cover charges unverified.\n\nArea: Sathon / Silom. Rooftop bar at Lebua State Tower",
+      "tags": [
+        "rooftop",
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.lebua.com/sky-bar/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.lebua.com/sky-bar/"
+    },
+    {
+      "externalKey": "id:bangkok:sing-sing",
+      "destinationSlug": "bangkok",
+      "category": "nightlife",
+      "subcategory": "cabaret_club",
+      "slug": "bangkok-sing-sing",
+      "nameEn": "Sing Sing Theater",
+      "nameAr": "سينغ سينغ ثييتر",
+      "shortDescriptionEn": "Theatrical nightlife night out.",
+      "descriptionEn": "Theatrical nightlife venue lead in Bangkok. Entry and show schedules unverified.\n\nArea: Sukhumvit / Thonglor area lead. Theatrical nightlife venue lead in Bangkok.",
+      "tags": [
+        "nightlife"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://singsingtheater.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://singsingtheater.com/"
+    },
+    {
+      "externalKey": "id:bangkok:levels-club",
+      "destinationSlug": "bangkok",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "slug": "bangkok-levels-club",
+      "nameEn": "Levels Club",
+      "nameAr": "ليفلز كلوب",
+      "shortDescriptionEn": "Late-night Sukhumvit club.",
+      "descriptionEn": "Sukhumvit nightclub staging lead. Entry policies unverified.\n\nArea: Sukhumvit. Nightclub lead on Sukhumvit",
+      "tags": [
+        "nightclub"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.tourismthailand.org/",
+          "notes": "Destination listing captured for identity provenance only. Not Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.tourismthailand.org/"
+    },
+    {
+      "externalKey": "id:bangkok:bamboo-bar",
+      "destinationSlug": "bangkok",
+      "category": "bar",
+      "subcategory": "live_music_bar",
+      "slug": "bangkok-bamboo-bar",
+      "nameEn": "Bamboo Bar",
+      "nameAr": "بامبو بار",
+      "shortDescriptionEn": "Jazz riverside bar night.",
+      "descriptionEn": "Historic riverside live-music bar lead inside Mandarin Oriental Bangkok.\n\nArea: Oriental / Riverside. Live jazz bar at Mandarin Oriental Bangkok",
+      "tags": [
+        "jazz",
+        "bar"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river"
+    },
+    {
+      "externalKey": "id:bangkok:mandarin-oriental-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-mandarin-oriental-bangkok",
+      "nameEn": "Mandarin Oriental, Bangkok",
+      "nameAr": "ماندارين أورينتال بانكوك",
+      "shortDescriptionEn": "Classic Chao Phraya luxury stay.",
+      "descriptionEn": "Historic riverside luxury hotel. Amenities and rates omitted until verified.\n\nArea: Riverside. Chao Phraya riverside landmark hotel",
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:peninsula-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-peninsula-bangkok",
+      "nameEn": "The Peninsula Bangkok",
+      "nameAr": "ذا بينينسولا بانكوك",
+      "shortDescriptionEn": "Riverside luxury hotel.",
+      "descriptionEn": "Peninsula Hotels riverside property in Bangkok. Staging accommodation lead.\n\nArea: Riverside. Riverside luxury hotel",
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.peninsula.com/en/bangkok",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.peninsula.com/en/bangkok",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:capella-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-capella-bangkok",
+      "nameEn": "Capella Bangkok",
+      "nameAr": "كابيللا بانكوك",
+      "shortDescriptionEn": "Design riverside luxury stay.",
+      "descriptionEn": "Capella Bangkok riverside hotel lead. Distinct from Capella Ubud in Bali datasets.\n\nArea: Riverside. Capella riverside hotel",
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.capellahotels.com/en/capella-bangkok",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.capellahotels.com/en/capella-bangkok",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:shangri-la-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-shangri-la-bangkok",
+      "nameEn": "Shangri-La Bangkok",
+      "nameAr": "شانغريلا بانكوك",
+      "shortDescriptionEn": "Riverside Shangri-La stay.",
+      "descriptionEn": "Shangri-La Hotels Bangkok riverside property. Staging lead.\n\nArea: Riverside / Sathorn. Shangri-La riverside hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.shangri-la.com/bangkok/shangrila/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.shangri-la.com/bangkok/shangrila/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:anantara-siam",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-anantara-siam",
+      "nameEn": "Anantara Siam Bangkok Hotel",
+      "nameAr": "أنانتارا سيام بانكوك",
+      "shortDescriptionEn": "Central Bangkok Anantara stay.",
+      "descriptionEn": "Anantara Siam city hotel lead near central Bangkok shopping.\n\nArea: Ratchadamri / city centre. City Anantara hotel",
+      "tags": [
+        "hotel",
+        "city"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.anantara.com/en/siam-bangkok",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.anantara.com/en/siam-bangkok",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:rosewood-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-rosewood-bangkok",
+      "nameEn": "Rosewood Bangkok",
+      "nameAr": "روزوود بانكوك",
+      "shortDescriptionEn": "Central Rosewood stay.",
+      "descriptionEn": "Rosewood Bangkok luxury hotel lead.\n\nArea: Phloen Chit / central. Rosewood tower hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.rosewoodhotels.com/en/bangkok",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.rosewoodhotels.com/en/bangkok",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:the-siam",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "bangkok-the-siam",
+      "nameEn": "The Siam",
+      "nameAr": "ذا سيام",
+      "shortDescriptionEn": "Boutique riverside suites.",
+      "descriptionEn": "Boutique all-suite riverside hotel in Bangkok. Staging lead.\n\nArea: Riverside / Dusit. Boutique riverside hotel",
+      "tags": [
+        "boutique_hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://thesiamhotel.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://thesiamhotel.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:four-seasons-bangkok",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-four-seasons-bangkok",
+      "nameEn": "Four Seasons Hotel Bangkok at Chao Phraya River",
+      "nameAr": "فور سيزونز بانكوك",
+      "shortDescriptionEn": "Four Seasons riverside stay.",
+      "descriptionEn": "Four Seasons riverside Bangkok hotel lead.\n\nArea: Riverside. Four Seasons Chao Phraya hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.fourseasons.com/bangkok/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.fourseasons.com/bangkok/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:kimpton-maa-lai",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "bangkok-kimpton-maa-lai",
+      "nameEn": "Kimpton Maa-Lai Bangkok",
+      "nameAr": "كيمبتون ما لاي بانكوك",
+      "shortDescriptionEn": "Central lifestyle boutique stay.",
+      "descriptionEn": "Kimpton Maa-Lai Bangkok lifestyle hotel lead.\n\nArea: Langsuan / central. Kimpton lifestyle hotel",
+      "tags": [
+        "boutique_hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.ihg.com/kimptonhotels/hotels/us/en/bangkok/bkkml/hoteldetail",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.ihg.com/kimptonhotels/hotels/us/en/bangkok/bkkml/hoteldetail",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:bangkok:okura-prestige",
+      "destinationSlug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "slug": "bangkok-okura-prestige",
+      "nameEn": "The Okura Prestige Bangkok",
+      "nameAr": "أوكورا بريستيج بانكوك",
+      "shortDescriptionEn": "Central Okura luxury stay.",
+      "descriptionEn": "The Okura Prestige Bangkok hotel lead.\n\nArea: Wireless Road / central. Okura luxury hotel",
+      "tags": [
+        "hotel"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.okurabangkok.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.okurabangkok.com/",
+      "accommodation": {
+        "accommodationType": "hotel"
+      }
+    }
+  ]
+}

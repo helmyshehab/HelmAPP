@@ -1,0 +1,2176 @@
+{
+  "dataset": "bangkok-curated-v1",
+  "format": "helm.catalog.editorial.v1",
+  "compiled_at": "2026-11-19",
+  "locale_primary": "en",
+  "locale_secondary": "ar",
+  "research_status": "Staging research leads for Thailand catalogue foundation. Not a verified inventory. Prefer Helm Admin editorial curation before publish.",
+  "country": {
+    "name": "Thailand",
+    "iso2": "TH",
+    "currency": "THB",
+    "note": "Apply-time prerequisite: geo.countries must include TH and pricing.currencies must include THB (not present in default seed.sql as of this dataset)."
+  },
+  "destination": {
+    "name": "Bangkok",
+    "name_ar": "بانكوك",
+    "slug": "bangkok",
+    "external_key": "id:bangkok",
+    "type": "destination_area",
+    "type_note": "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    "region": "Central Thailand",
+    "parent": "Thailand",
+    "parent_note": "Editorial parent label. Import format does not set parent_id; countryCode TH is required at apply time.",
+    "country_code": "TH",
+    "recommended_duration": "4–6 days",
+    "tags": [
+      "city",
+      "food",
+      "culture",
+      "nightlife",
+      "shopping",
+      "temples"
+    ],
+    "data_status": "curated_needs_verification",
+    "publication_status": "draft",
+    "unpublished": true,
+    "summary_en": "Thailand’s capital — temples, street food, river life, and nightlife across Rattanakosin, Sukhumvit, Silom, and riverside districts.",
+    "summary_ar": "عاصمة تايلاند — معابد وطعام شوارع وحياة نهرية وسهرات عبر راتاناكوسين وسوخومفيت وسيلوم وضفاف النهر."
+  },
+  "category_distribution": {
+    "restaurant": 5,
+    "cafe": 4,
+    "attraction": 3,
+    "activity": 4,
+    "bar_beach_club_nightlife": 4,
+    "accommodation": 10
+  },
+  "geography_note": "Bangkok districts (Rattanakosin, Riverside, Silom/Sathorn, Sukhumvit, Thonglor, Ari) are not one walkable area. Do not conflate with Pattaya or other Thai beach destinations.",
+  "integrity": {
+    "do_not_invent": [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified"
+    ],
+    "accommodation_import": "Only accommodationType mapped; starRating and amenities omitted until verified",
+    "lifecycle": "all_records_draft_curated_needs_verification"
+  },
+  "places": [
+    {
+      "external_key": "bangkok-thip-samai",
+      "name": "Thip Samai",
+      "name_ar": "ثيب ساماي",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_street_food",
+      "area": "Rattanakosin",
+      "area_note": "Famous pad thai shop near Democracy Monument",
+      "description": "Long-running Bangkok pad thai institution near the old city. Staging research lead; hours and wait times unverified.",
+      "why_visit": "Classic Bangkok pad thai stop.",
+      "best_for": [
+        "dinner",
+        "thai_street_food"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai",
+        "street_food"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-jay-fai",
+      "name": "Jay Fai",
+      "name_ar": "جاي فاي",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_street_fine",
+      "area": "Old Town",
+      "area_note": "Street-side crab omelette and wok cooking landmark",
+      "description": "Celebrated Bangkok wok restaurant known for seafood omelettes and night queues. Staging lead only.",
+      "why_visit": "Iconic Bangkok wok dinner.",
+      "best_for": [
+        "dinner",
+        "thai_street_fine"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai",
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-sorn",
+      "name": "Sorn",
+      "name_ar": "سورن",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "southern_thai",
+      "area": "Sukhumvit",
+      "area_note": "Southern Thai fine dining (brand site)",
+      "description": "Southern Thai tasting-menu restaurant in Bangkok. Official brand presence used as identity lead only.",
+      "why_visit": "Southern Thai fine dining in Sukhumvit.",
+      "best_for": [
+        "dinner",
+        "southern_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.sorn-bangkok.com/"
+      ],
+      "tags": [
+        "thai",
+        "fine_dining"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-le-du",
+      "name": "Le Du",
+      "name_ar": "لو دو",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "modern_thai",
+      "area": "Silom / Sathorn",
+      "area_note": "Modern Thai restaurant",
+      "description": "Modern Thai restaurant in Bangkok’s Silom/Sathorn dining corridor. Staging research lead.",
+      "why_visit": "Modern Thai dinner in Silom.",
+      "best_for": [
+        "dinner",
+        "modern_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://ledubkk.com/"
+      ],
+      "tags": [
+        "thai",
+        "modern"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-blue-elephant",
+      "name": "Blue Elephant Cooking School & Restaurant Bangkok",
+      "name_ar": "بلو إليفانت بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "restaurant",
+      "subcategory": "thai_royal",
+      "area": "Phra Khanong / Sukhumvit",
+      "area_note": "Colonial Thai restaurant and cooking school campus",
+      "description": "Established Thai restaurant and cooking school brand in Bangkok. Staging lead; class schedules unverified.",
+      "why_visit": "Thai dining and cooking campus.",
+      "best_for": [
+        "dinner",
+        "thai_royal"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.blueelephant.com/bangkok/"
+      ],
+      "tags": [
+        "thai",
+        "cooking_school"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-factory-coffee",
+      "name": "Factory Coffee",
+      "name_ar": "فاكتوري كوفي",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "area": "Ari",
+      "area_note": "Specialty coffee shop in Ari",
+      "description": "Specialty coffee café in Bangkok’s Ari neighbourhood. Staging lead.",
+      "why_visit": "Specialty coffee in Ari.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.factorycoffee.co/"
+      ],
+      "tags": [
+        "coffee",
+        "ari"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-casa-lapin",
+      "name": "Casa Lapin",
+      "name_ar": "كاسا لابين",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "area": "Multiple / Thonglor area lead",
+      "area_note": "Specialty coffee brand with Bangkok cafés",
+      "description": "Bangkok specialty coffee brand; this record is a city dining lead for Casa Lapin cafés. Exact branch to be pinned in Admin later.",
+      "why_visit": "Specialty coffee brand stop.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://casalapin.com/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-roast",
+      "name": "ROAST Coffee & Eatery",
+      "name_ar": "روست كوفي",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "cafe",
+      "subcategory": "specialty_coffee",
+      "area": "Thonglor",
+      "area_note": "Coffee and light meals",
+      "description": "Coffee and eatery lead in Bangkok’s Thonglor scene. Staging only.",
+      "why_visit": "Coffee and light plates in Thonglor.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "coffee",
+        "thonglor"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-after-you",
+      "name": "After You Dessert Cafe",
+      "name_ar": "أفتر يو",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "cafe",
+      "subcategory": "dessert_cafe",
+      "area": "Siam / multiple",
+      "area_note": "Popular dessert café brand",
+      "description": "Popular Thai dessert café brand with Bangkok locations. Branch pin deferred to Admin.",
+      "why_visit": "Dessert café favourite.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.afteryoudessertcafe.com/"
+      ],
+      "tags": [
+        "dessert",
+        "cafe"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-grand-palace",
+      "name": "Grand Palace & Wat Phra Kaew",
+      "name_ar": "القصر الكبير ووات فرا كايو",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "attraction",
+      "subcategory": "royal_palace_temple",
+      "area": "Rattanakosin",
+      "area_note": "Royal historic complex",
+      "description": "Bangkok’s primary royal and temple complex. Treat dress codes and ticket rules as unverified until Admin confirms.",
+      "why_visit": "Must-see royal temple complex.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/Attraction/The-Grand-Palace"
+      ],
+      "tags": [
+        "temple",
+        "landmark"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-wat-arun",
+      "name": "Wat Arun",
+      "name_ar": "وات أرون",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "attraction",
+      "subcategory": "temple",
+      "area": "Thonburi riverside",
+      "area_note": "Temple of Dawn on Chao Phraya",
+      "description": "Riverside temple landmark opposite Rattanakosin. Staging attraction lead.",
+      "why_visit": "Chao Phraya temple landmark.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "temple",
+        "riverside"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-chatuchak",
+      "name": "Chatuchak Weekend Market",
+      "name_ar": "سوق شاتوتشاك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "attraction",
+      "subcategory": "market",
+      "area": "Chatuchak",
+      "area_note": "Large weekend market",
+      "description": "Bangkok’s large weekend market for shopping and street snacks. Opening cadence unverified in this staging pass.",
+      "why_visit": "Vast weekend market browse.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "market",
+        "shopping"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-chao-phraya-cruise",
+      "name": "Chao Phraya Dinner Cruise",
+      "name_ar": "رحلة عشاء على نهر تشاو فرايا",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "activity",
+      "subcategory": "river_cruise",
+      "area": "Riverside",
+      "area_note": "Generic dinner-cruise category lead — pin operator in Admin",
+      "description": "Indicative river dinner-cruise activity category for Bangkok riverside. Specific operator to be selected in Helm Admin; no supplier quote invented.",
+      "why_visit": "Evening river cruise experience.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "river",
+        "cruise"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-muay-thai-rajadamnern",
+      "name": "Muay Thai at Rajadamnern Stadium",
+      "name_ar": "مواي تاي في راجادامنيرن",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "activity",
+      "subcategory": "spectator_sport",
+      "area": "Ratchadamnoen",
+      "area_note": "Historic Muay Thai stadium",
+      "description": "Historic Bangkok Muay Thai stadium experience lead. Bout schedules and ticket products unverified.",
+      "why_visit": "Live Muay Thai night.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.rajadamnern.com/"
+      ],
+      "tags": [
+        "muay_thai"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-blue-elephant-cooking",
+      "name": "Blue Elephant Bangkok Cooking Class",
+      "name_ar": "دورة طبخ بلو إليفانت",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "activity",
+      "subcategory": "cooking_class",
+      "area": "Phra Khanong",
+      "area_note": "Cooking class at Blue Elephant Bangkok",
+      "description": "Hands-on Thai cooking class offering associated with Blue Elephant Bangkok. Distinct from the restaurant dining record for Admin curation.",
+      "why_visit": "Learn Thai cooking in Bangkok.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.blueelephant.com/bangkok/"
+      ],
+      "tags": [
+        "cooking",
+        "class"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-longtail-or-bike",
+      "name": "Bangkok Canal / Local Bike Tour",
+      "name_ar": "جولة قنوات أو دراجات في بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "activity",
+      "subcategory": "local_tour",
+      "area": "Thonburi / old city",
+      "area_note": "Generic local tour lead",
+      "description": "Indicative canal or neighbourhood bike tour category. Operator to be pinned later; no booking URL invented.",
+      "why_visit": "Local canals or bike exploration.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "tour"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-sky-bar",
+      "name": "Sky Bar at Lebua",
+      "name_ar": "سكاي بار ليبوا",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "bar",
+      "subcategory": "rooftop_bar",
+      "area": "Sathon / Silom",
+      "area_note": "Rooftop bar at Lebua State Tower",
+      "description": "Famous Sathon rooftop bar lead. Dress codes and cover charges unverified.",
+      "why_visit": "Skyline rooftop cocktails.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.lebua.com/sky-bar/"
+      ],
+      "tags": [
+        "rooftop",
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-sing-sing",
+      "name": "Sing Sing Theater",
+      "name_ar": "سينغ سينغ ثييتر",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "nightlife",
+      "subcategory": "cabaret_club",
+      "area": "Sukhumvit / Thonglor area lead",
+      "area_note": "Theatrical nightlife venue lead in Bangkok.",
+      "description": "Theatrical nightlife venue lead in Bangkok. Entry and show schedules unverified.",
+      "why_visit": "Theatrical nightlife night out.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://singsingtheater.com/"
+      ],
+      "tags": [
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-levels-club",
+      "name": "Levels Club",
+      "name_ar": "ليفلز كلوب",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "nightlife",
+      "subcategory": "nightclub",
+      "area": "Sukhumvit",
+      "area_note": "Nightclub lead on Sukhumvit",
+      "description": "Sukhumvit nightclub staging lead. Entry policies unverified.",
+      "why_visit": "Late-night Sukhumvit club.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "nightclub"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-bamboo-bar",
+      "name": "Bamboo Bar",
+      "name_ar": "بامبو بار",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "bar",
+      "subcategory": "live_music_bar",
+      "area": "Oriental / Riverside",
+      "area_note": "Live jazz bar at Mandarin Oriental Bangkok",
+      "description": "Historic riverside live-music bar lead inside Mandarin Oriental Bangkok.",
+      "why_visit": "Jazz riverside bar night.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river"
+      ],
+      "tags": [
+        "jazz",
+        "bar"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "bangkok-mandarin-oriental-bangkok",
+      "name": "Mandarin Oriental, Bangkok",
+      "name_ar": "ماندارين أورينتال بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Riverside",
+      "area_note": "Chao Phraya riverside landmark hotel",
+      "description": "Historic riverside luxury hotel. Amenities and rates omitted until verified.",
+      "why_visit": "Classic Chao Phraya luxury stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river"
+      ],
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.mandarinoriental.com/en/bangkok/chao-phraya-river",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-peninsula-bangkok",
+      "name": "The Peninsula Bangkok",
+      "name_ar": "ذا بينينسولا بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Riverside",
+      "area_note": "Riverside luxury hotel",
+      "description": "Peninsula Hotels riverside property in Bangkok. Staging accommodation lead.",
+      "why_visit": "Riverside luxury hotel.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.peninsula.com/en/bangkok"
+      ],
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.peninsula.com/en/bangkok",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-capella-bangkok",
+      "name": "Capella Bangkok",
+      "name_ar": "كابيللا بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Riverside",
+      "area_note": "Capella riverside hotel",
+      "description": "Capella Bangkok riverside hotel lead. Distinct from Capella Ubud in Bali datasets.",
+      "why_visit": "Design riverside luxury stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.capellahotels.com/en/capella-bangkok"
+      ],
+      "tags": [
+        "hotel",
+        "riverside"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.capellahotels.com/en/capella-bangkok",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-shangri-la-bangkok",
+      "name": "Shangri-La Bangkok",
+      "name_ar": "شانغريلا بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Riverside / Sathorn",
+      "area_note": "Shangri-La riverside hotel",
+      "description": "Shangri-La Hotels Bangkok riverside property. Staging lead.",
+      "why_visit": "Riverside Shangri-La stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.shangri-la.com/bangkok/shangrila/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.shangri-la.com/bangkok/shangrila/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-anantara-siam",
+      "name": "Anantara Siam Bangkok Hotel",
+      "name_ar": "أنانتارا سيام بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Ratchadamri / city centre",
+      "area_note": "City Anantara hotel",
+      "description": "Anantara Siam city hotel lead near central Bangkok shopping.",
+      "why_visit": "Central Bangkok Anantara stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.anantara.com/en/siam-bangkok"
+      ],
+      "tags": [
+        "hotel",
+        "city"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.anantara.com/en/siam-bangkok",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-rosewood-bangkok",
+      "name": "Rosewood Bangkok",
+      "name_ar": "روزوود بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Phloen Chit / central",
+      "area_note": "Rosewood tower hotel",
+      "description": "Rosewood Bangkok luxury hotel lead.",
+      "why_visit": "Central Rosewood stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.rosewoodhotels.com/en/bangkok"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.rosewoodhotels.com/en/bangkok",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-the-siam",
+      "name": "The Siam",
+      "name_ar": "ذا سيام",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Riverside / Dusit",
+      "area_note": "Boutique riverside hotel",
+      "description": "Boutique all-suite riverside hotel in Bangkok. Staging lead.",
+      "why_visit": "Boutique riverside suites.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://thesiamhotel.com/"
+      ],
+      "tags": [
+        "boutique_hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://thesiamhotel.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-four-seasons-bangkok",
+      "name": "Four Seasons Hotel Bangkok at Chao Phraya River",
+      "name_ar": "فور سيزونز بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Riverside",
+      "area_note": "Four Seasons Chao Phraya hotel",
+      "description": "Four Seasons riverside Bangkok hotel lead.",
+      "why_visit": "Four Seasons riverside stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.fourseasons.com/bangkok/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.fourseasons.com/bangkok/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-kimpton-maa-lai",
+      "name": "Kimpton Maa-Lai Bangkok",
+      "name_ar": "كيمبتون ما لاي بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Langsuan / central",
+      "area_note": "Kimpton lifestyle hotel",
+      "description": "Kimpton Maa-Lai Bangkok lifestyle hotel lead.",
+      "why_visit": "Central lifestyle boutique stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.ihg.com/kimptonhotels/hotels/us/en/bangkok/bkkml/hoteldetail"
+      ],
+      "tags": [
+        "boutique_hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.ihg.com/kimptonhotels/hotels/us/en/bangkok/bkkml/hoteldetail",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "bangkok-okura-prestige",
+      "name": "The Okura Prestige Bangkok",
+      "name_ar": "أوكورا بريستيج بانكوك",
+      "country_code": "TH",
+      "destination_slug": "bangkok",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Wireless Road / central",
+      "area_note": "Okura luxury hotel",
+      "description": "The Okura Prestige Bangkok hotel lead.",
+      "why_visit": "Central Okura luxury stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.okurabangkok.com/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.okurabangkok.com/",
+        "booking_url": null
+      }
+    }
+  ],
+  "mapping": {
+    "import_file": "bangkok-curated-v1.json",
+    "import_format": "helm.catalog.import.v1",
+    "external_key_rule": "editorial.external_key → import.externalKey id:bangkok:<suffix>"
+  }
+}

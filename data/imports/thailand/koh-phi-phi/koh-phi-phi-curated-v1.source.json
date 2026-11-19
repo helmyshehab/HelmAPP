@@ -1,0 +1,2156 @@
+{
+  "dataset": "koh-phi-phi-curated-v1",
+  "format": "helm.catalog.editorial.v1",
+  "compiled_at": "2026-11-19",
+  "locale_primary": "en",
+  "locale_secondary": "ar",
+  "research_status": "Staging research leads for Thailand catalogue foundation. Not a verified inventory. Prefer Helm Admin editorial curation before publish.",
+  "country": {
+    "name": "Thailand",
+    "iso2": "TH",
+    "currency": "THB",
+    "note": "Apply-time prerequisite: geo.countries must include TH and pricing.currencies must include THB (not present in default seed.sql as of this dataset)."
+  },
+  "destination": {
+    "name": "Koh Phi Phi",
+    "name_ar": "كو في في",
+    "slug": "koh-phi-phi",
+    "external_key": "id:koh-phi-phi",
+    "type": "destination_area",
+    "type_note": "Editorial type only — catalog.destinations has no destination_type column; not imported as a typed enum.",
+    "region": "Andaman islands / Krabi province",
+    "parent": "Thailand",
+    "parent_note": "Editorial parent label. Import format does not set parent_id; countryCode TH is required at apply time.",
+    "country_code": "TH",
+    "recommended_duration": "2–4 days",
+    "tags": [
+      "islands",
+      "beach",
+      "snorkeling",
+      "nightlife",
+      "maya_bay"
+    ],
+    "data_status": "curated_needs_verification",
+    "publication_status": "draft",
+    "unpublished": true,
+    "summary_en": "Andaman island group centred on Phi Phi Don’s Tonsai/Ao Lo Dalam hub, with Maya Bay day visits — lodging here is not the same as Krabi mainland or Phuket.",
+    "summary_ar": "مجموعة جزر أندامان حول مركز تونساي/آو لو دالام في في في دون، مع زيارات لمايا باي — الإقامة هنا ليست كرابي البرية ولا بوكيت."
+  },
+  "category_distribution": {
+    "restaurant": 5,
+    "cafe": 4,
+    "attraction": 3,
+    "activity": 4,
+    "bar_beach_club_nightlife": 4,
+    "accommodation": 10
+  },
+  "geography_note": "Tonsai village, Ao Lo Dalam, Long Beach, and viewpoint trails are short distances but boat-dependent to the mainland. Maya Bay is typically a regulated day visit, not a hotel base. Do not merge with Krabi or Phuket destination inventories.",
+  "integrity": {
+    "do_not_invent": [
+      "exact_coordinates",
+      "opening_hours",
+      "booking_urls",
+      "confirmed_supplier_prices",
+      "google_maps_place_ids",
+      "provider_ids",
+      "visit_duration_minutes",
+      "booking_recommended",
+      "typicalDurationMinutes",
+      "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
+      "ratings_when_unverified"
+    ],
+    "accommodation_import": "Only accommodationType mapped; starRating and amenities omitted until verified",
+    "lifecycle": "all_records_draft_curated_needs_verification"
+  },
+  "places": [
+    {
+      "external_key": "koh-phi-phi-tonsai-seafood",
+      "name": "Tonsai Seafood Dining lead",
+      "name_ar": "مأكولات تونساي البحرية",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "seafood",
+      "area": "Tonsai",
+      "area_note": "Village seafood dining",
+      "description": "Indicative Tonsai village seafood dining lead.",
+      "why_visit": "Casual Tonsai seafood.",
+      "best_for": [
+        "dinner",
+        "seafood"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "seafood"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-unni",
+      "name": "Unni's Restaurant lead",
+      "name_ar": "مطعم أوني",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "international",
+      "area": "Tonsai",
+      "area_note": "Long-running Tonsai restaurant lead",
+      "description": "Popular Tonsai restaurant lead for mixed Thai/international plates.",
+      "why_visit": "Tonsai village dinner.",
+      "best_for": [
+        "dinner",
+        "international"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "tonsai"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-madam-chicken",
+      "name": "Local Thai Eatery lead",
+      "name_ar": "مأكل تايلاندي محلي",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "thai",
+      "area": "Tonsai",
+      "area_note": "Local Thai eatery lead",
+      "description": "Indicative affordable Thai eatery lead in Tonsai.",
+      "why_visit": "Simple Thai plates.",
+      "best_for": [
+        "dinner",
+        "thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "thai"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-beachfront-phi-phi",
+      "name": "Ao Lo Dalam Beachfront Dining lead",
+      "name_ar": "طعام شاطئ آو لو دالام",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "beach_dining",
+      "area": "Ao Lo Dalam",
+      "area_note": "Beachfront dining lead",
+      "description": "Indicative Ao Lo Dalam beachfront dining lead.",
+      "why_visit": "Dalam beachfront dinner.",
+      "best_for": [
+        "dinner",
+        "beach_dining"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "beach"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-le-grande",
+      "name": "Le Grand Bleu lead",
+      "name_ar": "لو غران بلو",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "restaurant",
+      "subcategory": "french_thai",
+      "area": "Tonsai",
+      "area_note": "Hill/restaurant lead",
+      "description": "Tonsai dining lead often associated with hillside views. Confirm live status in Admin.",
+      "why_visit": "Hillside Tonsai dinner.",
+      "best_for": [
+        "dinner",
+        "french_thai"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "dinner"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-coffee-phi-phi",
+      "name": "Tonsai Coffee lead",
+      "name_ar": "قهوة تونساي",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Tonsai",
+      "area_note": "Village coffee lead",
+      "description": "Indicative Tonsai coffee shop lead.",
+      "why_visit": "Tonsai coffee break.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-bakery-phi-phi",
+      "name": "Phi Phi Bakery lead",
+      "name_ar": "مخبز في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "bakery_cafe",
+      "area": "Tonsai",
+      "area_note": "Bakery café lead",
+      "description": "Indicative bakery/breakfast café lead in Tonsai.",
+      "why_visit": "Breakfast bakery stop.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bakery"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-smoothie-lead",
+      "name": "Beach Smoothie Cafe lead",
+      "name_ar": "عصائر الشاطئ",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "cafe",
+      "area": "Long Beach / Tonsai",
+      "area_note": "Smoothie café lead",
+      "description": "Indicative beach smoothie café lead.",
+      "why_visit": "Beach smoothie pause.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "cafe"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-amazon-phi-phi",
+      "name": "Island Coffee Chain lead",
+      "name_ar": "سلسلة قهوة الجزيرة",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "cafe",
+      "subcategory": "chain_coffee",
+      "area": "Tonsai",
+      "area_note": "Chain/island coffee lead",
+      "description": "Practical coffee lead; pin exact shop in Admin.",
+      "why_visit": "Easy island coffee.",
+      "best_for": [
+        "coffee",
+        "brunch"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.cafeamazon.com/"
+      ],
+      "tags": [
+        "coffee"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-maya-bay",
+      "name": "Maya Bay",
+      "name_ar": "خليج مايا",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "bay",
+      "area": "Koh Phi Phi Le",
+      "area_note": "Famous bay on Phi Phi Le (day visit rules apply)",
+      "description": "World-famous bay on uninhabited Phi Phi Le, typically visited by day trip with conservation rules. Not a hotel base.",
+      "why_visit": "Iconic Maya Bay day visit.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "maya_bay"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-viewpoint",
+      "name": "Phi Phi Viewpoint",
+      "name_ar": "نقطة مشاهدة في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "viewpoint",
+      "area": "Phi Phi Don ridge",
+      "area_note": "Island twin-bay viewpoint",
+      "description": "Ridge viewpoint overlooking Tonsai and Ao Lo Dalam.",
+      "why_visit": "Twin-bay island viewpoint.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "viewpoint"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-long-beach",
+      "name": "Long Beach (Hat Yao)",
+      "name_ar": "لونغ بيتش",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "attraction",
+      "subcategory": "beach",
+      "area": "Phi Phi Don west",
+      "area_note": "Long Beach swimming strip",
+      "description": "Long Beach swimming and sunbed area on Phi Phi Don.",
+      "why_visit": "Long Beach swim stop.",
+      "best_for": [
+        "sightseeing"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "beach"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-snorkel-phi-phi",
+      "name": "Phi Phi Snorkeling Tour",
+      "name_ar": "سنوركل في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "snorkel",
+      "area": "Tonsai piers",
+      "area_note": "Snorkel boat tour",
+      "description": "Indicative snorkel boat tour around Phi Phi. Operator pin deferred.",
+      "why_visit": "Half-day snorkel boat.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "snorkel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-viking-cave-tour",
+      "name": "Viking Cave / Bamboo Island Outing",
+      "name_ar": "كهف الفايكنغ / بامبو",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "island_tour",
+      "area": "Day-boat circuit",
+      "area_note": "Classic Phi Phi boat circuit lead",
+      "description": "Indicative boat outing including common Phi Phi Le / Bamboo stops. Rules change; verify in Admin.",
+      "why_visit": "Classic Phi Phi boat day.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "boat"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-diving-phi-phi",
+      "name": "Phi Phi Dive Experience",
+      "name_ar": "غوص في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "diving",
+      "area": "Tonsai dive shops",
+      "area_note": "Dive activity lead",
+      "description": "Indicative discover-dive or fun-dive lead from Tonsai shops.",
+      "why_visit": "Introductory island dive.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "diving"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-kayak-phi-phi",
+      "name": "Coastal Kayak Lead",
+      "name_ar": "كاياك ساحلي",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "activity",
+      "subcategory": "kayak",
+      "area": "Long Beach / Loh Dalum",
+      "area_note": "Kayak activity lead",
+      "description": "Indicative coastal kayak hire/tour lead.",
+      "why_visit": "Paddle the bays.",
+      "best_for": [
+        "experience"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "kayak"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-dalam-nightlife",
+      "name": "Ao Lo Dalam Nightlife Strip",
+      "name_ar": "سهرات آو لو دالام",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "nightlife",
+      "subcategory": "beach_party",
+      "area": "Ao Lo Dalam",
+      "area_note": "Beach nightlife corridor",
+      "description": "Ao Lo Dalam beach nightlife corridor lead (fire shows / beach bars). Individual venues to curate later.",
+      "why_visit": "Dalam beach party strip.",
+      "best_for": [
+        "nightlife"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "nightlife"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-carlito",
+      "name": "Carlito's lead",
+      "name_ar": "كارليتوز",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "beach_bar",
+      "area": "Ao Lo Dalam",
+      "area_note": "Beach bar lead",
+      "description": "Well-known Ao Lo Dalam beach bar lead.",
+      "why_visit": "Dalam beach bar night.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bar"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-reggae-bar",
+      "name": "Reggae Bar lead",
+      "name_ar": "ريغي بار",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "bar",
+      "area": "Tonsai",
+      "area_note": "Tonsai village bar lead",
+      "description": "Tonsai village bar/muay Thai entertainment lead.",
+      "why_visit": "Tonsai bar night.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bar"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-sunflower",
+      "name": "Sunflower Bar lead",
+      "name_ar": "صن فلاور بار",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "bar",
+      "subcategory": "viewpoint_bar",
+      "area": "Viewpoint trail",
+      "area_note": "Hillside/viewpoint bar lead",
+      "description": "Viewpoint-area bar lead above Tonsai.",
+      "why_visit": "Sunset viewpoint bar.",
+      "best_for": [
+        "bar"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "bar"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-zeavola",
+      "name": "Zeavola Resort",
+      "name_ar": "زيافولا",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Laem Tong",
+      "area_note": "Quiet-end luxury resort",
+      "description": "Upscale resort on quieter Laem Tong beach, Phi Phi Don.",
+      "why_visit": "Quiet-end Phi Phi luxury resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.zeavola.com/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.zeavola.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-saii-phi-phi",
+      "name": "SAii Phi Phi Island Village",
+      "name_ar": "ساي في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Laem Tong area",
+      "area_note": "SAii resort Phi Phi",
+      "description": "SAii Phi Phi Island Village resort lead.",
+      "why_visit": "Laem Tong SAii resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.saiiresorts.com/phi-phi-island-village/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.saiiresorts.com/phi-phi-island-village/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-phi-phi-island-cabana",
+      "name": "Phi Phi Island Cabana Hotel",
+      "name_ar": "كابانا في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Tonsai / central",
+      "area_note": "Central island hotel",
+      "description": "Central Phi Phi Don hotel lead near Tonsai amenities.",
+      "why_visit": "Central island hotel base.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.phiphi-cabana.com/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.phiphi-cabana.com/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-outhai",
+      "name": "Outrigger Phi Phi Island Resort / beach resort lead",
+      "name_ar": "منتجع أوتريغر في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Phi Phi Don",
+      "area_note": "Beach resort lead",
+      "description": "Beach resort staging lead on Phi Phi Don.",
+      "why_visit": "Beach resort stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-anjunabeach",
+      "name": "Anya Beach Resort & Spa lead",
+      "name_ar": "أنيا بيتش",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Phi Phi Don",
+      "area_note": "Beach resort lead",
+      "description": "Anya Beach / similar midscale resort lead — confirm brand URL in Admin.",
+      "why_visit": "Midscale beach resort.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-villa-ibiza",
+      "name": "Villa Ibiza Phi Phi lead",
+      "name_ar": "ڤيلا إيبيزا",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "area": "Tonsai hills",
+      "area_note": "Boutique hillside rooms lead",
+      "description": "Boutique hillside lodging lead above Tonsai.",
+      "why_visit": "Hillside boutique rooms.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "boutique_hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "boutique_hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-the-cliff",
+      "name": "The Cliff View Resort lead",
+      "name_ar": "ذا كليف ڤيو",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Viewpoint area",
+      "area_note": "Viewpoint-area hotel lead",
+      "description": "Hotel lead near the Phi Phi viewpoint trail.",
+      "why_visit": "Viewpoint-area hotel.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-pp-erawan",
+      "name": "PP Erawan Palms Resort lead",
+      "name_ar": "بي بي إيراوان",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Long Beach side",
+      "area_note": "Long Beach resort lead",
+      "description": "Resort lead on/near Long Beach.",
+      "why_visit": "Long Beach resort base.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-holiday-inn-phi-phi",
+      "name": "Holiday Inn Resort Phi Phi Island",
+      "name_ar": "هوليداي إن في في",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "area": "Laem Tong",
+      "area_note": "IHG Phi Phi resort",
+      "description": "Holiday Inn Resort on Phi Phi’s Laem Tong beach.",
+      "why_visit": "Laem Tong Holiday Inn stay.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.ihg.com/holidayinnresorts/hotels/us/en/phi-phi-island/phypb/hoteldetail"
+      ],
+      "tags": [
+        "resort"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "resort",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.ihg.com/holidayinnresorts/hotels/us/en/phi-phi-island/phypb/hoteldetail",
+        "booking_url": null
+      }
+    },
+    {
+      "external_key": "koh-phi-phi-matanee",
+      "name": "Matanee Resort lead",
+      "name_ar": "ماتاني ريزورت",
+      "country_code": "TH",
+      "destination_slug": "koh-phi-phi",
+      "category": "accommodation",
+      "subcategory": "hotel",
+      "area": "Tonsai",
+      "area_note": "Tonsai hotel lead",
+      "description": "Practical Tonsai hotel staging lead.",
+      "why_visit": "Simple Tonsai hotel.",
+      "best_for": [
+        "stay"
+      ],
+      "rating": {
+        "value": null,
+        "scale": 5,
+        "review_count": null,
+        "provider": null,
+        "verified_at": null,
+        "scope": null
+      },
+      "price": {
+        "tier": null,
+        "amount_min": null,
+        "amount_max": null,
+        "currency": "THB",
+        "basis": null,
+        "status": "unknown"
+      },
+      "address": null,
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "source": null,
+        "verified_at": null
+      },
+      "opening_hours": null,
+      "visit_duration_minutes": null,
+      "booking_recommended": null,
+      "source_urls": [
+        "https://www.tourismthailand.org/"
+      ],
+      "tags": [
+        "hotel"
+      ],
+      "data_status": "curated_needs_verification",
+      "publication_status": "draft",
+      "last_verified_at": null,
+      "ranking_support": {
+        "rating_score": null,
+        "review_volume": null,
+        "price_tier": null,
+        "experience_quality": null,
+        "distance_to_destination_center": null,
+        "data_confidence": "low_curated_needs_verification",
+        "composite_rank": null,
+        "composite_rank_note": "No definitive composite ranking while coordinates, verified prices, and Helm verification are missing."
+      },
+      "accommodation": {
+        "property_type": "hotel",
+        "verified_star_classification": null,
+        "marketplace_star_claim": null,
+        "guest_rating": null,
+        "price_per_night": null,
+        "currency": "THB",
+        "date_checked": null,
+        "room_categories": null,
+        "maximum_occupancy": null,
+        "private_pool": null,
+        "shared_pool": null,
+        "breakfast_inclusion": null,
+        "wifi": null,
+        "parking": null,
+        "air_conditioning": null,
+        "beach_access": null,
+        "verified_distance_to_beaches": null,
+        "adults_only": null,
+        "family_friendly": null,
+        "honeymoon_suitability": null,
+        "official_website": "https://www.tourismthailand.org/",
+        "booking_url": null
+      }
+    }
+  ],
+  "mapping": {
+    "import_file": "koh-phi-phi-curated-v1.json",
+    "import_format": "helm.catalog.import.v1",
+    "external_key_rule": "editorial.external_key → import.externalKey id:koh-phi-phi:<suffix>"
+  }
+}
