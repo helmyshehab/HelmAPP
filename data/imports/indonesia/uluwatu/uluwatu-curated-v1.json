@@ -1,0 +1,1106 @@
+{
+  "formatVersion": "helm.catalog.import.v1",
+  "sourceLabel": "uluwatu-curated-v1",
+  "destinations": [
+    {
+      "externalKey": "id:uluwatu",
+      "slug": "uluwatu",
+      "nameEn": "Uluwatu",
+      "nameAr": "أولوواتو",
+      "countryCode": "ID",
+      "summaryEn": "Bukit Peninsula cliffs, surf beaches, beach clubs, and Pura Luhur Uluwatu — spanning Pecatu, Bingin, Padang Padang, Suluban, Ungasan and nearby localities. Not all listings are walking distance from each other.",
+      "summaryAr": "منحدرات شبه جزيرة بوكيت وشواطئ الأمواج ونوادي الشاطئ ومعبد بورا لوهور أولوواتو — عبر بيكاتو وبينغين وبادانغ بادانغ وسولوبان وأونغاسان والمناطق المجاورة.",
+      "shortDescriptionEn": "Bukit Peninsula cliffs, surf, beach clubs, and Pura Luhur Uluwatu. Recommended stay 3–5 days. Draft curated destination.",
+      "tags": [
+        "surf",
+        "beach",
+        "cliffs",
+        "beach_clubs",
+        "temple",
+        "sunset",
+        "villas",
+        "bukit"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "manual_research",
+          "name": "Helm curated Uluwatu destination notes",
+          "notes": "Draft curated destination. Unpublished. Needs verification before publish.",
+          "collectedAt": "2026-11-19"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "externalKey": "id:uluwatu:the-warung-alila",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "indonesian_fine_casual",
+      "slug": "uluwatu-the-warung-alila",
+      "nameEn": "The Warung at Alila Villas Uluwatu",
+      "nameAr": "ذا وارونغ في أليلا فيلات أولوواتو",
+      "shortDescriptionEn": "A polished Indonesian meal with a strong sense of Bukit place.",
+      "descriptionEn": "Elevated Indonesian dining associated with Alila Villas Uluwatu, frequently cited for contemporary local dishes in a cliffside resort setting.\n\nArea: Pecatu. On the Alila Villas Uluwatu cliff campus — not a central-town walking cluster",
+      "tags": [
+        "indonesian",
+        "resort_dining",
+        "pecatu",
+        "cliff"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alilahotels.com/uluwatu/dining/the-warung/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.alilahotels.com/uluwatu/dining/the-warung/",
+      "dining": {
+        "cuisineTypes": [
+          "indonesian",
+          "balinese"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:ulu-garden",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "garden_restaurant",
+      "slug": "uluwatu-ulu-garden",
+      "nameEn": "Ulu Garden",
+      "nameAr": "ولو غاردن",
+      "shortDescriptionEn": "Relaxed garden dining close to the Padang Padang coast.",
+      "descriptionEn": "Open-air contemporary Indonesian garden restaurant on Padang Padang Beach Street (ULU Tribe), with daytime through evening dining and cultural programming cited on the brand site.\n\nArea: Padang Padang / Pecatu. On Jl. Pantai Padang-Padang (ULU Tribe) — not a beach-club listing",
+      "tags": [
+        "garden",
+        "indonesian",
+        "padang_padang"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://ulutribe.com/ulu-garden/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://ulutribe.com/ulu-garden/",
+      "dining": {
+        "cuisineTypes": [
+          "indonesian",
+          "contemporary"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:gooseberry",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "french_dining",
+      "slug": "uluwatu-gooseberry",
+      "nameEn": "Gooseberry",
+      "nameAr": "غوسبيري",
+      "shortDescriptionEn": "Date-night French dining away from the busiest beach-club scene.",
+      "descriptionEn": "Modern French restaurant above Bingin Beach with classic technique, garden/poolside seating, and daytime through dinner service per the brand site.\n\nArea: Bingin / Pecatu. Above Bingin Beach (Gang Pirta) — French restaurant, not a beach club",
+      "tags": [
+        "french",
+        "dinner",
+        "bingin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.gooseberry-restaurant.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.gooseberry-restaurant.com/",
+      "dining": {
+        "cuisineTypes": [
+          "french"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:mana",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "cliffside_dining",
+      "slug": "uluwatu-mana",
+      "nameEn": "Mana",
+      "nameAr": "مانا",
+      "shortDescriptionEn": "Sunset cliff dining with a strong Bukit viewpoint reputation.",
+      "descriptionEn": "Cliffside restaurant and bar associated with Uluwatu Surf Villas, repeatedly listed for sunset dining and ocean views over the Suluban / Uluwatu break area.\n\nArea: Suluban / Uluwatu Surf Villas. Cliffside restaurant at Uluwatu Surf Villas — frequently cited for sunset views; confirm current hours before publish",
+      "tags": [
+        "sunset",
+        "cliff",
+        "dinner",
+        "uluwatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://uluwatusurfvillas.com/restaurant/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://uluwatusurfvillas.com/restaurant/",
+      "dining": {
+        "cuisineTypes": [
+          "contemporary",
+          "coastal"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:teja",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "live_fire_dining",
+      "slug": "uluwatu-teja",
+      "nameEn": "Teja Uluwatu",
+      "nameAr": "تيجا أولوواتو",
+      "shortDescriptionEn": "Fire-kissed dinner with a strong sunset-dining reputation on the Bukit.",
+      "descriptionEn": "Live-fire Modern European restaurant in Pecatu focused on flame-grilled steaks and dry-aged seafood, frequently recommended for sunset cliff dining.\n\nArea: Pecatu / Uluwatu. Jl. Mamo, Pecatu — live-fire Modern European; not a Canggu venue",
+      "tags": [
+        "live_fire",
+        "dinner",
+        "sunset",
+        "pecatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.tejauluwatu.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.tejauluwatu.com/",
+      "dining": {
+        "cuisineTypes": [
+          "modern_european",
+          "grill"
+        ],
+        "mealTypes": [
+          "dinner"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:suka-espresso",
+      "destinationSlug": "uluwatu",
+      "category": "cafe",
+      "subcategory": "specialty_coffee_brunch",
+      "slug": "uluwatu-suka-espresso",
+      "nameEn": "Suka Espresso",
+      "nameAr": "سوكا إسبريسو",
+      "shortDescriptionEn": "Reliable coffee and brunch stop for Bukit mornings.",
+      "descriptionEn": "Specialty-coffee and brunch cafe frequently recommended for breakfast and daytime stops in Uluwatu.\n\nArea: Uluwatu / Pecatu. Cafe circuit on the Bukit — confirm branch address before publish",
+      "tags": [
+        "coffee",
+        "brunch",
+        "cafe"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.sukaespresso.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://www.sukaespresso.com/",
+      "dining": {
+        "cuisineTypes": [
+          "cafe",
+          "brunch"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "brunch",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:bambu-cafe",
+      "destinationSlug": "uluwatu",
+      "category": "cafe",
+      "subcategory": "healthy_cafe",
+      "slug": "uluwatu-bambu-cafe",
+      "nameEn": "Bambu Cafe",
+      "nameAr": "بامبو كافيه",
+      "shortDescriptionEn": "Daytime cafe stop when you want a quieter brunch pace.",
+      "descriptionEn": "Healthy cafe on the Bambu Fitness Bali campus in Bingin, with breakfast, bowls, smoothies, and specialty coffee listed on the brand cafe page.\n\nArea: Bingin / Pecatu. On the Bambu Fitness Bali campus at Jl. Pantai Bingin 8 — open to non-members per brand cafe page",
+      "tags": [
+        "cafe",
+        "breakfast",
+        "healthy",
+        "bingin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.bambufitnessbali.com/bambu-cafe",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://www.bambufitnessbali.com/bambu-cafe",
+      "dining": {
+        "cuisineTypes": [
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:ours",
+      "destinationSlug": "uluwatu",
+      "category": "restaurant",
+      "subcategory": "all_day_dining",
+      "slug": "uluwatu-ours",
+      "nameEn": "Ours Uluwatu",
+      "nameAr": "أورز أولوواتو",
+      "shortDescriptionEn": "All-day Bukit restaurant stop from breakfast through evening.",
+      "descriptionEn": "All-day restaurant on Jl. Labuansait in Pecatu. Brand site describes breakfast-to-dinner dining, pasta nights, and a cocktail/wine list — not a specialty-coffee cafe.\n\nArea: Labuansait / Pecatu. Reclassified from cafe → restaurant per brand positioning. Official site brands Ours as an all-day restaurant (breakfast through dinner, cocktails/wine)",
+      "tags": [
+        "all_day",
+        "restaurant",
+        "labuansait"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.oursbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://www.oursbali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "contemporary",
+          "international"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:alchemy",
+      "destinationSlug": "uluwatu",
+      "category": "cafe",
+      "subcategory": "plant_based_cafe",
+      "slug": "uluwatu-alchemy",
+      "nameEn": "Alchemy Uluwatu",
+      "nameAr": "ألكيمي أولوواتو",
+      "shortDescriptionEn": "Plant-based daytime stop with a clear Bingin brand presence.",
+      "descriptionEn": "Plant-based cafe/restaurant in Bingin (Alchemy Bali Uluwatu location), with an organic / regenerative ingredient focus and gluten-free menu framing on the brand site.\n\nArea: Bingin / Pecatu. Replaced Lands End Cafe (weak brand provenance). Alchemy Uluwatu is the Bingin plant-based venue on the brand site — distinct from Alchemy Ubud/Canggu",
+      "tags": [
+        "cafe",
+        "plant_based",
+        "vegan",
+        "bingin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alchemybali.co/uluwatu",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://www.alchemybali.co/uluwatu",
+      "dining": {
+        "cuisineTypes": [
+          "plant_based",
+          "cafe"
+        ],
+        "mealTypes": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ],
+        "dietaryOptions": [
+          "vegan",
+          "gluten_free"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:pura-luhur",
+      "destinationSlug": "uluwatu",
+      "category": "attraction",
+      "subcategory": "hindu_temple_cultural_site",
+      "slug": "uluwatu-pura-luhur",
+      "nameEn": "Uluwatu Temple (Pura Luhur Uluwatu)",
+      "nameAr": "معبد أولوواتو (بورا لوهور أولوواتو)",
+      "shortDescriptionEn": "Signature Bukit cultural landmark and sunset viewpoint.",
+      "descriptionEn": "Iconic sea-cliff Hindu temple (Pura Luhur Uluwatu), one of Bali’s key directional temples, with dramatic ocean views and resident macaques.\n\nArea: Pecatu / Uluwatu cliffs. Cliff-top temple complex — not a beach club; allow time for transport and stairs",
+      "tags": [
+        "temple",
+        "culture",
+        "cliffs",
+        "pecatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://lovebali.baliprov.go.id/destination/detail/231/kawasan-luar-pura-uluwatu-(uluwatu-temple)",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "attraction": {
+        "attractionType": "cultural",
+        "suitableFor": [
+          "culture",
+          "sunset",
+          "first_time_visitors"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:padang-padang-beach",
+      "destinationSlug": "uluwatu",
+      "category": "attraction",
+      "subcategory": "beach",
+      "slug": "uluwatu-padang-padang-beach",
+      "nameEn": "Padang Padang Beach",
+      "nameAr": "شاطئ بادانغ بادانغ",
+      "shortDescriptionEn": "Classic Bukit beach stop with strong traveller recognition.",
+      "descriptionEn": "Well-known Bukit beach (Padang Padang / Labuan Sait) with cliff access, popular for swimming when conditions allow and for nearby dining.\n\nArea: Padang Padang / Labuan Sait. Also known locally as Labuan Sait Beach; cliff-access beach — not walking distance to all Uluwatu listings",
+      "tags": [
+        "beach",
+        "padang_padang",
+        "labuan_sait",
+        "bukit"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://lovebali.baliprov.go.id/destination/detail/242/pantai-labuan-sait",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "attraction": {
+        "attractionType": "natural",
+        "suitableFor": [
+          "beach",
+          "families"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:suluban-beach",
+      "destinationSlug": "uluwatu",
+      "category": "attraction",
+      "subcategory": "surf_beach",
+      "slug": "uluwatu-suluban-beach",
+      "nameEn": "Suluban Beach (Blue Point)",
+      "nameAr": "شاطئ سولوبان (بلو بوينت)",
+      "shortDescriptionEn": "Watch world-class surf and access the Uluwatu break area.",
+      "descriptionEn": "Cliff- and cave-access beach at the famous Uluwatu surf break (Suluban / Blue Point), with warungs and viewing platforms above.\n\nArea: Suluban / Uluwatu. Cave/cliff access to the Uluwatu surf zone — experienced surfers dominate the break",
+      "tags": [
+        "surf",
+        "suluban",
+        "blue_point",
+        "beach"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://www.indonesia.travel/us/en/destination/bali-nusa-tenggara/bali/bali---suluban-beach",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "attraction": {
+        "attractionType": "natural",
+        "suitableFor": [
+          "surfers",
+          "viewers"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:green-bowl-beach",
+      "destinationSlug": "uluwatu",
+      "category": "attraction",
+      "subcategory": "beach",
+      "slug": "uluwatu-green-bowl-beach",
+      "nameEn": "Green Bowl Beach (Pantai Batu Pageh)",
+      "nameAr": "شاطئ غرين بول (بانتاي باتو باجيه)",
+      "shortDescriptionEn": "Quieter Bukit beach cove reached by a cliff staircase.",
+      "descriptionEn": "Secluded Ungasan cove also known as Pantai Batu Pageh / Green Bowl Beach, reached by a long cliff staircase. Listed as a beach destination on Bali provincial and Badung tourism pages.\n\nArea: Ungasan / Green Bowl. Reclassified from activity → attraction. Official tourism beach destination (Pantai Green Bowl / Pantai Batu Pageh). Stair access is how visitors reach the beach — not a branded activity operator",
+      "tags": [
+        "green_bowl",
+        "ungasan",
+        "beach",
+        "batu_pageh"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://lovebali.baliprov.go.id/destination/detail/1606371174760/pantai-green-bowl-%28green-bowl-beach%29",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://sita.badungkab.go.id/destinasiwisata/pantai-batu-pageh",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "attraction": {
+        "attractionType": "natural",
+        "suitableFor": [
+          "beach",
+          "surfers",
+          "adventurous_visitors"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:kecak-dance",
+      "destinationSlug": "uluwatu",
+      "category": "activity",
+      "subcategory": "cultural_performance",
+      "slug": "uluwatu-kecak-dance",
+      "nameEn": "Kecak Dance at Uluwatu Temple",
+      "nameAr": "رقصة الكيتشاك في معبد أولوواتو",
+      "shortDescriptionEn": "Cultural performance paired with one of Bali’s most dramatic temple settings.",
+      "descriptionEn": "Kecak (and fire) dance performed at the Uluwatu Temple cliff amphitheatre. Provincial tourism materials describe daily Kecak performances at the temple setting; this record does not assert current ticket inventory or prices.\n\nArea: Pecatu / Uluwatu Temple amphitheatre. Performance event identity supported by Bali provincial tourism materials. Ticket price, availability, and booking remain unverified — keep null/omitted",
+      "tags": [
+        "kecak",
+        "culture",
+        "sunset",
+        "temple"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://disparda.baliprov.go.id/pura-uluwatu",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "other",
+          "name": "Official tourism / destination listing",
+          "url": "https://kemlu.go.id/files/publikasi/additional_file/1762932702691437de2beb3__EN__Bali___Travel_Guide_Book__2025_.pdf",
+          "notes": "Destination listing captured for identity provenance only. Fees, hours, and conditions not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "activity": {
+        "activityType": "tour"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:surf-lessons-uluwatu",
+      "destinationSlug": "uluwatu",
+      "category": "activity",
+      "subcategory": "surf_lesson",
+      "slug": "uluwatu-surf-lessons-uluwatu",
+      "nameEn": "Surf Lessons Uluwatu",
+      "nameAr": "دروس ركوب الأمواج أولوواتو",
+      "shortDescriptionEn": "Book a named local instructor instead of a generic “surf lesson” label.",
+      "descriptionEn": "Named Bukit surf coaching business (Surf Lessons Uluwatu) offering private and small-group lessons around Bingin and nearby beginner-friendlier breaks, per the operator site.\n\nArea: Bingin / Labuansait / Pecatu. Replaced generic “Bukit Peninsula Surf Lesson”. Named operator (Jack / Surf Lessons Uluwatu) based on Jl. Labuansait — break choice depends on swell and ability",
+      "tags": [
+        "surf",
+        "lesson",
+        "bingin",
+        "named_operator"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://surflessonsuluwatu.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://surflessonsuluwatu.com/",
+      "activity": {
+        "activityType": "water_sports"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:morning-light-yoga",
+      "destinationSlug": "uluwatu",
+      "category": "activity",
+      "subcategory": "yoga_class",
+      "slug": "uluwatu-morning-light-yoga",
+      "nameEn": "Morning Light Yoga",
+      "nameAr": "مورنينغ لايت يوغا",
+      "shortDescriptionEn": "Named Bukit yoga class with a clear operator page, not a packaged public-beach day.",
+      "descriptionEn": "Morning Light Yoga studio at Uluwatu Surf Villas — daily open-air yoga classes with ocean/jungle setting described on the property yoga page.\n\nArea: Suluban / Uluwatu Surf Villas. Replaced generic “Bingin Beach Day”. Named yoga studio on the Uluwatu Surf Villas campus — open-air shala; drop-in framing per brand yoga page",
+      "tags": [
+        "yoga",
+        "wellness",
+        "uluwatu",
+        "named_operator"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://uluwatusurfvillas.com/yoga/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://uluwatusurfvillas.com/yoga/",
+      "activity": {
+        "activityType": "wellness"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:single-fin",
+      "destinationSlug": "uluwatu",
+      "category": "beach_club",
+      "subcategory": "surf_beach_club",
+      "slug": "uluwatu-single-fin",
+      "nameEn": "Single Fin",
+      "nameAr": "سينغل فين",
+      "shortDescriptionEn": "Classic Uluwatu sunset and surf-watching social stop.",
+      "descriptionEn": "Legendary cliffside surf bar / beach club overlooking the Uluwatu break, known for daytime views and busy sunset sessions.\n\nArea: Suluban / Uluwatu. Above the Uluwatu surf zone — iconic sunset spot; expect crowds",
+      "tags": [
+        "beach_club",
+        "sunset",
+        "surf",
+        "suluban"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.singlefinbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 2,
+      "websiteUrl": "https://www.singlefinbali.com/",
+      "dining": {
+        "cuisineTypes": [
+          "bar_food",
+          "drinks"
+        ],
+        "mealTypes": [
+          "lunch",
+          "dinner",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:sundays-beach-club",
+      "destinationSlug": "uluwatu",
+      "category": "beach_club",
+      "subcategory": "private_beach_club",
+      "slug": "uluwatu-sundays-beach-club",
+      "nameEn": "Sundays Beach Club",
+      "nameAr": "صنديز بيتش كلوب",
+      "shortDescriptionEn": "Spend a full day on a managed private beach with food and facilities.",
+      "descriptionEn": "Private beach club on the southern Bukit (Ungasan) known for a full day-beach experience rather than a quick drink stop.\n\nArea: Ungasan / southern Bukit. Private beach club affiliated with The Ungasan — day passes / VIP experiences per brand site; book ahead on busy days",
+      "tags": [
+        "beach_club",
+        "ungasan",
+        "day_pass"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.sundaysbeachclub.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.sundaysbeachclub.com/",
+      "dining": {
+        "cuisineTypes": [
+          "beach_club"
+        ],
+        "mealTypes": [
+          "lunch",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:ulu-cliffhouse",
+      "destinationSlug": "uluwatu",
+      "category": "beach_club",
+      "subcategory": "cliff_beach_club",
+      "slug": "uluwatu-ulu-cliffhouse",
+      "nameEn": "Ulu Cliffhouse",
+      "nameAr": "ولو كليف هاوس",
+      "shortDescriptionEn": "Cliff views with a full beach-club day program.",
+      "descriptionEn": "Cliffside pool club and dining destination on the Uluwatu coast (Labuansait), with daybed reservations and restaurants per the brand site.\n\nArea: Labuansait / Uluwatu cliffs. Adults-only cliffside pool club with dining and suites — verify dress code / minimum spend before arrival",
+      "tags": [
+        "beach_club",
+        "cliffs",
+        "uluwatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.ulucliffhouse.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.ulucliffhouse.com/",
+      "dining": {
+        "cuisineTypes": [
+          "beach_club"
+        ],
+        "mealTypes": [
+          "lunch",
+          "drinks"
+        ],
+        "dietaryOptions": []
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:el-kabron",
+      "destinationSlug": "uluwatu",
+      "category": "nightlife",
+      "subcategory": "cliff_club_nightlife",
+      "slug": "uluwatu-el-kabron",
+      "nameEn": "El Kabron Beach Club",
+      "nameAr": "إل كابرون بيتش كلوب",
+      "shortDescriptionEn": "Later Bukit night option with cliff views.",
+      "descriptionEn": "Cliffside luxury beach club / nightlife venue in Pecatu, known for sunset parties and later evening energy per the brand site.\n\nArea: Pecatu / Bingin cliffs. Jl. Pantai Cemongkak, Pecatu — Spanish-themed cliff club; evenings can run later than daytime beach clubs",
+      "tags": [
+        "nightlife",
+        "beach_club",
+        "pecatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.elkabron.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "priceLevel": 3,
+      "websiteUrl": "https://www.elkabron.com/",
+      "nightlife": {
+        "venueType": "bar_nightlife",
+        "musicGenres": [
+          "dj",
+          "sunset"
+        ]
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:radisson-blu",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "uluwatu-radisson-blu",
+      "nameEn": "Radisson Blu Resort & Villas Bali Uluwatu",
+      "nameAr": "رادسون بلو ريزورت وفيلات بالي أولوواتو",
+      "shortDescriptionEn": "Full-service resort base for exploring the Bukit.",
+      "descriptionEn": "Radisson Blu branded resort and villas in the Pecatu / Uluwatu area. Marketplace listings commonly describe ocean-area resort facilities; Helm has not verified rates or amenity claims.\n\nArea: Pecatu. Pecatu resort campus — brand listing places it near Padang Padang / Bingin by road",
+      "tags": [
+        "resort",
+        "pecatu",
+        "radisson"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.radissonhotels.com/en-us/hotels/radisson-blu-bali-uluwatu",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.radissonhotels.com/en-us/hotels/radisson-blu-bali-uluwatu",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:nisi-villas",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "slug": "uluwatu-nisi-villas",
+      "nameEn": "Nisí Villas",
+      "nameAr": "نيسي فيلات",
+      "shortDescriptionEn": "Villa-style stay alternative to large resorts in Bingin.",
+      "descriptionEn": "Boutique private-pool villa stay in Bingin (Nisí Villas). Record covers villa inventory only. Do not invent unit-level amenities, rates, or suite inventory.\n\nArea: Bingin / Pecatu. Renamed from “Nisí Villas & Suites”. Brand villas pages present private-pool villas as the operating product; Nisí Suites still advertised as arriving Q3 2026 with early-access signup — suites inventory not treated as open",
+      "tags": [
+        "villa",
+        "bingin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://nisivillas.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        },
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://nisivillas.com/villas",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://nisivillas.com/",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:grun",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "eco_resort",
+      "slug": "uluwatu-grun",
+      "nameEn": "Grün Uluwatu",
+      "nameAr": "غرون أولوواتو",
+      "shortDescriptionEn": "Nature-forward resort base closer to Bingin / Uluwatu temple road network.",
+      "descriptionEn": "Eco resort in Pecatu (Grün Resorts) with treehouse and ocean-view villa products. Amenity and star claims from OTAs remain unverified for Helm.\n\nArea: Pecatu. Jl. Pura Kulat, Pecatu — Grün Resorts treehouse / ocean-view villas; marketplace star claims are not Helm-verified",
+      "tags": [
+        "resort",
+        "eco",
+        "pecatu",
+        "grun"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://grunresorts.com/grun-uluwatu/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://grunresorts.com/grun-uluwatu/",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:alila-villas",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "luxury_villa_resort",
+      "slug": "uluwatu-alila-villas",
+      "nameEn": "Alila Villas Uluwatu",
+      "nameAr": "أليلا فيلات أولوواتو",
+      "shortDescriptionEn": "Flagship luxury villa resort stay on the southern Bukit cliffs.",
+      "descriptionEn": "Luxury cliff-top villa resort by Alila in Pecatu. Official brand materials describe private villa stays; Helm has not verified rates, occupancy, or unit-level pool claims.\n\nArea: Pecatu. Cliff-top villa resort — official brand site positions it as a luxury villa resort",
+      "tags": [
+        "luxury",
+        "villa",
+        "resort",
+        "pecatu",
+        "alila"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.alilahotels.com/uluwatu",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.alilahotels.com/uluwatu",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:surf-villas",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "villa",
+      "slug": "uluwatu-surf-villas",
+      "nameEn": "Uluwatu Surf Villas",
+      "nameAr": "فيلات سيرف أولوواتو",
+      "shortDescriptionEn": "Villa base aimed at surf-trip travellers.",
+      "descriptionEn": "Cliff-front villa property above the Uluwatu / Suluban surf zone. Brand site describes villa stays with saltwater pools; Helm has not verified rates or unit-level amenities.\n\nArea: Suluban / Pecatu. Jl. Pantai Suluban cliff-front villas per brand site — related to Mana restaurant and Morning Light Yoga on the same campus",
+      "tags": [
+        "villa",
+        "surf",
+        "suluban"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://uluwatusurfvillas.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://uluwatusurfvillas.com/",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:melali-bingin",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "uluwatu-melali-bingin",
+      "nameEn": "Melali Bingin",
+      "nameAr": "ميلالي بينغين",
+      "shortDescriptionEn": "Stay close to Bingin’s cliff-beach scene without a mega-resort footprint.",
+      "descriptionEn": "Small boutique stay in Bingin (Melali). Brand site describes a pool villa and sunset suites; amenities and rates remain unverified for Helm. Construction-period caveats appear on the brand homepage.\n\nArea: Bingin / Pecatu. Jl. Buana Sari, Gg Pirta Bingin — brand presents boutique rooms (pool villa + sunset suites). Brand notes neighbouring construction noise in 2026 and temporary breakfast unavailability",
+      "tags": [
+        "bingin",
+        "boutique_hotel",
+        "pecatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://melalibingin.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://melalibingin.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:terra-cottages",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "uluwatu-terra-cottages",
+      "nameEn": "Terra Cottages Bali",
+      "nameAr": "تيرا كوتاجز بالي",
+      "shortDescriptionEn": "Boutique cottage stay close to Bingin’s cliff-beach access.",
+      "descriptionEn": "Terracotta / boutique cottage hotel near Bingin Beach. Brand site confirms boutique hotel positioning; do not invent cottage counts, rates, or pool types.\n\nArea: Bingin / Pecatu. Jl. Pantai Bingin boutique hotel — brand notes Bingin beachfront construction context; beach still described as open",
+      "tags": [
+        "cottages",
+        "boutique_hotel",
+        "bingin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.terracottagesbali.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.terracottagesbali.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:origin",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "tented_villa",
+      "slug": "uluwatu-origin",
+      "nameEn": "Origin Uluwatu",
+      "nameAr": "أوريجين أولوواتو",
+      "shortDescriptionEn": "Nature-forward villa alternative to large cliff resorts.",
+      "descriptionEn": "Tented-villa stay (Origin Collection) in Pecatu marketed as open-air villas near Bukit beaches. Star rating, rates, and amenity matrix remain unverified for Helm.\n\nArea: Pecatu / Uluwatu. Jl. Ancak Sari, Pecatu — tented villa / glamping product; unit-level private-pool claims need verification",
+      "tags": [
+        "villa",
+        "glamping",
+        "uluwatu",
+        "origin"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://www.originuluwatu.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://www.originuluwatu.com/",
+      "accommodation": {
+        "accommodationType": "villa"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:seascape-resort",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "resort",
+      "slug": "uluwatu-seascape-resort",
+      "nameEn": "Seascape Resort & Spa Uluwatu by Ini Vie Hospitality",
+      "nameAr": "سيسكيب ريزورت وسبا أولوواتو",
+      "shortDescriptionEn": "Resort + spa base for a multi-night Bukit trip.",
+      "descriptionEn": "Resort and spa stay under Ini Vie Hospitality branding in the Labuan Sait / Uluwatu area. Rates, spa inclusion, and beach access remain unverified.\n\nArea: Labuan Sait / Pecatu. Ini Vie Hospitality cliffside resort — Svaha Spa Bingin cited on brand materials",
+      "tags": [
+        "resort",
+        "spa",
+        "uluwatu"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://inivie.com/seascapeuluwatu",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://inivie.com/seascapeuluwatu",
+      "accommodation": {
+        "accommodationType": "resort"
+      }
+    },
+    {
+      "externalKey": "id:uluwatu:nema",
+      "destinationSlug": "uluwatu",
+      "category": "accommodation",
+      "subcategory": "boutique_hotel",
+      "slug": "uluwatu-nema",
+      "nameEn": "Nema. Uluwatu",
+      "nameAr": "نيما أولوواتو",
+      "shortDescriptionEn": "Design-led boutique hotel option on the Bukit.",
+      "descriptionEn": "Boutique hotel stay in Pecatu / Uluwatu (nemauluwatu.com). Do not invent star class, private-pool claims, or nightly rates.\n\nArea: Pecatu / Uluwatu. Boutique hotel near Thomas Beach area per brand site — inventory still needs Helm verification",
+      "tags": [
+        "boutique_hotel",
+        "uluwatu",
+        "nema"
+      ],
+      "updateIfExists": false,
+      "sources": [
+        {
+          "sourceType": "official_website",
+          "name": "Official / brand website reference",
+          "url": "https://nemauluwatu.com/",
+          "notes": "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
+          "collectedAt": "2026-11-19"
+        }
+      ],
+      "websiteUrl": "https://nemauluwatu.com/",
+      "accommodation": {
+        "accommodationType": "boutique_hotel"
+      }
+    }
+  ]
+}
