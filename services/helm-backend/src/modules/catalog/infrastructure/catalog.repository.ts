@@ -558,6 +558,82 @@ export class CatalogRepository {
     return (rows as unknown as Record<string, unknown>[])[0];
   }
 
+  async listImportRuns(input: {
+    status?: string;
+    dryRun?: boolean;
+    sourceLabel?: string;
+    limit: number;
+    offset: number;
+  }): Promise<{ items: Record<string, unknown>[]; total: number }> {
+    const db = this.requireDb();
+    const statusFilter =
+      input.status != null
+        ? sql`and status = ${input.status}`
+        : sql``;
+    const dryRunFilter =
+      input.dryRun != null ? sql`and dry_run = ${input.dryRun}` : sql``;
+    const sourceFilter =
+      input.sourceLabel != null && input.sourceLabel.trim() !== ''
+        ? sql`and source_label ilike ${`%${input.sourceLabel.trim()}%`}`
+        : sql``;
+
+    const countRows = await db.execute(sql`
+      select count(*)::int as total
+      from catalog.import_runs
+      where true
+      ${statusFilter}
+      ${dryRunFilter}
+      ${sourceFilter}
+    `);
+    const total = Number(
+      (countRows as unknown as { total: number }[])[0]?.total ?? 0,
+    );
+
+    const rows = await db.execute(sql`
+      select
+        id,
+        dry_run as "dryRun",
+        status,
+        source_label as "sourceLabel",
+        actor_user_id as "actorUserId",
+        created_at as "createdAt",
+        summary,
+        coalesce(jsonb_array_length(error_report), 0)::int as "errorCount"
+      from catalog.import_runs
+      where true
+      ${statusFilter}
+      ${dryRunFilter}
+      ${sourceFilter}
+      order by created_at desc, id desc
+      limit ${input.limit} offset ${input.offset}
+    `);
+
+    return {
+      items: rows as unknown as Record<string, unknown>[],
+      total,
+    };
+  }
+
+  async getImportRunById(id: string): Promise<Record<string, unknown> | null> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        id,
+        dry_run as "dryRun",
+        status,
+        source_label as "sourceLabel",
+        actor_user_id as "actorUserId",
+        created_at as "createdAt",
+        summary,
+        error_report as "errorReport",
+        coalesce(jsonb_array_length(error_report), 0)::int as "errorCount"
+      from catalog.import_runs
+      where id = ${id}::uuid
+      limit 1
+    `);
+    return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+  }
+
   async upsertImportedPlace(input: {
     externalKey: string;
     destinationId: string;

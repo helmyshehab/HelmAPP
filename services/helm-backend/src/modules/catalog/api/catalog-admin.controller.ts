@@ -39,6 +39,17 @@ const importBody = z.object({
   payload: z.unknown(),
 });
 
+const importRunListQuery = z.object({
+  status: z.enum(['completed', 'partial', 'failed']).optional(),
+  dryRun: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === 'true')),
+  sourceLabel: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+});
+
 const staffListQuery = z.object({
   category: z.string().max(40).optional(),
   q: z.string().max(120).optional(),
@@ -203,6 +214,22 @@ export class CatalogAdminController {
     @Body(new ZodValidationPipe(transitionBody)) body: z.infer<typeof transitionBody>,
   ) {
     return this.admin.transitionPlace(user, id, body.to, body.rejectionReason);
+  }
+
+  @Get('import-runs')
+  @Roles('operator', 'administrator', 'super-administrator')
+  listImportRuns(
+    @CurrentUser() user: AuthPrincipal,
+    @Query(new ZodValidationPipe(importRunListQuery))
+    query: z.infer<typeof importRunListQuery>,
+  ) {
+    return this.admin.listImportRuns(user, query);
+  }
+
+  @Get('import-runs/:id')
+  @Roles('operator', 'administrator', 'super-administrator')
+  getImportRun(@CurrentUser() user: AuthPrincipal, @Param('id') id: string) {
+    return this.admin.getImportRun(user, id);
   }
 
   @Post('import')

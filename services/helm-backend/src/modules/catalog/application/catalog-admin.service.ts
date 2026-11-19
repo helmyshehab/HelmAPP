@@ -14,6 +14,11 @@ import {
   validateCatalogImport,
   type CatalogImportPayload,
 } from '../domain/import-format';
+import {
+  isImportRunStatus,
+  resolveImportRunStatus,
+  type ImportRunStatus,
+} from '../domain/import-run-status';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
 import { CatalogImportWriter } from '../infrastructure/catalog-import.writer';
 
@@ -467,11 +472,17 @@ export class CatalogAdminService {
     const data = validated.data;
     if (options.dryRun) {
       const preview = await this.previewImport(data);
+      const status = resolveImportRunStatus({
+        dryRun: true,
+        errorCount: preview.errors.length,
+        created: 0,
+        updated: 0,
+      });
       // Dry-run records only an import_run audit row — no destination/place mutations.
       const run = await this.repo.insertImportRun({
         actorUserId: actor.userId,
         dryRun: true,
-        status: preview.errors.length ? 'partial' : 'completed',
+        status,
         sourceLabel: data.sourceLabel,
         summary: preview,
         errorReport: preview.errors,
@@ -484,16 +495,22 @@ export class CatalogAdminService {
         action: 'catalog.import.dry_run',
         entityType: 'import_run',
         entityId: String(run.id),
-        after: preview,
+        after: { ...preview, status },
       });
-      return { dryRun: true, importRunId: run.id, ...preview };
+      return { dryRun: true, importRunId: run.id, status, ...preview };
     }
 
     const applied = await this.applyImport(actor, data);
+    const status = resolveImportRunStatus({
+      dryRun: false,
+      errorCount: applied.errors.length,
+      created: applied.created,
+      updated: applied.updated,
+    });
     const run = await this.repo.insertImportRun({
       actorUserId: actor.userId,
       dryRun: false,
-      status: applied.errors.length ? 'partial' : 'completed',
+      status,
       sourceLabel: data.sourceLabel,
       summary: applied,
       errorReport: applied.errors,
@@ -507,6 +524,7 @@ export class CatalogAdminService {
       entityType: 'import_run',
       entityId: String(run.id),
       after: {
+        status,
         destinationsCreated: applied.destinationsCreated,
         destinationsUpdated: applied.destinationsUpdated,
         destinationsSkipped: applied.destinationsSkipped,
@@ -515,7 +533,120 @@ export class CatalogAdminService {
         placesSkipped: applied.placesSkipped,
       },
     });
-    return { dryRun: false, importRunId: run.id, ...applied };
+    return { dryRun: false, importRunId: run.id, status, ...applied };
+  }
+
+  async listImportRuns(
+    actor: AuthPrincipal,
+    query: {
+      status?: string;
+      dryRun?: boolean;
+      sourceLabel?: string;
+      limit?: number;
+      offset?: number;
+    },
+  ) {
+    this.assertStaff(actor);
+    if (query.status != null && !isImportRunStatus(query.status)) {
+      throw AppException.validation('Invalid import run status filter');
+    }
+    const limit = query.limit ?? 20;
+    const offset = query.offset ?? 0;
+    const { items, total } = await this.repo.listImportRuns({
+      status: query.status,
+      dryRun: query.dryRun,
+      sourceLabel: query.sourceLabel,
+      limit,
+      offset,
+    });
+    return {
+      items: items.map((row) => this.mapImportRunListItem(row)),
+      total,
+      limit,
+      offset,
+    };
+  }
+
+  async getImportRun(actor: AuthPrincipal, id: string) {
+    this.assertStaff(actor);
+    const row = await this.repo.getImportRunById(id);
+    if (!row) {
+      throw AppException.notFound('Import run not found');
+    }
+    const base = this.mapImportRunListItem(row);
+    const rawErrors = row.errorReport;
+    const errors = Array.isArray(rawErrors)
+      ? rawErrors.map((err) => {
+          if (err && typeof err === 'object') {
+            const rec = err as Record<string, unknown>;
+            return {
+              path: typeof rec.path === 'string' ? rec.path : undefined,
+              message: typeof rec.message === 'string' ? rec.message : String(err),
+            };
+          }
+          return { message: String(err) };
+        })
+      : [];
+    return { ...base, errors };
+  }
+
+  private mapImportRunListItem(row: Record<string, unknown>) {
+    const statusRaw = String(row.status ?? '');
+    const status: ImportRunStatus = isImportRunStatus(statusRaw)
+      ? statusRaw
+      : 'completed';
+    const summary =
+      row.summary && typeof row.summary === 'object'
+        ? (row.summary as Record<string, unknown>)
+        : {};
+    return {
+      id: String(row.id),
+      dryRun: Boolean(row.dryRun),
+      status,
+      sourceLabel:
+        row.sourceLabel == null ? null : String(row.sourceLabel),
+      actorUserId:
+        row.actorUserId == null ? null : String(row.actorUserId),
+      createdAt:
+        row.createdAt instanceof Date
+          ? row.createdAt.toISOString()
+          : String(row.createdAt),
+      errorCount: Number(row.errorCount ?? 0),
+      summary: this.pickSummaryCounts(summary),
+    };
+  }
+
+  private pickSummaryCounts(summary: Record<string, unknown>) {
+    const keys = [
+      'destinationsInPayload',
+      'placesInPayload',
+      'destinationsWouldCreate',
+      'destinationsWouldUpdate',
+      'destinationsWouldSkip',
+      'placesWouldCreate',
+      'placesWouldUpdate',
+      'placesWouldSkip',
+      'destinationsCreated',
+      'destinationsUpdated',
+      'destinationsSkipped',
+      'placesCreated',
+      'placesUpdated',
+      'placesSkipped',
+      'wouldCreate',
+      'wouldUpdate',
+      'wouldSkip',
+      'created',
+      'updated',
+      'skipped',
+    ] as const;
+    const out: Record<string, number> = {};
+    for (const key of keys) {
+      const value = summary[key];
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        out[key] = value;
+      }
+    }
+    return out;
   }
 
   private async previewImport(data: CatalogImportPayload) {
