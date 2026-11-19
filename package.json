@@ -13,6 +13,8 @@
     "typecheck": "turbo run typecheck",
     "codegen": "pnpm --filter @helm/openapi codegen && pnpm --filter @helm/api-client-ts codegen && pnpm --filter @helm/api-client-dart codegen",
     "codegen:check": "pnpm codegen && git diff --exit-code -- packages/api-client-ts packages/api-client-dart || (echo 'Generated clients are dirty. Do not hand-edit; regenerate from OpenAPI.' && exit 1)",
+    "dataset:ubud:build": "node scripts/build-ubud-dataset-v1.mjs",
+    "dataset:ubud:validate": "node scripts/validate-ubud-dataset-v1.mjs",
     "test": "turbo run test"
   },
   "devDependencies": {
