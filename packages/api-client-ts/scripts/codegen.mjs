@@ -46,13 +46,35 @@ mkdirSync(outDir, { recursive: true });
 
 let schemaBody = "";
 try {
-  const bin = join(pkgRoot, "node_modules", ".bin", "openapi-typescript");
-  const localBin = existsSync(bin) ? bin : "openapi-typescript";
-  schemaBody = execFileSync(localBin, [openapi], {
-    encoding: "utf8",
-    cwd: pkgRoot,
-  });
-} catch {
+  // Prefer the package CLI via node so Windows does not silently fall back
+  // when `.bin/openapi-typescript` shims fail under execFileSync.
+  const cliJs = join(
+    pkgRoot,
+    "node_modules",
+    "openapi-typescript",
+    "bin",
+    "cli.js",
+  );
+  if (existsSync(cliJs)) {
+    schemaBody = execFileSync(process.execPath, [cliJs, openapi], {
+      encoding: "utf8",
+      cwd: pkgRoot,
+      maxBuffer: 20 * 1024 * 1024,
+    });
+  } else {
+    const bin = join(pkgRoot, "node_modules", ".bin", "openapi-typescript");
+    const localBin = existsSync(bin) ? bin : "openapi-typescript";
+    schemaBody = execFileSync(localBin, [openapi], {
+      encoding: "utf8",
+      cwd: pkgRoot,
+      maxBuffer: 20 * 1024 * 1024,
+    });
+  }
+} catch (error) {
+  console.error(
+    "@helm/api-client-ts: openapi-typescript failed; using schema.fallback.ts",
+    error instanceof Error ? error.message : error,
+  );
   schemaBody = readFileSync(join(templatesDir, "schema.fallback.ts"), "utf8");
 }
 

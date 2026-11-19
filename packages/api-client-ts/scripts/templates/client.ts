@@ -269,6 +269,21 @@ export function createHelmClient(options: HelmClientOptions) {
         })}`,
       );
     },
+    async adminListCatalogPlaces(params?: {
+      category?: string;
+      q?: string;
+      limit?: number;
+      offset?: number;
+    }): Promise<PlaceListResponse> {
+      return getJson<PlaceListResponse>(
+        `/v1/admin/catalog/places${qs({
+          category: params?.category,
+          q: params?.q,
+          limit: params?.limit,
+          offset: params?.offset,
+        })}`,
+      );
+    },
     async adminCreateCatalogPlace(body: CreatePlaceRequest): Promise<PlaceAdminSummary> {
       return sendJson<PlaceAdminSummary>("/v1/admin/catalog/places", {
         method: "POST",
