@@ -1,6 +1,6 @@
 # Helm حلم — Ubud Curated Travel Catalogue (Dataset v1)
 
-Staging dataset for **Ubud, Bali, Indonesia**. Exactly **20** curated places for import testing.
+Staging dataset for **Ubud, Bali, Indonesia**. Exactly **30** curated places for import testing (original 20 dining/attraction/activity/nightlife records plus **10 accommodation** properties).
 
 **Do not auto-apply to a database. Do not publish. All records remain draft / needs verification.**
 
@@ -25,11 +25,12 @@ Staging dataset for **Ubud, Bali, Indonesia**. Exactly **20** curated places for
 | Attractions | 3 | `attraction` |
 | Activities | 4 | `activity` |
 | Bars / nightlife | 4 | `bar` (1) + `nightlife` (3) |
-| **Total** | **20** | |
+| Accommodation | 10 | `accommodation` |
+| **Total** | **30** | |
 
 ---
 
-## All 20 records
+## All 30 records
 
 ### Restaurants
 
@@ -77,6 +78,25 @@ Activity prices are **indicative advertised starting prices**, not confirmed sup
 | 18 | No Más | `ubud-no-mas` | `nightlife` | live_music_cocktail_bar | 4.4 | 232 | business_listing_snapshot |
 | 19 | The Blue Door Bar, Restaurant & Club | `ubud-blue-door` | `nightlife` | club_live_music | 4.8 | 114 | business_listing_snapshot |
 | 20 | Lokal Bar Ubud | `ubud-lokal-bar` | `nightlife` | cocktail_live_music_bar | 4.9 | 28 | business_listing_snapshot |
+
+### Accommodation (expansion)
+
+Guest ratings, nightly rates, star classifications, and amenity inventories are **null / omitted** until independently verified. Import maps **`accommodationType` only** (contract fields `starRating` / `amenities` / place `priceLevel` are not invented). Brand marketing that mentions private-pool villas is noted in editorial text only — editorial `private_pool` / `shared_pool` remain **null**.
+
+| # | Name | External key | Type | Area | Official source |
+|---|------|--------------|------|------|-----------------|
+| 21 | Swasti Eco Cottages | `ubud-swasti-eco-cottages` | `guesthouse` | Nyuh Kuning | https://baliswasti.com/ |
+| 22 | Ubud Village Hotel | `ubud-village-hotel` | `boutique_hotel` | Monkey Forest / Central Ubud | https://theubudvillage.com/en/hotel/ |
+| 23 | Adiwana Resort Jembawan | `ubud-adiwana-jembawan` | `boutique_hotel` | Central Ubud (Jembawan) | https://adiwanahotels.com/jembawan-resort-ubud-bali/ |
+| 24 | Komaneka at Bisma | `ubud-komaneka-bisma` | `boutique_hotel` | Bisma / Campuhan | https://komaneka.com/resort/bisma/ |
+| 25 | Bisma Eight | `ubud-bisma-eight` | `boutique_hotel` | Bisma / Central Ubud | https://bisma-eight.com/ |
+| 26 | Chapung Sebali Resort | `ubud-chapung-sebali` | `resort` | Sebali / Keliki / Tegallalang | https://chapung.com/ |
+| 27 | Alila Ubud | `ubud-alila-ubud` | `resort` | Payangan | https://www.alilahotels.com/ubud |
+| 28 | COMO Uma Ubud | `ubud-como-uma-ubud` | `resort` | Kedewatan / Sanggingan | https://www.comohotels.com/bali/como-uma-ubud |
+| 29 | The Kayon Jungle Resort | `ubud-kayon-jungle-resort` | `resort` | Bresela / Payangan | https://thekayonjungleresort.com/ |
+| 30 | Capella Ubud, Bali | `ubud-capella-ubud` | `resort` | Keliki / Tegallalang | https://capellahotels.com/en/capella-ubud |
+
+Tier mix (editorial intent only — not written as `priceLevel`): budget-friendly private cottages (Swasti) → mid boutique (Ubud Village Hotel, Adiwana Jembawan) → upscale boutique (Komaneka Bisma, Bisma Eight, Chapung) → luxury resorts (Alila, COMO Uma, Kayon Jungle, Capella).
 
 ---
 
@@ -150,6 +170,7 @@ Category detail blocks:
 | attraction | `attraction` | attractionType ∈ landmark\|museum\|cultural\|natural\|viewpoint\|other |
 | activity | `activity` | activityType ∈ adventure\|water_sports\|tour\|outdoor\|wellness\|other |
 | nightlife | `nightlife` | venueType ∈ nightclub\|music_venue\|festival_venue\|bar_nightlife\|other |
+| accommodation | `accommodation` | `accommodationType` ∈ hotel\|resort\|villa\|apartment\|guesthouse\|boutique_hotel — **type only** until verified |
 
 ---
 
@@ -193,14 +214,18 @@ Do **not** reintroduce estimated durations or booking flags unless either:
 
 ### Unknown / missing field summary
 
-| Field | Status across 20 places |
-|-------|-------------------------|
+| Field | Status |
+|-------|--------|
 | `address` | all null |
 | `coordinates` | all null |
 | `opening_hours` | all null |
-| `source_urls` | all empty arrays |
+| `source_urls` (original 20) | empty arrays |
+| `source_urls` (accommodation 10) | official / brand website URLs |
 | `price.amount_*` (non-activity) | null |
-| `price.tier` (attractions, bars/nightlife) | null |
+| `price.tier` (attractions, bars/nightlife, accommodation) | null |
+| Accommodation guest ratings | null (not invented) |
+| Accommodation `starRating` / `amenities` / `priceLevel` | omitted from import |
+| Accommodation `private_pool` / `shared_pool` / wifi / parking | editorial null |
 | `last_verified_at` | all null |
 | `visit_duration_minutes` | all null |
 | `booking_recommended` | all null |

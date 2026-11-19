@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * Builds Ubud curated dataset v1:
+ * Builds Ubud curated dataset v1 (+ accommodation expansion to 30 places):
  * - data/imports/indonesia/ubud/ubud-curated-v1.source.json (rich editorial)
  * - data/imports/indonesia/ubud/ubud-curated-v1.json (helm.catalog.import.v1)
  *
- * Does not invent coordinates, opening hours, booking URLs, or confirmed prices.
+ * Does not invent coordinates, opening hours, booking URLs, confirmed prices,
+ * star ratings, or amenity claims. Accommodation import maps accommodationType only.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -15,7 +16,61 @@ const OUT_DIR = join(ROOT, "data/imports/indonesia/ubud");
 const COMPILED_AT = "2026-11-19";
 const DATASET_VERSION = "ubud-curated-v1";
 
-/** @typedef {'restaurant'|'cafe'|'attraction'|'activity'|'bar'|'nightlife'} PlaceCategory */
+/** @typedef {'restaurant'|'cafe'|'attraction'|'activity'|'bar'|'nightlife'|'accommodation'} PlaceCategory */
+
+function nullCoords() {
+  return { lat: null, lng: null, source: null, verified_at: null };
+}
+
+function unknownPrice(currency = "IDR") {
+  return {
+    tier: null,
+    amount_min: null,
+    amount_max: null,
+    currency,
+    basis: null,
+    status: "unknown",
+  };
+}
+
+function nullRating() {
+  return {
+    value: null,
+    scale: 5,
+    review_count: null,
+    provider: null,
+    verified_at: null,
+    scope: null,
+  };
+}
+
+/** @param {string} officialWebsite @param {string} propertyType */
+function accommodationEditorial(officialWebsite, propertyType) {
+  return {
+    property_type: propertyType,
+    verified_star_classification: null,
+    marketplace_star_claim: null,
+    guest_rating: null,
+    price_per_night: null,
+    currency: "IDR",
+    date_checked: null,
+    room_categories: null,
+    maximum_occupancy: null,
+    private_pool: null,
+    shared_pool: null,
+    breakfast_inclusion: null,
+    wifi: null,
+    parking: null,
+    air_conditioning: null,
+    beach_access: null,
+    verified_distance_to_beaches: null,
+    adults_only: null,
+    family_friendly: null,
+    honeymoon_suitability: null,
+    official_website: officialWebsite,
+    booking_url: null,
+  };
+}
 
 /**
  * Price tier → import priceLevel (1–4). Unknown tiers stay null / omitted.
@@ -56,7 +111,7 @@ function rankingSupport(p) {
   };
 }
 
-/** Canonical curated place list (exactly 20). */
+/** Canonical curated place list (exactly 30: original 20 + 10 accommodation). */
 const PLACES = [
   {
     external_key: "ubud-hujan-locale",
@@ -876,10 +931,314 @@ const PLACES = [
       musicGenres: ["live"],
     },
   },
+  // --- Accommodation expansion (10). Original 20 records above unchanged. ---
+  {
+    external_key: "ubud-swasti-eco-cottages",
+    name: "Swasti Eco Cottages",
+    name_ar: "سواستي إيكو كوتيجز",
+    category: "accommodation",
+    subcategory: "guesthouse",
+    area: "Nyuh Kuning",
+    area_note:
+      "Banjar Nyuh Kuning / Mas village edge — brand places the property near Sacred Monkey Forest",
+    description:
+      "Eco-minded cottage and traditional-room stay in Nyuh Kuning with on-site organic cafe and wellness facilities described on the property website. Helm has not verified rates, amenity inventories, or pool claims.",
+    why_visit: "Budget-friendly private cottages with a wellness / garden focus near Monkey Forest.",
+    best_for: ["budget", "eco", "wellness", "couples"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://baliswasti.com/", "https://baliswasti.com/contact-us/"],
+    websiteUrl: "https://baliswasti.com/",
+    tags: ["guesthouse", "eco", "nyuh_kuning", "budget"],
+    accommodation_editorial: accommodationEditorial(
+      "https://baliswasti.com/",
+      "guesthouse",
+    ),
+    accommodation: { accommodationType: "guesthouse" },
+  },
+  {
+    external_key: "ubud-village-hotel",
+    name: "Ubud Village Hotel",
+    name_ar: "فندق أوبود فيلدج",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Monkey Forest / Central Ubud",
+    area_note: "Jl. Monkey Forest — walking access to central Ubud dining and shops",
+    description:
+      "Boutique hotel on Monkey Forest Road with rooms, suites, and rooftop villas as described by the brand. Supporting facilities are marketed on the official site; Helm has not verified rates or amenity claims.",
+    why_visit: "Central Ubud boutique base for walkable nights out and Monkey Forest access.",
+    best_for: ["central_ubud", "boutique", "couples", "short_stays"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://theubudvillage.com/en/hotel/",
+      "https://theubudvillage.com/hotel/contact-information/",
+    ],
+    websiteUrl: "https://theubudvillage.com/en/hotel/",
+    tags: ["boutique_hotel", "monkey_forest", "central_ubud"],
+    accommodation_editorial: accommodationEditorial(
+      "https://theubudvillage.com/en/hotel/",
+      "boutique_hotel",
+    ),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "ubud-adiwana-jembawan",
+    name: "Adiwana Resort Jembawan",
+    name_ar: "أديوانا ريزورت جيمباوان",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Central Ubud",
+    area_note: "Jl. Jembawan — brand positions it as a boutique wellness retreat in Ubud",
+    description:
+      "Boutique wellness-oriented resort in central Ubud (Adiwana collection). Brand pages describe rooms/suites and wellness programming; Helm has not verified rates, star claims, or amenity inventories.",
+    why_visit: "Mid-range boutique wellness stay walking-distance from Ubud town sites.",
+    best_for: ["wellness", "boutique", "mid_range", "couples"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://adiwanahotels.com/jembawan-resort-ubud-bali/",
+      "https://adiwanahotels.com/jembawan-resort-ubud-bali/contact/",
+    ],
+    websiteUrl: "https://adiwanahotels.com/jembawan-resort-ubud-bali/",
+    tags: ["boutique_hotel", "wellness", "jembawan", "adiwana"],
+    accommodation_editorial: accommodationEditorial(
+      "https://adiwanahotels.com/jembawan-resort-ubud-bali/",
+      "boutique_hotel",
+    ),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "ubud-komaneka-bisma",
+    name: "Komaneka at Bisma",
+    name_ar: "كومانيكا في بيسمة",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Bisma / Campuhan",
+    area_note:
+      "Slope overlooking the Campuhan river valley; brand describes suites and private-pool villas — villa pool claims not Helm-verified",
+    description:
+      "Balinese-owned Komaneka boutique resort overlooking the Campuhan valley and rice fields. Suites and villa categories appear on the official site; Helm has not verified rates or unit-level amenities.",
+    why_visit: "Valley-view boutique stay a short hop from central Ubud.",
+    best_for: ["boutique", "valley_views", "couples", "families"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://komaneka.com/resort/bisma/",
+      "https://komaneka.com/resort/bisma/rooms/",
+    ],
+    websiteUrl: "https://komaneka.com/resort/bisma/",
+    tags: ["boutique_hotel", "bisma", "campuhan", "komaneka"],
+    accommodation_editorial: accommodationEditorial(
+      "https://komaneka.com/resort/bisma/",
+      "boutique_hotel",
+    ),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "ubud-bisma-eight",
+    name: "Bisma Eight",
+    name_ar: "بيسمة إيت",
+    category: "accommodation",
+    subcategory: "boutique_hotel",
+    area: "Bisma / Central Ubud",
+    area_note: "Jl. Bisma No. 68 — brand places it about a 10-minute walk from central Ubud",
+    description:
+      "Independent boutique hotel on Jalan Bisma offering suites and private villas as marketed on the official site (One Michelin Key claim is brand-facing only). Helm has not verified rates or amenity inventories.",
+    why_visit: "Design-led boutique stay within walking distance of the Ubud core.",
+    best_for: ["boutique", "design", "couples", "central_ubud"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://bisma-eight.com/", "https://bisma-eight.com/contact"],
+    websiteUrl: "https://bisma-eight.com/",
+    tags: ["boutique_hotel", "bisma", "design"],
+    accommodation_editorial: accommodationEditorial(
+      "https://bisma-eight.com/",
+      "boutique_hotel",
+    ),
+    accommodation: { accommodationType: "boutique_hotel" },
+  },
+  {
+    external_key: "ubud-chapung-sebali",
+    name: "Chapung Sebali Resort",
+    name_ar: "تشابونغ سيبالي ريزورت",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Sebali / Keliki / Tegallalang",
+    area_note:
+      "Jl. Raya Sebali, Banjar Sebali, Desa Keliki — brand places it about ten minutes north of Ubud town",
+    description:
+      "Boutique hillside resort above the Wos / Osh river valley in Sebali (Keliki). Brand markets suites and private-pool villas; Helm has not verified rates, pool distinctions, or amenity inventories.",
+    why_visit: "Jungle-valley resort base north of Ubud with a distinct Sebali setting.",
+    best_for: ["resort", "jungle", "couples", "upscale"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://chapung.com/", "https://chapung.com/contact-us/"],
+    websiteUrl: "https://chapung.com/",
+    tags: ["resort", "sebali", "tegallalang", "jungle"],
+    accommodation_editorial: accommodationEditorial("https://chapung.com/", "resort"),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "ubud-alila-ubud",
+    name: "Alila Ubud",
+    name_ar: "أليلا أوبود",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Payangan",
+    area_note:
+      "Desa Melinggih Kelod, Payangan — hillside above the Ayung River (outside Ubud town centre)",
+    description:
+      "Alila branded hillside resort overlooking the Ayung River valley in Payangan. Brand pages describe rooms and villas with jungle / plantation views; Helm has not verified rates or amenity claims.",
+    why_visit: "River-valley luxury resort for a quieter Ubud-area base.",
+    best_for: ["luxury", "resort", "river_valley", "couples"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: ["https://www.alilahotels.com/ubud"],
+    websiteUrl: "https://www.alilahotels.com/ubud",
+    tags: ["resort", "alila", "payangan", "luxury"],
+    accommodation_editorial: accommodationEditorial(
+      "https://www.alilahotels.com/ubud",
+      "resort",
+    ),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "ubud-como-uma-ubud",
+    name: "COMO Uma Ubud",
+    name_ar: "كومو أوما أوبود",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Kedewatan / Sanggingan",
+    area_note:
+      "Jl. Raya Sanggingan, Banjar Lungsiakan, Kedewatan — overlooking Tjampuhan Valley / River Oos",
+    description:
+      "COMO branded intimate resort with rooms, suites, and villas near Ubud’s cultural core. Brand marketing references private-pool villas among the mix; Helm has not verified unit-level amenities or rates.",
+    why_visit: "Compact luxury resort with valley access minutes from central Ubud.",
+    best_for: ["luxury", "resort", "wellness", "couples"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://www.comohotels.com/bali/como-uma-ubud",
+      "https://www.comohotels.com/bali/como-uma-ubud/about",
+    ],
+    websiteUrl: "https://www.comohotels.com/bali/como-uma-ubud",
+    tags: ["resort", "como", "kedewatan", "luxury"],
+    accommodation_editorial: accommodationEditorial(
+      "https://www.comohotels.com/bali/como-uma-ubud",
+      "resort",
+    ),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "ubud-kayon-jungle-resort",
+    name: "The Kayon Jungle Resort",
+    name_ar: "ذا كايون جانغل ريزورت",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Bresela / Payangan",
+    area_note:
+      "Banjar Bresela, Desa Bresela — brand places the resort ~25 minutes from central Ubud",
+    description:
+      "Kayon collection jungle resort with suites and private-pool villas marketed on the official site. Helm has not verified rates, pool distinctions, or amenity inventories.",
+    why_visit: "Secluded jungle resort for a quieter Ubud-area escape.",
+    best_for: ["luxury", "jungle", "resort", "couples"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://thekayonjungleresort.com/",
+      "https://thekayonjungleresort.com/the-resort/",
+      "https://thekayonjungleresort.com/contact/",
+    ],
+    websiteUrl: "https://thekayonjungleresort.com/",
+    tags: ["resort", "kayon", "bresela", "jungle", "luxury"],
+    accommodation_editorial: accommodationEditorial(
+      "https://thekayonjungleresort.com/",
+      "resort",
+    ),
+    accommodation: { accommodationType: "resort" },
+  },
+  {
+    external_key: "ubud-capella-ubud",
+    name: "Capella Ubud, Bali",
+    name_ar: "كابيلا أوبود، بالي",
+    category: "accommodation",
+    subcategory: "resort",
+    area: "Keliki / Tegallalang",
+    area_note:
+      "Jl. Raya Dalem, Banjar Triwangsa, Desa Keliki, Tegallalang — jungle tented camp north of Ubud town",
+    description:
+      "Capella Hotels tented-camp resort in Keliki designed by Bill Bensley (official brand name: Capella Ubud, Bali). Brand presents unique tented accommodations in rainforest setting; Helm has not verified rates, occupancy, or amenity claims.",
+    why_visit: "Distinctive luxury tented-camp stay in the Ubud jungle hinterland.",
+    best_for: ["luxury", "unique_stay", "couples", "design"],
+    rating: nullRating(),
+    price: unknownPrice("IDR"),
+    address: null,
+    coordinates: nullCoords(),
+    opening_hours: null,
+    visit_duration_minutes: null,
+    booking_recommended: null,
+    source_urls: [
+      "https://capellahotels.com/en/capella-ubud",
+      "https://capellahotels.com/en/capella-ubud/contact",
+    ],
+    websiteUrl: "https://capellahotels.com/en/capella-ubud",
+    tags: ["resort", "capella", "keliki", "luxury", "tented_camp"],
+    accommodation_editorial: accommodationEditorial(
+      "https://capellahotels.com/en/capella-ubud",
+      "resort",
+    ),
+    accommodation: { accommodationType: "resort" },
+  },
 ];
 
 function toEditorialRecord(p) {
-  return {
+  const record = {
     external_key: p.external_key,
     name: p.name,
     name_ar: p.name_ar,
@@ -906,6 +1265,10 @@ function toEditorialRecord(p) {
     last_verified_at: null,
     ranking_support: rankingSupport(p),
   };
+  if (p.accommodation_editorial) {
+    record.accommodation = p.accommodation_editorial;
+  }
+  return record;
 }
 
 function importExternalKey(editorialKey) {
@@ -926,32 +1289,48 @@ function ratingPlatform(rating) {
 }
 
 function sourceForPlace(p) {
-  const provider = p.rating.provider;
-  if (provider === "Tripadvisor") {
-    return {
-      sourceType: "maps_listing",
-      name: "Tripadvisor public listing snapshot",
+  if (p.source_urls?.length) {
+    return p.source_urls.map((url) => ({
+      sourceType: "official_website",
+      name: "Official / brand website reference",
+      url,
       notes:
-        "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+        "URL captured as a research lead only. Content not treated as Helm-verified inventory.",
       collectedAt: COMPILED_AT,
-    };
+    }));
+  }
+  const provider = p.rating?.provider;
+  if (provider === "Tripadvisor") {
+    return [
+      {
+        sourceType: "maps_listing",
+        name: "Tripadvisor public listing snapshot",
+        notes:
+          "Rating value and review_count preserved from supplied Tripadvisor snapshot. Not Helm-verified.",
+        collectedAt: COMPILED_AT,
+      },
+    ];
   }
   if (provider === "business_listing_snapshot") {
-    return {
-      sourceType: "other",
-      name: "Business listing snapshot",
-      notes:
-        "Rating value and review_count preserved from a business-listing snapshot. Not Helm-verified. Distinct from Tripadvisor.",
-      collectedAt: COMPILED_AT,
-    };
+    return [
+      {
+        sourceType: "other",
+        name: "Business listing snapshot",
+        notes:
+          "Rating value and review_count preserved from a business-listing snapshot. Not Helm-verified. Distinct from Tripadvisor.",
+        collectedAt: COMPILED_AT,
+      },
+    ];
   }
-  return {
-    sourceType: "manual_research",
-    name: "Helm curated Ubud dataset v1",
-    notes:
-      "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
-    collectedAt: COMPILED_AT,
-  };
+  return [
+    {
+      sourceType: "manual_research",
+      name: "Helm curated Ubud dataset v1",
+      notes:
+        "Rating value and review_count preserved from the curated brief; original listing provider was not specified. Not Helm-verified.",
+      collectedAt: COMPILED_AT,
+    },
+  ];
 }
 
 function toImportPlace(p) {
@@ -977,22 +1356,39 @@ function toImportPlace(p) {
       .join("\n\n"),
     tags: p.tags,
     updateIfExists: false,
-    sources: [sourceForPlace(p)],
-    rating: {
+    sources: sourceForPlace(p),
+  };
+
+  // Attach rating whenever value + review_count exist. Null provider maps to
+  // platform "provider_unspecified" (historical Ubud V1 behavior) — never invent
+  // Tripadvisor/business attribution, and never silently drop a known value.
+  if (
+    p.rating &&
+    typeof p.rating.value === "number" &&
+    typeof p.rating.review_count === "number"
+  ) {
+    place.rating = {
       value: p.rating.value,
-      scale: p.rating.scale,
+      scale: p.rating.scale ?? 5,
       reviewCount: p.rating.review_count,
       platform: ratingPlatform(p.rating),
       observedAt: COMPILED_AT,
-    },
-  };
+    };
+  }
 
-  if (level != null) place.priceLevel = level;
-  // Never set latitude/longitude/address/website when unknown.
+  // Accommodation: never invent priceLevel from null tiers.
+  if (p.category !== "accommodation" && level != null) place.priceLevel = level;
+  if (p.websiteUrl) place.websiteUrl = p.websiteUrl;
+  // Never set latitude/longitude/address when unknown.
   if (p.dining) place.dining = p.dining;
   if (p.attraction) place.attraction = p.attraction;
   if (p.activity) place.activity = p.activity;
   if (p.nightlife) place.nightlife = p.nightlife;
+  if (p.accommodation) {
+    place.accommodation = {
+      accommodationType: p.accommodation.accommodationType,
+    };
+  }
 
   return place;
 }
@@ -1048,6 +1444,7 @@ const editorial = {
     attraction: 3,
     activity: 4,
     bar_nightlife: 4,
+    accommodation: 10,
   },
   integrity: {
     do_not_invent: [
@@ -1061,10 +1458,19 @@ const editorial = {
       "booking_recommended",
       "typicalDurationMinutes",
       "bookingRequired",
+      "starRating",
+      "amenities",
+      "private_pool",
+      "shared_pool",
+      "accommodation_price_per_night",
     ],
     visit_duration_and_booking:
       "Null/omitted until verified. Curated estimates must not be written as facts.",
     activity_prices: "indicative_advertised_starting_price_only",
+    accommodation_import:
+      "Only accommodationType mapped; starRating and amenities omitted until verified",
+    accommodation_fields:
+      "Rich accommodation editorial block stays in source JSON; import only sends category accommodation + accommodation.accommodationType",
     lifecycle: "all_records_draft_curated_needs_verification",
   },
   places: PLACES.map(toEditorialRecord),
@@ -1084,9 +1490,14 @@ const editorial = {
       "data_status curated_needs_verification (import creates draft lifecycle)",
       "indicative activity USD amounts as first-class price rows",
       "visit_duration_minutes / booking_recommended when null (omitted from detail blocks)",
+      "accommodation starRating / amenities / price_per_night when unverified",
     ],
   },
 };
+
+if (PLACES.length !== 30) {
+  throw new Error(`Expected 30 places, got ${PLACES.length}`);
+}
 
 const importPayload = {
   formatVersion: "helm.catalog.import.v1",
