@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
+import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import '../discover/destination_list_item.dart';
@@ -18,8 +19,10 @@ class DiscoverTab extends StatefulWidget {
 enum _DiscoverLoadState { loading, empty, failure, success }
 
 class _DiscoverTabState extends State<DiscoverTab> {
-  late final HelmApiClient _client =
-      widget.apiClient ?? HelmApiClient(baseUrl: ApiConfig.apiBaseUrl);
+  /// True when this tab created the [http.Client] (not when [apiClient] injected).
+  late final bool _ownsHttpClient;
+  http.Client? _ownedHttp;
+  late final HelmApiClient _client;
 
   _DiscoverLoadState _state = _DiscoverLoadState.loading;
   List<DestinationListItem> _items = const [];
@@ -28,7 +31,27 @@ class _DiscoverTabState extends State<DiscoverTab> {
   @override
   void initState() {
     super.initState();
+    final injected = widget.apiClient;
+    if (injected != null) {
+      _ownsHttpClient = false;
+      _client = injected;
+    } else {
+      _ownsHttpClient = true;
+      _ownedHttp = http.Client();
+      _client = HelmApiClient(
+        baseUrl: ApiConfig.apiBaseUrl,
+        httpClient: _ownedHttp,
+      );
+    }
     _load();
+  }
+
+  @override
+  void dispose() {
+    if (_ownsHttpClient) {
+      _ownedHttp?.close();
+    }
+    super.dispose();
   }
 
   Future<void> _load() async {
