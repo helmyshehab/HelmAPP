@@ -1,6 +1,9 @@
 \set ON_ERROR_STOP on
 -- Soft-revoke administrator and confirm has_role / draft visibility drop.
 begin;
+-- Local Supabase: membership for SET ROLE; rolled back with this transaction.
+grant helm_authenticated to current_user;
+
 update identity.user_roles
   set revoked_at = now()
   where user_id = '77777777-7777-7777-7777-777777777777'
