@@ -246,34 +246,56 @@ test('customer profile bootstrap creates once, preserves on repeat, 401 without 
   } catch (err) {
     primaryError = err;
   } finally {
-    try {
+    const cleanupErrors: unknown[] = [];
+
+    const runCleanup = async (label: string, fn: () => Promise<void>) => {
+      try {
+        await fn();
+      } catch (err) {
+        cleanupErrors.push(
+          err instanceof Error ? err : new Error(`${label}: ${String(err)}`),
+        );
+      }
+    };
+
+    await runCleanup('fixtureSql.end', async () => {
+      if (fixtureSql) await fixtureSql.end({ timeout: 5 });
+    });
+    await runCleanup('nestDrizzleClient.end', async () => {
+      if (nestDrizzleClient?.end) await nestDrizzleClient.end({ timeout: 5 });
+    });
+    await runCleanup('app.close', async () => {
       if (app) await app.close();
-    } catch {
-      /* ignore */
+    });
+    await runCleanup('drop disposable database', async () => {
+      // Terminate leftover sessions then drop disposable DB.
+      await adminSql.unsafe(
+        `select pg_terminate_backend(pid)
+         from pg_stat_activity
+         where datname = $1 and pid <> pg_backend_pid()`,
+        [disposableDb],
+      );
+      await adminSql.unsafe(`drop database if exists "${disposableDb}"`);
+    });
+    await runCleanup('adminSql.end', async () => {
+      await adminSql.end({ timeout: 5 });
+    });
+
+    if (primaryError && cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [primaryError, ...cleanupErrors],
+        `Test assertion failed and disposable database cleanup also failed (${cleanupErrors.length})`,
+      );
     }
-    try {
-      if (nestDrizzleClient?.end) await nestDrizzleClient.end({ timeout: 1 });
-    } catch {
-      /* ignore */
-    }
-    try {
-      if (fixtureSql) await fixtureSql.end({ timeout: 1 });
-    } catch {
-      /* ignore */
-    }
-    try {
-      await adminSql.unsafe(`drop database if exists "${disposableDb}" with (force)`);
-    } catch {
-      /* ignore */
-    }
-    try {
-      await adminSql.end({ timeout: 1 });
-    } catch {
-      /* ignore */
+    if (primaryError) throw primaryError;
+    if (cleanupErrors.length === 1) throw cleanupErrors[0];
+    if (cleanupErrors.length > 1) {
+      throw new AggregateError(
+        cleanupErrors,
+        `Disposable database cleanup failed (${cleanupErrors.length})`,
+      );
     }
   }
-
-  if (primaryError) throw primaryError;
 });
 
 test('concurrent bootstrap for a fresh subject creates exactly one account and profile', async (t) => {
