@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import '../discover/destination_list_item.dart';
+import '../discover/destination_overview_screen.dart';
 
-/// Discover tab — published destination list (list screen only).
+/// Discover tab — published destination list with overview navigation.
 class DiscoverTab extends StatefulWidget {
   const DiscoverTab({super.key, this.apiClient});
 
@@ -141,6 +142,16 @@ class _DiscoverTabState extends State<DiscoverTab> {
               key: Key('discover-item-${item.slug}'),
               title: Text(item.nameEn),
               subtitle: summary != null ? Text(summary) : null,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => DestinationOverviewScreen(
+                      slug: item.slug,
+                      apiClient: _client,
+                    ),
+                  ),
+                );
+              },
             );
           },
         );
