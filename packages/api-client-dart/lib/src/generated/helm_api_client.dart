@@ -69,6 +69,39 @@ class MeResponse {
       );
 }
 
+class BootstrapCustomerProfileResponse {
+  BootstrapCustomerProfileResponse({
+    required this.userId,
+    required this.accountStatus,
+    required this.preferredLocale,
+    required this.preferredCurrency,
+    required this.accountCreated,
+    required this.profileCreated,
+    this.email,
+    this.displayName,
+  });
+  final String userId;
+  final String? email;
+  final String accountStatus;
+  final String? displayName;
+  final String preferredLocale;
+  final String preferredCurrency;
+  final bool accountCreated;
+  final bool profileCreated;
+
+  factory BootstrapCustomerProfileResponse.fromJson(Map<String, dynamic> json) =>
+      BootstrapCustomerProfileResponse(
+        userId: json['userId'] as String,
+        email: json['email'] as String?,
+        accountStatus: json['accountStatus'] as String,
+        displayName: json['displayName'] as String?,
+        preferredLocale: json['preferredLocale'] as String,
+        preferredCurrency: json['preferredCurrency'] as String,
+        accountCreated: json['accountCreated'] as bool,
+        profileCreated: json['profileCreated'] as bool,
+      );
+}
+
 /// Generated Helm حلم API client (meta/identity + catalog discovery).
 class HelmApiClient {
   HelmApiClient({required this.baseUrl, http.Client? httpClient})
@@ -127,6 +160,21 @@ class HelmApiClient {
       throw Exception('getMe failed: ${res.statusCode}');
     }
     return MeResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<BootstrapCustomerProfileResponse> bootstrapCustomerProfile({
+    required String accessToken,
+  }) async {
+    final res = await _http.post(
+      _u('/v1/customer/profile/bootstrap'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('bootstrapCustomerProfile failed: ${res.statusCode}');
+    }
+    return BootstrapCustomerProfileResponse.fromJson(
+      jsonDecode(res.body) as Map<String, dynamic>,
+    );
   }
 
   Future<Map<String, dynamic>> listDestinations({String? country, String? q}) {

@@ -78,6 +78,35 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/customer/profile/bootstrap:
+    post:
+      operationId: bootstrapCustomerProfile
+      summary: Ensure Helm account and customer profile for the authenticated subject
+      description: |
+        Idempotent onboarding for a verified JWT subject.
+        Account id is taken only from the JWT `sub` (never looked up or linked by email).
+        Creates `identity.user_accounts` and `identity.customer_profiles` when missing.
+        Repeated and concurrent calls are safe: existing account status, profile fields,
+        and roles are preserved. If the JWT email is already used by another account,
+        the caller's account is still created/ensured with a null primary email (no email linking).
+      tags: [identity]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Account and customer profile ensured for the caller
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BootstrapCustomerProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -870,6 +899,46 @@ components:
           type: string
           description: database = identity.user_roles; fallback = fail-closed customer-only
           enum: [database, fallback]
+    BootstrapCustomerProfileResponse:
+      type: object
+      required:
+        - userId
+        - accountStatus
+        - preferredLocale
+        - preferredCurrency
+        - accountCreated
+        - profileCreated
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: Always equal to the verified JWT subject
+        email:
+          type: string
+          format: email
+          description: Account primary email when present (may be omitted on email collision)
+          nullable: true
+        accountStatus:
+          type: string
+          description: Preserved when the account already existed
+          example: active
+        displayName:
+          type: string
+          nullable: true
+        preferredLocale:
+          type: string
+          example: ar
+        preferredCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: EGP
+        accountCreated:
+          type: boolean
+          description: True when this call inserted the Helm account row
+        profileCreated:
+          type: boolean
+          description: True when this call inserted the customer profile row
     AppRole:
       type: string
       enum: [customer, operator, administrator, super-administrator]
@@ -1969,7 +2038,7 @@ tags:
   - name: meta
     description: Health, readiness, and service metadata
   - name: identity
-    description: Authenticated identity foundation (no product profile CMS yet)
+    description: Authenticated identity foundation and customer account/profile bootstrap
   - name: catalog
     description: Public travel catalog discovery (published entries only)
   - name: geo

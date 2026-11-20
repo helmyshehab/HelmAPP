@@ -73,6 +73,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/customer/profile/bootstrap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ensure Helm account and customer profile for the authenticated subject
+         * @description Idempotent onboarding for a verified JWT subject.
+         *     Account id is taken only from the JWT `sub` (never looked up or linked by email).
+         *     Creates `identity.user_accounts` and `identity.customer_profiles` when missing.
+         *     Repeated and concurrent calls are safe: existing account status, profile fields,
+         *     and roles are preserved. If the JWT email is already used by another account,
+         *     the caller's account is still created/ensured with a null primary email (no email linking).
+         */
+        post: operations["bootstrapCustomerProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -483,6 +508,32 @@ export interface components {
              * @enum {string}
              */
             rolesSource: "database" | "fallback";
+        };
+        BootstrapCustomerProfileResponse: {
+            /**
+             * Format: uuid
+             * @description Always equal to the verified JWT subject
+             */
+            userId: string;
+            /**
+             * Format: email
+             * @description Account primary email when present (may be omitted on email collision)
+             */
+            email?: string | null;
+            /**
+             * @description Preserved when the account already existed
+             * @example active
+             */
+            accountStatus: string;
+            displayName?: string | null;
+            /** @example ar */
+            preferredLocale: string;
+            /** @example EGP */
+            preferredCurrency: string;
+            /** @description True when this call inserted the Helm account row */
+            accountCreated: boolean;
+            /** @description True when this call inserted the customer profile row */
+            profileCreated: boolean;
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
@@ -1152,6 +1203,36 @@ export interface operations {
             };
             /** @description Missing or invalid access token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    bootstrapCustomerProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account and customer profile ensured for the caller */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BootstrapCustomerProfileResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Database is not configured or unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

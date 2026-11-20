@@ -189,6 +189,24 @@ test('get me use case maps principal', () => {
   });
 });
 
+test('get me use case stays read-only (no repository / async side effects)', () => {
+  const useCase = new GetMeUseCase();
+  assert.equal(useCase.execute.length, 1);
+  const result = useCase.execute({
+    userId: 'u-readonly',
+    roles: ['customer'],
+    rolesSource: 'fallback',
+  });
+  assert.ok(result && typeof result === 'object');
+  assert.equal((result as { then?: unknown }).then, undefined);
+  assert.deepEqual(result, {
+    userId: 'u-readonly',
+    email: undefined,
+    roles: ['customer'],
+    rolesSource: 'fallback',
+  });
+});
+
 test('role helper recognizes staff', () => {
   assert.equal(hasAnyRole(['customer'], ['administrator']), false);
   assert.equal(hasAnyRole(['customer', 'administrator'], ['administrator']), true);
