@@ -171,3 +171,16 @@ jobs:
           grep -E '^# pass 2$' "$out"
           grep -E '^# fail 0$' "$out"
           grep -E '^# skipped 0$' "$out"
+      - name: Trip drafts Nest HTTP (must not skip)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          SUPABASE_JWT_SECRET: test-only-helm-jwt-secret-min-32-chars!!
+        run: |
+          set -euo pipefail
+          out="$(mktemp)"
+          pnpm --filter @helm/helm-backend exec node --import tsx --test \
+            test/trip-drafts-api.test.ts | tee "$out"
+          grep -E '^# tests 1$' "$out"
+          grep -E '^# pass 1$' "$out"
+          grep -E '^# fail 0$' "$out"
+          grep -E '^# skipped 0$' "$out"

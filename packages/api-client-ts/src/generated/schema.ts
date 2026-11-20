@@ -98,6 +98,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/trips/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the caller's private trip drafts
+         * @description Returns only drafts owned by the verified JWT subject.
+         *     Status is always `draft` (server-controlled).
+         */
+        get: operations["listTripDrafts"];
+        put?: never;
+        /**
+         * Create a private trip draft for the authenticated subject
+         * @description Ownership is taken only from the verified JWT `sub`.
+         *     `destinationId` and `title` may be null or omitted.
+         *     `constraints` must be a JSON object when provided (defaults to `{}`).
+         *     Status is always set to `draft` by the server.
+         */
+        post: operations["createTripDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/trips/drafts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get one of the caller's trip drafts by id
+         * @description Returns 404 when the draft is missing or owned by another customer.
+         */
+        get: operations["getTripDraft"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Partially update one of the caller's trip drafts
+         * @description Omitted fields are preserved. Explicit null clears nullable fields
+         *     (`destinationId`, `title`). `constraints` must be a JSON object when
+         *     provided. Status remains server-controlled as `draft`.
+         *     Returns 404 when the draft is missing or owned by another customer.
+         */
+        patch: operations["updateTripDraft"];
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -534,6 +589,52 @@ export interface components {
             accountCreated: boolean;
             /** @description True when this call inserted the customer profile row */
             profileCreated: boolean;
+        };
+        /**
+         * @description Server-controlled trip draft lifecycle (Draft-only in v1)
+         * @enum {string}
+         */
+        TripDraftStatus: "draft";
+        TripDraft: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            destinationId: string | null;
+            title: string | null;
+            /** @description Opaque JSON object (dates, budget, party, pace, interests, …) */
+            constraints: {
+                [key: string]: unknown;
+            };
+            status: components["schemas"]["TripDraftStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TripDraftListResponse: {
+            items: components["schemas"]["TripDraft"][];
+        };
+        CreateTripDraftRequest: {
+            /** Format: uuid */
+            destinationId?: string | null;
+            title?: string | null;
+            /** @description Must be a JSON object; defaults to `{}` when omitted */
+            constraints?: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Partial update. Omitted fields are preserved.
+         *     Explicit null clears `destinationId` or `title`.
+         */
+        UpdateTripDraftRequest: {
+            /** Format: uuid */
+            destinationId?: string | null;
+            title?: string | null;
+            /** @description Must be a JSON object when provided */
+            constraints?: {
+                [key: string]: unknown;
+            };
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
@@ -1102,6 +1203,7 @@ export interface components {
     parameters: {
         Slug: string;
         DestinationId: string;
+        TripDraftId: string;
         CountryFilter: string;
         FeaturedFilter: "true" | "false";
         SearchQuery: string;
@@ -1231,6 +1333,142 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+            /** @description Database is not configured or unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listTripDrafts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Owner-scoped trip draft list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description Database is not configured or unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    createTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTripDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Trip draft created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            /** @description Database is not configured or unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trip draft detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description Database is not configured or unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    updateTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTripDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated trip draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
             /** @description Database is not configured or unavailable */
             503: {
                 headers: {

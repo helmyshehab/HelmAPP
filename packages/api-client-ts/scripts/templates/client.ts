@@ -12,6 +12,10 @@ export type MetaResponse = components["schemas"]["MetaResponse"];
 export type MeResponse = components["schemas"]["MeResponse"];
 export type BootstrapCustomerProfileResponse =
   components["schemas"]["BootstrapCustomerProfileResponse"];
+export type TripDraft = components["schemas"]["TripDraft"];
+export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
+export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
+export type UpdateTripDraftRequest = components["schemas"]["UpdateTripDraftRequest"];
 export type DestinationListResponse = components["schemas"]["DestinationListResponse"];
 export type DestinationPublic = components["schemas"]["DestinationPublic"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
@@ -112,6 +116,49 @@ export function createHelmClient(options: HelmClientOptions) {
       });
       if (!res.ok) throw new Error(`bootstrapCustomerProfile failed: ${res.status}`);
       return (await res.json()) as BootstrapCustomerProfileResponse;
+    },
+    async listTripDrafts(accessToken?: string): Promise<TripDraftListResponse> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("listTripDrafts requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/drafts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`listTripDrafts failed: ${res.status}`);
+      return (await res.json()) as TripDraftListResponse;
+    },
+    async createTripDraft(
+      body: CreateTripDraftRequest,
+      accessToken?: string,
+    ): Promise<TripDraft> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("createTripDraft requires an access token");
+      return sendJson<TripDraft>("/v1/trips/drafts", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+    },
+    async getTripDraft(id: string, accessToken?: string): Promise<TripDraft> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("getTripDraft requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/drafts/${encodeURIComponent(id)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`getTripDraft failed: ${res.status}`);
+      return (await res.json()) as TripDraft;
+    },
+    async updateTripDraft(
+      id: string,
+      body: UpdateTripDraftRequest,
+      accessToken?: string,
+    ): Promise<TripDraft> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("updateTripDraft requires an access token");
+      return sendJson<TripDraft>(`/v1/trips/drafts/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
     },
     async listDestinations(params?: {
       country?: string;
