@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TripDraftsController } from './api/trip-drafts.controller';
+import { TripDraftsService } from './application/trip-drafts.service';
+import { TripDraftsRepository } from './infrastructure/trip-drafts.repository';
 
 /**
- * TripBuilderModule — domain boundary stub (Step 2).
- * No product feature implementation yet.
+ * TripBuilderModule — private trip drafts (owner-scoped API).
  */
 @Module({
-  providers: [],
-  exports: [],
+  controllers: [TripDraftsController],
+  providers: [TripDraftsRepository, TripDraftsService],
+  exports: [TripDraftsService],
 })
 export class TripBuilderModule {}

@@ -102,7 +102,50 @@ class BootstrapCustomerProfileResponse {
       );
 }
 
-/// Generated Helm حلم API client (meta/identity + catalog discovery).
+class TripDraft {
+  TripDraft({
+    required this.id,
+    required this.constraints,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+    this.destinationId,
+    this.title,
+  });
+  final String id;
+  final String? destinationId;
+  final String? title;
+  final Map<String, dynamic> constraints;
+  final String status;
+  final String createdAt;
+  final String updatedAt;
+
+  factory TripDraft.fromJson(Map<String, dynamic> json) => TripDraft(
+        id: json['id'] as String,
+        destinationId: json['destinationId'] as String?,
+        title: json['title'] as String?,
+        constraints: Map<String, dynamic>.from(json['constraints'] as Map),
+        status: json['status'] as String,
+        createdAt: json['createdAt'] as String,
+        updatedAt: json['updatedAt'] as String,
+      );
+}
+
+class TripDraftListResponse {
+  TripDraftListResponse({required this.items});
+  final List<TripDraft> items;
+
+  factory TripDraftListResponse.fromJson(Map<String, dynamic> json) =>
+      TripDraftListResponse(
+        items: (json['items'] as List<dynamic>)
+            .map((e) => TripDraft.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
+const Object _omit = Object();
+
+/// Generated Helm حلم API client (meta/identity + catalog discovery + trip drafts).
 class HelmApiClient {
   HelmApiClient({required this.baseUrl, http.Client? httpClient})
       : _http = httpClient ?? http.Client();
@@ -175,6 +218,80 @@ class HelmApiClient {
     return BootstrapCustomerProfileResponse.fromJson(
       jsonDecode(res.body) as Map<String, dynamic>,
     );
+  }
+
+  Future<TripDraftListResponse> listTripDrafts({required String accessToken}) async {
+    final res = await _http.get(
+      _u('/v1/trips/drafts'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('listTripDrafts failed: ${res.statusCode}');
+    }
+    return TripDraftListResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripDraft> createTripDraft({
+    required String accessToken,
+    String? destinationId,
+    String? title,
+    Map<String, dynamic>? constraints,
+  }) async {
+    final body = <String, dynamic>{};
+    if (destinationId != null) body['destinationId'] = destinationId;
+    if (title != null) body['title'] = title;
+    if (constraints != null) body['constraints'] = constraints;
+    final res = await _http.post(
+      _u('/v1/trips/drafts'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+    if (res.statusCode != 201) {
+      throw Exception('createTripDraft failed: ${res.statusCode}');
+    }
+    return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripDraft> getTripDraft({
+    required String accessToken,
+    required String id,
+  }) async {
+    final res = await _http.get(
+      _u('/v1/trips/drafts/${Uri.encodeComponent(id)}'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('getTripDraft failed: ${res.statusCode}');
+    }
+    return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripDraft> updateTripDraft({
+    required String accessToken,
+    required String id,
+    Object? destinationId = _omit,
+    Object? title = _omit,
+    Map<String, dynamic>? constraints,
+  }) async {
+    final body = <String, dynamic>{};
+    if (!identical(destinationId, _omit)) body['destinationId'] = destinationId;
+    if (!identical(title, _omit)) body['title'] = title;
+    if (constraints != null) body['constraints'] = constraints;
+    final res = await _http.patch(
+      _u('/v1/trips/drafts/${Uri.encodeComponent(id)}'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+    if (res.statusCode != 200) {
+      throw Exception('updateTripDraft failed: ${res.statusCode}');
+    }
+    return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<Map<String, dynamic>> listDestinations({String? country, String? q}) {

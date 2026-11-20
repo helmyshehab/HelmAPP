@@ -84,6 +84,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/trips/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the caller's private trip drafts */
+        get: operations["listTripDrafts"];
+        put?: never;
+        /** Create a private trip draft for the authenticated subject */
+        post: operations["createTripDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/trips/drafts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one of the caller's trip drafts by id */
+        get: operations["getTripDraft"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Partially update one of the caller's trip drafts */
+        patch: operations["updateTripDraft"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -138,6 +174,52 @@ export interface components {
             accountCreated: boolean;
             profileCreated: boolean;
         };
+        /**
+         * @description Server-controlled trip draft lifecycle (Draft-only in v1)
+         * @enum {string}
+         */
+        TripDraftStatus: "draft";
+        TripDraft: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            destinationId: string | null;
+            title: string | null;
+            /** @description Opaque JSON object (dates, budget, party, pace, interests, …) */
+            constraints: {
+                [key: string]: unknown;
+            };
+            status: components["schemas"]["TripDraftStatus"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TripDraftListResponse: {
+            items: components["schemas"]["TripDraft"][];
+        };
+        CreateTripDraftRequest: {
+            /** Format: uuid */
+            destinationId?: string | null;
+            title?: string | null;
+            /** @description Must be a JSON object; defaults to `{}` when omitted */
+            constraints?: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * @description Partial update. Omitted fields are preserved.
+         *     Explicit null clears `destinationId` or `title`.
+         */
+        UpdateTripDraftRequest: {
+            /** Format: uuid */
+            destinationId?: string | null;
+            title?: string | null;
+            /** @description Must be a JSON object when provided */
+            constraints?: {
+                [key: string]: unknown;
+            };
+        };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
         /** @description RFC 7807 problem+json */
@@ -152,7 +234,10 @@ export interface components {
         };
     };
     responses: never;
-    parameters: never;
+    parameters: {
+        /** Format: uuid */
+        TripDraftId: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -277,6 +362,152 @@ export interface operations {
             };
             /** @description Missing or invalid access token */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listTripDrafts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Owner-scoped trip draft list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftListResponse"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    createTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTripDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Trip draft created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trip draft detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Trip draft missing or not owned by caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    updateTripDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTripDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated trip draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Trip draft missing or not owned by caller */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

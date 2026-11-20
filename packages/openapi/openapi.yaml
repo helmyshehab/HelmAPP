@@ -107,6 +107,131 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/trips/drafts:
+    get:
+      operationId: listTripDrafts
+      summary: List the caller's private trip drafts
+      description: |
+        Returns only drafts owned by the verified JWT subject.
+        Status is always `draft` (server-controlled).
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Owner-scoped trip draft list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraftListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    post:
+      operationId: createTripDraft
+      summary: Create a private trip draft for the authenticated subject
+      description: |
+        Ownership is taken only from the verified JWT `sub`.
+        `destinationId` and `title` may be null or omitted.
+        `constraints` must be a JSON object when provided (defaults to `{}`).
+        Status is always set to `draft` by the server.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTripDraftRequest"
+      responses:
+        "201":
+          description: Trip draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraft"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /v1/trips/drafts/{id}:
+    get:
+      operationId: getTripDraft
+      summary: Get one of the caller's trip drafts by id
+      description: |
+        Returns 404 when the draft is missing or owned by another customer.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TripDraftId"
+      responses:
+        "200":
+          description: Trip draft detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraft"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    patch:
+      operationId: updateTripDraft
+      summary: Partially update one of the caller's trip drafts
+      description: |
+        Omitted fields are preserved. Explicit null clears nullable fields
+        (`destinationId`, `title`). `constraints` must be a JSON object when
+        provided. Status remains server-controlled as `draft`.
+        Returns 404 when the draft is missing or owned by another customer.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TripDraftId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTripDraftRequest"
+      responses:
+        "200":
+          description: Updated trip draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraft"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -765,6 +890,13 @@ components:
       schema:
         type: string
         format: uuid
+    TripDraftId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     CountryFilter:
       name: country
       in: query
@@ -939,6 +1071,86 @@ components:
         profileCreated:
           type: boolean
           description: True when this call inserted the customer profile row
+    TripDraftStatus:
+      type: string
+      description: Server-controlled trip draft lifecycle (Draft-only in v1)
+      enum: [draft]
+    TripDraft:
+      type: object
+      required:
+        - id
+        - destinationId
+        - title
+        - constraints
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        destinationId:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        constraints:
+          type: object
+          additionalProperties: true
+          description: Opaque JSON object (dates, budget, party, pace, interests, …)
+        status:
+          $ref: "#/components/schemas/TripDraftStatus"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TripDraftListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TripDraft"
+    CreateTripDraftRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        destinationId:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        constraints:
+          type: object
+          additionalProperties: true
+          description: Must be a JSON object; defaults to `{}` when omitted
+    UpdateTripDraftRequest:
+      type: object
+      description: |
+        Partial update. Omitted fields are preserved.
+        Explicit null clears `destinationId` or `title`.
+      additionalProperties: false
+      properties:
+        destinationId:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        constraints:
+          type: object
+          additionalProperties: true
+          description: Must be a JSON object when provided
     AppRole:
       type: string
       enum: [customer, operator, administrator, super-administrator]
@@ -2039,6 +2251,8 @@ tags:
     description: Health, readiness, and service metadata
   - name: identity
     description: Authenticated identity foundation and customer account/profile bootstrap
+  - name: trips
+    description: Authenticated private trip drafts (owner-scoped)
   - name: catalog
     description: Public travel catalog discovery (published entries only)
   - name: geo
