@@ -1,20 +1,26 @@
 # helm_mobile
 
-Flutter shell for **Helm حلم**.
+Flutter app for **Helm حلم**.
 
-Step 2: app title branding + five empty tab destinations only. No product features.
+Five-tab shell (Discover / Build / Packages / Trips / Profile). Discover loads
+published destinations via the generated `helm_api_client` (`listDestinations`).
+
 Uses `helm_api_client` from `packages/api-client-dart` (generated — do not hand-edit).
 
-## Platform notes (Step 2)
+## API base URL
 
-Android/iOS shells include Manifest, MainActivity, Gradle stubs, and AppDelegate.
-After installing the Flutter SDK, run once from this directory if tooling asks to regenerate platform projects:
+Configurable at launch:
 
 ```bash
-flutter create --project-name helm_mobile --org app.helm .
+flutter run --dart-define=HELM_API_BASE_URL=https://helm-staging-api-ujqa.onrender.com
+```
+
+Default (when unset): `https://helm-staging-api-ujqa.onrender.com`.
+
+## Develop
+
+```bash
 flutter pub get
 flutter analyze
 flutter test
 ```
-
-Do not implement product features in Step 2.
