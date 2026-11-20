@@ -65,6 +65,8 @@ test('operator HTTP 403 on published destination mutations via Nest guards', asy
   let disposableUrl = '';
   let app: { getUrl(): Promise<string>; close(): Promise<void>; get<T>(token: unknown): T } | undefined;
   let fixtureSql: ReturnType<typeof postgres> | undefined;
+  let nestDrizzleClient: { end: (opts?: object) => Promise<void> } | undefined;
+  let primaryError: unknown;
 
   try {
     await adminSql.unsafe(`create database "${disposableDb}"`);
@@ -299,39 +301,64 @@ test('operator HTTP 403 on published destination mutations via Nest guards', asy
 
     // Close Nest drizzle pool so the process can exit and the DB can be dropped.
     const drizzleDb = nestApp.get(DRIZZLE) as { $client?: { end: (opts?: object) => Promise<void> } };
-    if (drizzleDb?.$client?.end) {
-      await drizzleDb.$client.end({ timeout: 5 });
+    nestDrizzleClient = drizzleDb?.$client;
+    if (nestDrizzleClient?.end) {
+      await nestDrizzleClient.end({ timeout: 5 });
+      nestDrizzleClient = undefined;
     }
     await nestApp.close();
     app = undefined;
+  } catch (err) {
+    primaryError = err;
   } finally {
-    if (fixtureSql) {
+    const cleanupErrors: unknown[] = [];
+
+    const runCleanup = async (label: string, fn: () => Promise<void>) => {
       try {
-        await fixtureSql.end({ timeout: 5 });
-      } catch {
-        /* ignore */
+        await fn();
+      } catch (err) {
+        cleanupErrors.push(
+          err instanceof Error ? err : new Error(`${label}: ${String(err)}`),
+        );
       }
+    };
+
+    await runCleanup('fixtureSql.end', async () => {
+      if (fixtureSql) await fixtureSql.end({ timeout: 5 });
+    });
+    await runCleanup('nestDrizzleClient.end', async () => {
+      if (nestDrizzleClient?.end) await nestDrizzleClient.end({ timeout: 5 });
+    });
+    await runCleanup('app.close', async () => {
+      if (app) await app.close();
+    });
+    await runCleanup('drop disposable database', async () => {
+      // Terminate leftover sessions then drop disposable DB.
+      await adminSql.unsafe(
+        `select pg_terminate_backend(pid)
+         from pg_stat_activity
+         where datname = $1 and pid <> pg_backend_pid()`,
+        [disposableDb],
+      );
+      await adminSql.unsafe(`drop database if exists "${disposableDb}"`);
+    });
+    await runCleanup('adminSql.end', async () => {
+      await adminSql.end({ timeout: 5 });
+    });
+
+    if (primaryError && cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [primaryError, ...cleanupErrors],
+        `Test assertion failed and disposable database cleanup also failed (${cleanupErrors.length})`,
+      );
     }
-    if (app) {
-      try {
-        await app.close();
-      } catch {
-        /* ignore */
-      }
+    if (primaryError) throw primaryError;
+    if (cleanupErrors.length === 1) throw cleanupErrors[0];
+    if (cleanupErrors.length > 1) {
+      throw new AggregateError(
+        cleanupErrors,
+        `Disposable database cleanup failed (${cleanupErrors.length})`,
+      );
     }
-    if (disposableDb) {
-      try {
-        // Terminate leftover sessions then drop disposable DB.
-        await adminSql.unsafe(`
-          select pg_terminate_backend(pid)
-          from pg_stat_activity
-          where datname = '${disposableDb}' and pid <> pg_backend_pid()
-        `);
-        await adminSql.unsafe(`drop database if exists "${disposableDb}"`);
-      } catch {
-        /* ignore */
-      }
-    }
-    await adminSql.end({ timeout: 5 });
   }
 });
