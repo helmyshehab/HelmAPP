@@ -137,3 +137,24 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
         run: ./scripts/test-db-integrity.sh
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Catalog D9 operator authz Nest HTTP (must not skip)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          SUPABASE_JWT_SECRET: test-only-helm-jwt-secret-min-32-chars!!
+        run: |
+          set -euo pipefail
+          out="$(mktemp)"
+          pnpm --filter @helm/helm-backend exec node --import tsx --test \
+            test/catalog-d9-authz-integration.test.ts | tee "$out"
+          grep -E '^# tests 1$' "$out"
+          grep -E '^# pass 1$' "$out"
+          grep -E '^# fail 0$' "$out"
+          grep -E '^# skipped 0$' "$out"
