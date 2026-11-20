@@ -84,6 +84,13 @@ void main() {
         isFalse);
   });
 
+  http.Response emptyPlaces() => _jsonOk({
+        'items': [],
+        'total': 0,
+        'limit': 20,
+        'offset': 0,
+      });
+
   testWidgets('tapping a destination row opens overview and loads by slug',
       (tester) async {
     final gate = Completer<void>();
@@ -97,6 +104,9 @@ void main() {
           'limit': 20,
           'offset': 0,
         });
+      }
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
       }
       expect(request.url.path, '/v1/destinations/ubud');
       await gate.future;
@@ -143,6 +153,9 @@ void main() {
           'offset': 0,
         });
       }
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
+      }
       return http.Response('{"error":"not found"}', 404);
     });
 
@@ -171,6 +184,9 @@ void main() {
           'limit': 20,
           'offset': 0,
         });
+      }
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
       }
       detailCalls += 1;
       if (detailCalls == 1) {
@@ -213,6 +229,9 @@ void main() {
           'limit': 20,
           'offset': 0,
         });
+      }
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
       }
       return _jsonOk(
         _detailPayload(
