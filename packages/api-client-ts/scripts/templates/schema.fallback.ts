@@ -67,6 +67,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/customer/profile/bootstrap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ensure Helm account and customer profile for the authenticated subject */
+        post: operations["bootstrapCustomerProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -106,6 +123,20 @@ export interface components {
             /** Format: email */
             email?: string;
             roles: components["schemas"]["AppRole"][];
+            /** @enum {string} */
+            rolesSource: "database" | "fallback";
+        };
+        BootstrapCustomerProfileResponse: {
+            /** Format: uuid */
+            userId: string;
+            /** Format: email */
+            email?: string | null;
+            accountStatus: string;
+            displayName?: string | null;
+            preferredLocale: string;
+            preferredCurrency: string;
+            accountCreated: boolean;
+            profileCreated: boolean;
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
@@ -213,6 +244,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    bootstrapCustomerProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account and customer profile ensured for the caller */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BootstrapCustomerProfileResponse"];
                 };
             };
             /** @description Missing or invalid access token */

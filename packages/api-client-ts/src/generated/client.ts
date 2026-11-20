@@ -10,6 +10,8 @@ export type HealthResponse = components["schemas"]["HealthResponse"];
 export type ReadyResponse = components["schemas"]["ReadyResponse"];
 export type MetaResponse = components["schemas"]["MetaResponse"];
 export type MeResponse = components["schemas"]["MeResponse"];
+export type BootstrapCustomerProfileResponse =
+  components["schemas"]["BootstrapCustomerProfileResponse"];
 export type DestinationListResponse = components["schemas"]["DestinationListResponse"];
 export type DestinationPublic = components["schemas"]["DestinationPublic"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
@@ -98,6 +100,18 @@ export function createHelmClient(options: HelmClientOptions) {
       });
       if (!res.ok) throw new Error(`getMe failed: ${res.status}`);
       return (await res.json()) as MeResponse;
+    },
+    async bootstrapCustomerProfile(
+      accessToken?: string,
+    ): Promise<BootstrapCustomerProfileResponse> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("bootstrapCustomerProfile requires an access token");
+      const res = await fetchImpl(`${base}/v1/customer/profile/bootstrap`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`bootstrapCustomerProfile failed: ${res.status}`);
+      return (await res.json()) as BootstrapCustomerProfileResponse;
     },
     async listDestinations(params?: {
       country?: string;
