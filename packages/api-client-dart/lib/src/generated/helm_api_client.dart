@@ -140,10 +140,16 @@ class HelmApiClient {
   Future<Map<String, dynamic>> getDestination(String slug) =>
       _getJson('/v1/destinations/${Uri.encodeComponent(slug)}');
 
-  Future<Map<String, dynamic>> listCatalogPlaces({String? category, String? country, String? q}) {
+  Future<Map<String, dynamic>> listCatalogPlaces({
+    String? category,
+    String? country,
+    String? destinationSlug,
+    String? q,
+  }) {
     final params = <String, String>{};
     if (category != null) params['category'] = category;
     if (country != null) params['country'] = country;
+    if (destinationSlug != null) params['destinationSlug'] = destinationSlug;
     if (q != null) params['q'] = q;
     final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
     return _getJson('/v1/catalog/places$query');
