@@ -27,7 +27,37 @@ void main() {
       expect(captured.queryParameters['destinationSlug'], 'ubud');
     });
 
-    test('omits destinationSlug from the query string when not provided', () async {
+    test(
+        'sends destinationSlug, limit, and offset together (including offset 0)',
+        () async {
+      late Uri captured;
+      final mock = MockClient((request) async {
+        captured = request.url;
+        return http.Response(
+          '{"items":[],"total":0}',
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+      final client = HelmApiClient(
+        baseUrl: 'https://api.example.com',
+        httpClient: mock,
+      );
+
+      await client.listCatalogPlaces(
+        destinationSlug: 'ubud',
+        limit: 10,
+        offset: 0,
+      );
+
+      expect(captured.path, '/v1/catalog/places');
+      expect(captured.queryParameters['destinationSlug'], 'ubud');
+      expect(captured.queryParameters['limit'], '10');
+      expect(captured.queryParameters['offset'], '0');
+    });
+
+    test('omits destinationSlug and pagination from the query when not provided',
+        () async {
       late Uri captured;
       final mock = MockClient((request) async {
         captured = request.url;
@@ -46,6 +76,8 @@ void main() {
 
       expect(captured.path, '/v1/catalog/places');
       expect(captured.queryParameters.containsKey('destinationSlug'), isFalse);
+      expect(captured.queryParameters.containsKey('limit'), isFalse);
+      expect(captured.queryParameters.containsKey('offset'), isFalse);
       expect(captured.query, isEmpty);
     });
   });
