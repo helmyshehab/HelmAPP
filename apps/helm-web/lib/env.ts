@@ -6,6 +6,11 @@ export type PublicWebEnv = {
   apiBaseUrl: string;
 };
 
+export type TravelerAuthEnv = {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+};
+
 function requiredPublic(name: string, value: string | undefined): string {
   const trimmed = value?.trim();
   if (!trimmed) {
@@ -19,10 +24,9 @@ function requiredPublic(name: string, value: string | undefined): string {
   return trimmed;
 }
 
-/** Validate and return browser-safe public config (API base URL only). */
-export function getPublicWebEnv(
-  source: Record<string, string | undefined> = process.env,
-): PublicWebEnv {
+function assertNoServiceRolePublicValues(
+  source: Record<string, string | undefined>,
+): void {
   for (const [key, value] of Object.entries(source)) {
     if (!key.startsWith("NEXT_PUBLIC_")) continue;
     if (value && /service_role|SERVICE_ROLE/i.test(value)) {
@@ -31,6 +35,13 @@ export function getPublicWebEnv(
       );
     }
   }
+}
+
+/** Validate and return browser-safe public config (API base URL only). */
+export function getPublicWebEnv(
+  source: Record<string, string | undefined> = process.env,
+): PublicWebEnv {
+  assertNoServiceRolePublicValues(source);
 
   const apiBaseUrl = requiredPublic(
     "NEXT_PUBLIC_API_BASE_URL",
@@ -45,4 +56,32 @@ export function getPublicWebEnv(
   }
 
   return { apiBaseUrl };
+}
+
+/**
+ * Supabase anon config for traveler Build sign-in.
+ * Required only on Build/login paths — Discover stays API-only.
+ */
+export function getTravelerAuthEnv(
+  source: Record<string, string | undefined> = process.env,
+): TravelerAuthEnv {
+  assertNoServiceRolePublicValues(source);
+
+  const supabaseUrl = requiredPublic(
+    "NEXT_PUBLIC_SUPABASE_URL",
+    source.NEXT_PUBLIC_SUPABASE_URL,
+  );
+  const supabaseAnonKey = requiredPublic(
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    source.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+
+  try {
+    // eslint-disable-next-line no-new
+    new URL(supabaseUrl);
+  } catch {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL must be an absolute URL");
+  }
+
+  return { supabaseUrl, supabaseAnonKey };
 }

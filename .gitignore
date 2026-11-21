@@ -2,9 +2,8 @@
 node_modules/
 .pnpm-store/
 
-# Build
+# Build artifacts (do not ignore source routes named "build", e.g. helm-web /build)
 dist/
-build/
 .next/
 .turbo/
 *.tsbuildinfo
