@@ -15,14 +15,21 @@ import {
   formValuesFromDraft,
   type DraftFormValues,
 } from "@/lib/build/draft-form";
+import type { PublishedDestinationCatalog } from "@/lib/destinations/list-published";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { DestinationPicker } from "./DestinationPicker";
 
 type DraftEditorProps = {
   ownerUserId: string;
   draft: TripDraft;
+  destinationCatalog: PublishedDestinationCatalog;
 };
 
-export function DraftEditor({ ownerUserId, draft }: DraftEditorProps) {
+export function DraftEditor({
+  ownerUserId,
+  draft,
+  destinationCatalog,
+}: DraftEditorProps) {
   const router = useRouter();
   const [saved, setSaved] = useState(draft);
   const [form, setForm] = useState<DraftFormValues>(() =>
@@ -105,23 +112,15 @@ export function DraftEditor({ ownerUserId, draft }: DraftEditorProps) {
         />
       </label>
 
-      <label className="build-field">
-        <span>Destination id</span>
-        <input
-          className="build-input"
-          name="destinationId"
-          value={form.destinationId}
-          onChange={(e) =>
-            setForm((current) => ({
-              ...current,
-              destinationId: e.target.value,
-            }))
-          }
-          disabled={pending}
-          placeholder="UUID (optional)"
-          spellCheck={false}
-        />
-      </label>
+      <DestinationPicker
+        savedDestinationId={saved.destinationId}
+        value={form.destinationId}
+        catalog={destinationCatalog}
+        disabled={pending}
+        onChange={(destinationId) =>
+          setForm((current) => ({ ...current, destinationId }))
+        }
+      />
 
       <label className="build-field">
         <span>Constraints (JSON object)</span>
