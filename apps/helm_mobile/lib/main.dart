@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'tabs/discover_tab.dart';
+import 'theme/helm_theme.dart';
 
 void main() {
   runApp(const HelmApp());
@@ -14,10 +15,9 @@ class HelmApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Helm حلم',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B3D2E)),
-        useMaterial3: true,
-      ),
+      theme: HelmTheme.light(),
+      darkTheme: HelmTheme.dark(),
+      themeMode: ThemeMode.system,
       home: const HelmShell(),
     );
   }
