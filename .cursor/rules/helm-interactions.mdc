@@ -1,0 +1,56 @@
+---
+description: HELM discovery order, globe previews, motion, accessibility, and backend-backed interaction limits
+globs: apps/helm-web/**/*.tsx, apps/helm-web/**/*.css, apps/helm-web/next.config.ts, apps/helm-admin/**/*.tsx, apps/helm-admin/**/*.css, apps/helm-admin/next.config.ts, apps/helm_mobile/**/*.dart, apps/helm_mobile/pubspec.yaml
+alwaysApply: false
+---
+
+# HELM interactions
+
+## Traveler website
+
+Homepage order:
+
+1. Search
+2. Interactive globe
+3. Published destination browsing
+
+Search and browsing stay usable when the globe cannot load. Show published destinations only. Discovery is not booking availability.
+
+## Flutter discovery
+
+Discovery order:
+
+1. Immersive interactive globe
+2. Accessible discovery dock
+3. Search and destination browsing
+
+The dock is an explicit control to reach browsing. Essential actions have a visible control. Do not require a swipe for them.
+
+## Flutter navigation
+
+Approved future UI step, not part of rule setup: hide the four nonfunctional placeholder tabs — Build, Packages, Trips, and Profile — in a later, separately approved implementation. Leave them in place until that step is approved and started.
+
+New navigation exposes implemented functionality only. Add a destination when its backend-supported experience exists.
+
+## Globe previews
+
+- Open compact by default.
+- Provide explicit expand, collapse, and close controls.
+- Expanded content: a photograph only when a resolvable URL exists, a short description, at most three tags, and Explore.
+- Switching markers keeps the current compact or expanded state.
+- Closing resets the next preview to compact.
+- Keep a single bottom surface. Leave the globe operable.
+- Provide keyboard, screen-reader, and non-globe alternatives.
+- Resolve gesture conflicts on purpose. Do not stack competing gestures.
+
+## Motion
+
+Use short cinematic motion, restrained easing, and responsive transitions. Honor reduced motion on the web (`prefers-reduced-motion`) and in Flutter. Skip parallax, long animations, distracting hover effects, and transitions that delay navigation.
+
+## Accessibility
+
+Visible keyboard focus. Semantic controls. Readable contrast on the real surface. Touch targets at least 44px on traveler UI. Accessible names. Logical keyboard and reading order. RTL where Arabic is shown. Loading, error, empty, and unavailable states stay usable.
+
+## Backend integrity
+
+Expose a feature only when its API is implemented. Do not add placeholder navigation or fake product capability. Plot destination coordinates from public destination data. Do not assume destination media URLs, place coordinates, map-bounds search, booking, payments, or AI planning exist. Verify the contract first.
