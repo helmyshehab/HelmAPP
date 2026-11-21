@@ -8,65 +8,59 @@ import 'package:helm_mobile/tabs/discover_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-void main() {
-  testWidgets('Helm حلم shell renders brand title and five tabs', (tester) async {
-    final mock = MockClient((request) async {
-      return http.Response(
-        jsonEncode({'items': [], 'total': 0, 'limit': 20, 'offset': 0}),
-        200,
-        headers: {'content-type': 'application/json; charset=utf-8'},
-      );
-    });
-    final client = HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
+HelmApiClient _emptyClient() {
+  final mock = MockClient((request) async {
+    return http.Response(
+      jsonEncode({'items': [], 'total': 0, 'limit': 20, 'offset': 0}),
+      200,
+      headers: {'content-type': 'application/json; charset=utf-8'},
+    );
+  });
+  return HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
+}
 
+void main() {
+  testWidgets('HelmShell renders Discover without bottom navigation',
+      (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(title: const Text('Helm حلم')),
-          body: DiscoverTab(apiClient: client),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: 0,
-            onDestinationSelected: (_) {},
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.explore_outlined),
-                label: 'Discover',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.auto_awesome_outlined),
-                label: 'Build',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.card_travel_outlined),
-                label: 'Packages',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.map_outlined),
-                label: 'Trips',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                label: 'Profile',
-              ),
-            ],
-          ),
-        ),
-      ),
+      MaterialApp(home: HelmShell(apiClient: _emptyClient())),
     );
     await tester.pumpAndSettle();
 
     expect(find.text('Helm حلم'), findsOneWidget);
-    expect(find.text('Discover'), findsWidgets);
-    expect(find.text('Build'), findsOneWidget);
-    expect(find.text('Packages'), findsOneWidget);
-    expect(find.text('Trips'), findsOneWidget);
-    expect(find.text('Profile'), findsOneWidget);
+    expect(find.byType(DiscoverTab), findsOneWidget);
+    expect(find.byKey(const Key('discover-empty')), findsOneWidget);
+
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(BottomNavigationBar), findsNothing);
+    expect(find.text('Build'), findsNothing);
+    expect(find.text('Packages'), findsNothing);
+    expect(find.text('Trips'), findsNothing);
+    expect(find.text('Profile'), findsNothing);
   });
 
-  testWidgets('HelmApp still boots with default Discover client', (tester) async {
+  testWidgets('HelmShell keeps Discover above the bottom safe area',
+      (tester) async {
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.padding = const FakeViewPadding(top: 47, bottom: 34);
+    tester.view.viewPadding = const FakeViewPadding(top: 47, bottom: 34);
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      MaterialApp(home: HelmShell(apiClient: _emptyClient())),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.getBottomLeft(find.byType(DiscoverTab)).dy, 844 - 34);
+  });
+
+  testWidgets('HelmApp boots into Discover with no bottom navigation',
+      (tester) async {
     // Avoid network: pump only until first frame (loading), then dispose.
     await tester.pumpWidget(const HelmApp());
     expect(find.text('Helm حلم'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byKey(const Key('discover-loading')), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
   });
 }

@@ -2,8 +2,10 @@
 
 Flutter app for **Helm حلم**.
 
-Five-tab shell (Discover / Build / Packages / Trips / Profile). Discover loads
-published destinations via the generated `helm_api_client` (`listDestinations`).
+Discover-first shell with no bottom navigation. Discover loads published
+destinations via the generated `helm_api_client` (`listDestinations`). The
+placeholder Build, Packages, Trips, and Profile tabs in `lib/tabs/` are not
+wired into the app until their features exist.
 
 Uses `helm_api_client` from `packages/api-client-dart` (generated — do not hand-edit).
 
