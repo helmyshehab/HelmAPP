@@ -20,3 +20,28 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - fonts/licenses/Fraunces-OFL.txt
+    - fonts/licenses/Outfit-OFL.txt
+    - fonts/licenses/IBMPlexSansArabic-OFL.txt
+  fonts:
+    - family: Fraunces
+      fonts:
+        - asset: fonts/Fraunces9pt-Regular.ttf
+          weight: 400
+        - asset: fonts/Fraunces9pt-SemiBold.ttf
+          weight: 600
+    - family: Outfit
+      fonts:
+        - asset: fonts/Outfit-Regular.ttf
+          weight: 400
+        - asset: fonts/Outfit-Medium.ttf
+          weight: 500
+    - family: IBM Plex Sans Arabic
+      fonts:
+        - asset: fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600

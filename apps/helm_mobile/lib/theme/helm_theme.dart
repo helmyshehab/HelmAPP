@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'helm_colors.dart';
 import 'helm_tokens.dart';
+import 'helm_typography.dart';
 
 /// HELM light and dark [ThemeData]; the app picks one from the system mode.
 abstract final class HelmTheme {
@@ -69,9 +70,11 @@ abstract final class HelmTheme {
   );
 
   static ThemeData _build(ColorScheme scheme) {
-    return ThemeData(
+    final draft = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
+      fontFamily: HelmFonts.outfit,
+      fontFamilyFallback: HelmFonts.arabicFallback,
       scaffoldBackgroundColor: scheme.surface,
       dividerTheme: DividerThemeData(color: scheme.outlineVariant),
       // Material defaults these labels to `primary` (Teal), which fails AA as
@@ -99,6 +102,10 @@ abstract final class HelmTheme {
           ),
         ),
       ),
+    );
+    return draft.copyWith(
+      textTheme: HelmTypography.apply(draft.textTheme),
+      primaryTextTheme: HelmTypography.apply(draft.primaryTextTheme),
     );
   }
 }
