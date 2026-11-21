@@ -9,6 +9,7 @@ import {
   createBootstrappedTravelerClient,
   getTravelerSession,
 } from "@/lib/auth/require-traveler";
+import { loadPublishedDestinationCatalog } from "@/lib/destinations/load-published-catalog";
 
 type DraftPageProps = {
   params: Promise<{ draftId: string }>;
@@ -67,6 +68,8 @@ export default async function DraftPage({ params }: DraftPageProps) {
     );
   }
 
+  const destinationCatalog = await loadPublishedDestinationCatalog();
+
   return (
     <main className="shell">
       <div className="build-header-row">
@@ -92,6 +95,7 @@ export default async function DraftPage({ params }: DraftPageProps) {
         key={`${session.userId}:${draft.id}`}
         ownerUserId={session.userId}
         draft={draft}
+        destinationCatalog={destinationCatalog}
       />
     </main>
   );

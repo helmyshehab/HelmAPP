@@ -79,6 +79,38 @@ describe("buildUpdateTripDraftRequest", () => {
   });
 });
 
+describe("destinationId PATCH keep / change / clear", () => {
+  it("keeps destinationId omitted when unchanged", () => {
+    const form = formValuesFromDraft(BASE_DRAFT);
+    form.title = "Bali week";
+    const result = buildUpdateTripDraftRequest(BASE_DRAFT, form);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal("destinationId" in result.body, false);
+    assert.deepEqual(result.body, {});
+  });
+
+  it("sends the selected destinationId when changed", () => {
+    const form = formValuesFromDraft(BASE_DRAFT);
+    form.destinationId = "33333333-3333-3333-3333-333333333333";
+    const result = buildUpdateTripDraftRequest(BASE_DRAFT, form);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.deepEqual(result.body, {
+      destinationId: "33333333-3333-3333-3333-333333333333",
+    });
+  });
+
+  it("sends null only when destinationId is explicitly cleared", () => {
+    const form = formValuesFromDraft(BASE_DRAFT);
+    form.destinationId = "";
+    const result = buildUpdateTripDraftRequest(BASE_DRAFT, form);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.deepEqual(result.body, { destinationId: null });
+  });
+});
+
 describe("canStartMutation", () => {
   it("blocks duplicate submissions while in flight", () => {
     assert.equal(canStartMutation(false), true);
