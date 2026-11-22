@@ -3,8 +3,10 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
+import '../discover/destination_card.dart';
 import '../discover/destination_list_item.dart';
 import '../discover/destination_overview_screen.dart';
+import '../discover/discover_hero.dart';
 
 /// Discover tab — published destination list with overview navigation.
 class DiscoverTab extends StatefulWidget {
@@ -20,6 +22,8 @@ class DiscoverTab extends StatefulWidget {
 enum _DiscoverLoadState { loading, empty, failure, success }
 
 class _DiscoverTabState extends State<DiscoverTab> {
+  final GlobalKey _destinationListKey = GlobalKey();
+
   /// True when this tab created the [http.Client] (not when [apiClient] injected).
   late final bool _ownsHttpClient;
   http.Client? _ownedHttp;
@@ -53,6 +57,25 @@ class _DiscoverTabState extends State<DiscoverTab> {
       _ownedHttp?.close();
     }
     super.dispose();
+  }
+
+  void _scrollToDestinations() {
+    final target = _destinationListKey.currentContext;
+    if (target == null) return;
+    final reduceMotion = MediaQuery.disableAnimationsOf(target);
+    Scrollable.ensureVisible(
+      target,
+      alignment: 0,
+      duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  String? get _editorialSlug {
+    for (final item in _items) {
+      if (item.isFeatured) return item.slug;
+    }
+    return null;
   }
 
   Future<void> _load() async {
@@ -130,30 +153,36 @@ class _DiscoverTabState extends State<DiscoverTab> {
           ),
         );
       case _DiscoverLoadState.success:
-        return ListView.separated(
+        final editorialSlug = _editorialSlug;
+        return ListView(
           key: const Key('discover-list'),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: _items.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final item = _items[index];
-            final summary = item.availableSummary;
-            return ListTile(
-              key: Key('discover-item-${item.slug}'),
-              title: Text(item.nameEn),
-              subtitle: summary != null ? Text(summary) : null,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => DestinationOverviewScreen(
-                      slug: item.slug,
-                      apiClient: _client,
-                    ),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+          children: [
+            DiscoverHero(onBrowse: _scrollToDestinations),
+            Column(
+              key: _destinationListKey,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final item in _items) ...[
+                  if (item != _items.first) const SizedBox(height: 12),
+                  DestinationCard(
+                    item: item,
+                    editorial: item.slug == editorialSlug,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => DestinationOverviewScreen(
+                            slug: item.slug,
+                            apiClient: _client,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            );
-          },
+                ],
+              ],
+            ),
+          ],
         );
     }
   }

@@ -7,6 +7,9 @@ class DestinationListItem {
     this.nameAr,
     this.summaryEn,
     this.summaryAr,
+    this.countryCode,
+    this.isFeatured = false,
+    this.tags = const [],
   });
 
   final String id;
@@ -15,6 +18,9 @@ class DestinationListItem {
   final String? nameAr;
   final String? summaryEn;
   final String? summaryAr;
+  final String? countryCode;
+  final bool isFeatured;
+  final List<String> tags;
 
   /// Prefer English summary; fall back to Arabic when English is absent.
   String? get availableSummary {
@@ -25,6 +31,18 @@ class DestinationListItem {
     return null;
   }
 
+  String? get displayNameAr {
+    final ar = nameAr?.trim();
+    if (ar == null || ar.isEmpty) return null;
+    return ar;
+  }
+
+  String? get displayCountryCode {
+    final code = countryCode?.trim();
+    if (code == null || code.isEmpty) return null;
+    return code;
+  }
+
   factory DestinationListItem.fromJson(Map<String, dynamic> json) {
     return DestinationListItem(
       id: json['id'] as String,
@@ -33,6 +51,9 @@ class DestinationListItem {
       nameAr: json['nameAr'] as String?,
       summaryEn: json['summaryEn'] as String?,
       summaryAr: json['summaryAr'] as String?,
+      countryCode: json['countryCode'] as String?,
+      isFeatured: json['isFeatured'] == true,
+      tags: _parseTags(json['tags']),
     );
   }
 
@@ -44,4 +65,13 @@ class DestinationListItem {
         .map((e) => DestinationListItem.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
+}
+
+List<String> _parseTags(Object? raw) {
+  if (raw is! List) return const [];
+  return raw
+      .whereType<String>()
+      .map((tag) => tag.trim())
+      .where((tag) => tag.isNotEmpty)
+      .toList(growable: false);
 }

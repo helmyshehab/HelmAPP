@@ -1,7 +1,7 @@
 import type { DestinationPublic } from "@helm/api-client-ts";
 import { DestinationCard } from "./DestinationCard";
+import { HelmWordmark } from "./HelmWordmark";
 import { StatusPanel } from "./StatusPanel";
-import { prioritizeDiscoverDestinations } from "@/lib/destinations/present";
 
 type DiscoverScreenProps = {
   destinations: DestinationPublic[];
@@ -14,38 +14,40 @@ export function DiscoverScreen({
   total,
   locale = "en",
 }: DiscoverScreenProps) {
-  const ordered = prioritizeDiscoverDestinations(destinations);
+  const leadId = destinations.find(
+    (destination) => destination.isFeatured === true,
+  )?.id;
+  const hasDestinations = total > 0 && destinations.length > 0;
 
   return (
     <main className="shell">
-      <p className="eyebrow">Traveler · Discover</p>
-      <h1 className="brand-mark">
-        Helm
-        <span>حلم · Discover</span>
-      </h1>
-      <p className="lede">
-        Browse published destinations for your next trip. Start with Ubud when
-        it is live on the catalog.
-      </p>
+      <header className="discover-hero">
+        <HelmWordmark />
+        <p className="lede">Browse published destinations.</p>
+      </header>
 
-      {total === 0 || ordered.length === 0 ? (
-        <StatusPanel
-          title="No destinations yet"
-          body="The public catalog has no published destinations right now. Check back once destinations are published."
-        />
-      ) : (
-        <>
-          <p className="section-label">Published destinations</p>
+      {hasDestinations ? (
+        <section aria-labelledby="published-destinations-heading">
+          <h2 id="published-destinations-heading" className="section-label">
+            Published destinations
+          </h2>
           <ul className="destination-list">
-            {ordered.map((destination) => (
+            {destinations.map((destination, index) => (
               <DestinationCard
                 key={destination.id}
                 destination={destination}
                 locale={locale}
+                lead={destination.id === leadId}
+                span={index === 0 && destination.id === leadId}
               />
             ))}
           </ul>
-        </>
+        </section>
+      ) : (
+        <StatusPanel
+          title="No destinations yet"
+          body="The public catalog has no published destinations right now. Check back once destinations are published."
+        />
       )}
     </main>
   );

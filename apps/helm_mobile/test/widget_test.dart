@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/main.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
+import 'package:helm_mobile/theme/helm_wordmark.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -27,7 +28,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Helm حلم'), findsOneWidget);
+    expect(find.byType(HelmWordmark), findsOneWidget);
     expect(find.byType(DiscoverTab), findsOneWidget);
     expect(find.byKey(const Key('discover-empty')), findsOneWidget);
 
@@ -59,7 +60,9 @@ void main() {
       (tester) async {
     // Avoid network: pump only until first frame (loading), then dispose.
     await tester.pumpWidget(const HelmApp());
-    expect(find.text('Helm حلم'), findsOneWidget);
+    expect(find.byType(HelmWordmark), findsOneWidget);
+    expect(tester.widget<MaterialApp>(find.byType(MaterialApp)).title,
+        HelmWordmark.label);
     expect(find.byKey(const Key('discover-loading')), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
   });

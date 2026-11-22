@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/discover/destination_detail.dart';
+import 'package:helm_mobile/discover/destination_overview_screen.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -255,5 +256,84 @@ void main() {
     expect(find.byKey(const Key('discover-list')), findsOneWidget);
     expect(find.byKey(const Key('discover-item-ubud')), findsOneWidget);
     expect(find.byKey(const Key('destination-overview-ubud')), findsNothing);
+  });
+
+  testWidgets('overview directs Arabic copy and keeps the scaffold LTR',
+      (tester) async {
+    final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
+      }
+      expect(request.url.path, '/v1/destinations/demo');
+      return _jsonOk({
+        'id': '11111111-1111-1111-1111-111111111111',
+        'slug': 'demo',
+        'nameEn': 'Harbor',
+        'nameAr': 'ميناء',
+        'summaryEn': 'English summary',
+        'summaryAr': 'ملخص لا يُعرض',
+        'descriptionEn': '   ',
+        'descriptionAr': 'وصف عربي',
+        'countryCode': 'XX',
+        'tags': const <String>['culture'],
+        'status': 'published',
+      });
+    });
+
+    await tester.pumpWidget(
+      _wrap(
+        DestinationOverviewScreen(
+          slug: 'demo',
+          apiClient: _client(mock),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('English summary'), findsOneWidget);
+    expect(find.text('ملخص لا يُعرض'), findsNothing);
+    expect(find.text('وصف عربي'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('ميناء')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      tester.widget<Text>(find.text('English summary')).textDirection,
+      TextDirection.ltr,
+    );
+    expect(
+      tester.widget<Text>(find.text('وصف عربي')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      tester.widget<Text>(find.byKey(const Key('destination-overview-name'))).textDirection,
+      isNull,
+    );
+    expect(tester.widget<Text>(find.text('XX')).textDirection, isNull);
+    expect(
+      Directionality.of(tester.element(find.byType(DestinationOverviewScreen))),
+      TextDirection.ltr,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(2),
+            ),
+            child: child!,
+          );
+        },
+        home: Scaffold(
+          body: DestinationOverviewScreen(
+            slug: 'demo',
+            apiClient: _client(mock),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }

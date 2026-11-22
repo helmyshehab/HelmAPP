@@ -1,4 +1,5 @@
 import { DiscoverScreen } from "@/components/discover/DiscoverScreen";
+import { HelmWordmark } from "@/components/discover/HelmWordmark";
 import { StatusPanel } from "@/components/discover/StatusPanel";
 import { createPublicHelmClient } from "@/lib/api/helm-client";
 
@@ -16,11 +17,7 @@ export default async function DiscoverPage() {
   } catch {
     return (
       <main className="shell">
-        <p className="eyebrow">Traveler · Discover</p>
-        <h1 className="brand-mark">
-          Helm
-          <span>حلم · Discover</span>
-        </h1>
+        <HelmWordmark />
         <StatusPanel
           title="Discover unavailable"
           body="We could not reach the public Helm catalog. Confirm the local API is running and NEXT_PUBLIC_API_BASE_URL points at it."

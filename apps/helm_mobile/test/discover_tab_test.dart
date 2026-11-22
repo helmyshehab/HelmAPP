@@ -33,6 +33,7 @@ void main() {
 
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     expect(find.byKey(const Key('discover-loading')), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
 
     gate.complete();
     await tester.pumpAndSettle();
@@ -49,6 +50,7 @@ void main() {
 
     expect(find.byKey(const Key('discover-empty')), findsOneWidget);
     expect(find.text('No destinations yet'), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
   });
 
   testWidgets('Discover shows failure with Retry and reloads on tap',
@@ -83,6 +85,7 @@ void main() {
 
     expect(find.byKey(const Key('discover-failure')), findsOneWidget);
     expect(find.byKey(const Key('discover-retry')), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
 
     await tester.tap(find.byKey(const Key('discover-retry')));
     await tester.pumpAndSettle();
@@ -133,5 +136,408 @@ void main() {
     expect(find.text('Ubud'), findsOneWidget);
     expect(find.text('Cultural heart of Bali'), findsOneWidget);
     expect(find.text('Canggu'), findsOneWidget);
+  });
+
+  testWidgets('Discover keeps English summaries and directs Arabic fallbacks',
+      (tester) async {
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'english-first',
+            'nameEn': 'Harbor',
+            'nameAr': 'ميناء',
+            'summaryEn': 'English summary',
+            'summaryAr': 'ملخص عربي',
+            'countryCode': 'XX',
+            'status': 'published',
+          },
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'arabic-only',
+            'nameEn': 'Coast',
+            'nameAr': 'ساحل',
+            'summaryEn': null,
+            'summaryAr': 'ملخص عربي',
+            'countryCode': 'XX',
+            'status': 'published',
+          },
+        ],
+        'total': 2,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    expect(find.text('English summary'), findsOneWidget);
+    expect(find.text('ملخص عربي'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('English summary')).textDirection,
+      TextDirection.ltr,
+    );
+    expect(
+      tester.widget<Text>(find.text('ملخص عربي')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(tester.widget<Text>(find.text('Harbor')).textDirection, isNull);
+    expect(
+      Directionality.of(tester.element(find.byType(Scaffold))),
+      TextDirection.ltr,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Discover features only API-featured destinations and caps tags',
+      (tester) async {
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Harbor',
+            'nameAr': 'ميناء',
+            'summaryEn': 'English harbor',
+            'countryCode': 'ID',
+            'isFeatured': false,
+            'tags': ['harbor'],
+            'status': 'published',
+          },
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Ridge',
+            'nameAr': 'حافة',
+            'summaryEn': 'First featured destination',
+            'countryCode': 'TH',
+            'isFeatured': true,
+            'tags': ['rice_terrace', 'temple', 'walk', 'extra_tag'],
+            'status': 'published',
+          },
+          {
+            'id': '33333333-3333-3333-3333-333333333333',
+            'slug': 'cove',
+            'nameEn': 'Cove',
+            'summaryEn': 'Second featured destination',
+            'countryCode': 'GR',
+            'isFeatured': true,
+            'tags': ['cove'],
+            'status': 'published',
+          },
+        ],
+        'total': 3,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Featured'), findsNWidgets(2));
+    expect(find.text('ID'), findsOneWidget);
+    expect(find.text('TH'), findsOneWidget);
+    expect(find.text('rice terrace'), findsOneWidget);
+    expect(find.text('temple'), findsOneWidget);
+    expect(find.text('walk'), findsOneWidget);
+    expect(find.text('extra tag'), findsNothing);
+    expect(find.text('extra_tag'), findsNothing);
+
+    final harborSize = tester.widget<Text>(find.text('Harbor')).style?.fontSize;
+    final ridgeSize = tester.widget<Text>(find.text('Ridge')).style?.fontSize;
+    final coveSize = tester.widget<Text>(find.text('Cove')).style?.fontSize;
+    expect(ridgeSize, greaterThan(harborSize!));
+    expect(coveSize, harborSize);
+
+    expect(
+      tester.widget<Text>(find.text('ميناء')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(find.byKey(const Key('discover-browse')), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const Key('discover-browse'))).height,
+      greaterThanOrEqualTo(44),
+    );
+  });
+
+  testWidgets('Browse destinations scrolls a later card into view',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 420);
+    addTearDown(tester.view.reset);
+
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          for (var i = 0; i < 8; i++)
+            {
+              'id': '00000000-0000-0000-0000-${i.toString().padLeft(12, '0')}',
+              'slug': 'place-$i',
+              'nameEn': 'Place $i',
+              'summaryEn': 'A published destination summary that fills the card. '
+                  'More lines keep later places below the first screen.',
+              'countryCode': 'ID',
+              'status': 'published',
+            },
+        ],
+        'total': 8,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    final laterBefore = tester.getTopLeft(find.text('Place 1')).dy;
+    expect(laterBefore, greaterThan(420));
+
+    await tester.tap(find.byKey(const Key('discover-browse')));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      greaterThan(0),
+    );
+    expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
+  });
+
+  testWidgets('Browse destinations jumps when motion is reduced',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 420);
+    addTearDown(tester.view.reset);
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          for (var i = 0; i < 8; i++)
+            {
+              'id': '00000000-0000-0000-0000-${i.toString().padLeft(12, '0')}',
+              'slug': 'place-$i',
+              'nameEn': 'Place $i',
+              'summaryEn': 'A published destination summary that fills the card. '
+                  'More lines keep later places below the first screen.',
+              'countryCode': 'ID',
+              'status': 'published',
+            },
+        ],
+        'total': 8,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(find.text('Place 1')).dy, greaterThan(420));
+
+    await tester.tap(find.byKey(const Key('discover-browse')));
+    await tester.pump();
+
+    expect(
+      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      greaterThan(0),
+    );
+    expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
+  });
+
+  testWidgets('Tapping a destination card opens the overview', (tester) async {
+    final mock = MockClient((request) async {
+      final path = request.url.path;
+      if (path == '/v1/destinations/ubud') {
+        return _jsonOk({
+          'id': '11111111-1111-1111-1111-111111111111',
+          'slug': 'ubud',
+          'nameEn': 'Ubud',
+          'nameAr': 'أبود',
+          'summaryEn': 'Cultural heart of Bali',
+          'countryCode': 'ID',
+          'status': 'published',
+        });
+      }
+      if (path == '/v1/catalog/places') {
+        return _jsonOk({'items': [], 'total': 0, 'limit': 20, 'offset': 0});
+      }
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'ubud',
+            'nameEn': 'Ubud',
+            'nameAr': 'أبود',
+            'summaryEn': 'Cultural heart of Bali',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
+        ],
+        'total': 1,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('discover-item-ubud')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('destination-overview-back')), findsOneWidget);
+    expect(find.text('Ubud'), findsWidgets);
+  });
+
+  testWidgets('maximum text scale keeps Discover and long names on screen',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(402, 874);
+    addTearDown(tester.view.reset);
+
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Demonstration',
+            'nameAr': 'ميناء',
+            'summaryEn': 'A regular preview card with an English summary.',
+            'countryCode': 'ID',
+            'isFeatured': false,
+            'tags': ['harbor'],
+            'status': 'published',
+          },
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Supercalifragilistic',
+            'nameAr': 'حافة',
+            'summaryEn': 'Featured destination',
+            'countryCode': 'TH',
+            'isFeatured': true,
+            'status': 'published',
+          },
+        ],
+        'total': 2,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(3.12),
+            ),
+            child: child!,
+          );
+        },
+        home: Scaffold(body: DiscoverTab(apiClient: _client(mock))),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final discover = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          (widget.data ?? '').replaceAll('\u200B', '') == 'Discover',
+    );
+    expect(discover, findsOneWidget);
+    final discoverRect = tester.getRect(discover);
+    expect(discoverRect.left, greaterThanOrEqualTo(0));
+    expect(discoverRect.right, lessThanOrEqualTo(402));
+    expect(discoverRect.height, greaterThan(0));
+    final discoverText = tester.widget<Text>(discover);
+    if ((discoverText.data ?? '').contains('\u200B')) {
+      expect(discoverRect.height, greaterThan(40 * 3.12));
+    }
+
+    await tester.drag(
+      find.byKey(const Key('discover-list')),
+      const Offset(0, -2400),
+    );
+    await tester.pumpAndSettle();
+
+    final longName = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          (widget.data ?? '').replaceAll('\u200B', '') == 'Supercalifragilistic',
+    );
+    expect(longName, findsOneWidget);
+    final nameRect = tester.getRect(longName);
+    expect(nameRect.left, greaterThanOrEqualTo(0));
+    expect(nameRect.right, lessThanOrEqualTo(402));
+    expect(nameRect.height, greaterThan(0));
+
+    final spaced = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          (widget.data ?? '').replaceAll('\u200B', '') == 'Demonstration',
+    );
+    expect(spaced, findsOneWidget);
+    expect(tester.getRect(spaced).right, lessThanOrEqualTo(402));
+
+    final english = tester.getTopLeft(spaced);
+    final arabic = tester.getTopLeft(find.text('ميناء'));
+    expect(arabic.dx, closeTo(english.dx, 1));
+    expect(arabic.dy, greaterThan(english.dy));
+
+    expect(find.text('ID'), findsOneWidget);
+    expect(find.text('TH'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    final ridge = tester.widget<Material>(
+      find.byKey(const Key('discover-item-ridge')),
+    );
+    expect(ridge.color, const Color(0xFF0C1B2A));
+    final harbor = tester.widget<Material>(
+      find.byKey(const Key('discover-item-harbor')),
+    );
+    expect(harbor.color, const Color(0xFFFFFFFF));
+  });
+
+  testWidgets('dark featured card stays Deep Ocean', (tester) async {
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Ridge',
+            'summaryEn': 'A featured place',
+            'countryCode': 'XX',
+            'isFeatured': true,
+            'status': 'published',
+          },
+        ],
+        'total': 1,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark, useMaterial3: true),
+        home: Scaffold(body: DiscoverTab(apiClient: _client(mock))),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Material>(find.byKey(const Key('discover-item-ridge'))).color,
+      const Color(0xFF163747),
+    );
+    expect(find.text('XX'), findsOneWidget);
+    expect(find.text('Featured'), findsOneWidget);
   });
 }

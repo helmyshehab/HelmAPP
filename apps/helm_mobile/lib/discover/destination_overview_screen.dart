@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 
+import '../geo/country_label.dart';
+import '../theme/helm_directional_text.dart';
+import '../theme/helm_wrapping_text.dart';
 import 'destination_detail.dart';
 import 'place_list_item.dart';
 
@@ -222,32 +225,38 @@ class _DestinationOverviewScreenState extends State<DestinationOverviewScreen> {
           key: Key('destination-overview-${detail.slug}'),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           children: [
-            Text(
+            HelmWrappingText(
               detail.nameEn,
-              key: const Key('destination-overview-name'),
-              style: Theme.of(context).textTheme.headlineSmall,
+              textKey: const Key('destination-overview-name'),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    height: 1.25,
+                  ),
             ),
             if (detail.nameAr != null && detail.nameAr!.trim().isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(
-                detail.nameAr!,
-                key: const Key('destination-overview-name-ar'),
-                style: Theme.of(context).textTheme.titleMedium,
-                textDirection: TextDirection.rtl,
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: HelmDirectionalText(
+                  detail.nameAr!,
+                  key: const Key('destination-overview-name-ar'),
+                  textWidthBasis: TextWidthBasis.longestLine,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        height: 1.5,
+                      ),
+                ),
               ),
             ],
-            if (detail.countryCode != null &&
-                detail.countryCode!.trim().isNotEmpty) ...[
+            if (helmCountryLabel(detail.countryCode) != null) ...[
               const SizedBox(height: 8),
               Text(
-                detail.countryCode!,
+                helmCountryLabel(detail.countryCode)!,
                 key: const Key('destination-overview-country'),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
             if (summary != null) ...[
               const SizedBox(height: 16),
-              Text(
+              HelmDirectionalText(
                 summary,
                 key: const Key('destination-overview-summary'),
                 style: Theme.of(context).textTheme.bodyLarge,
@@ -255,7 +264,7 @@ class _DestinationOverviewScreenState extends State<DestinationOverviewScreen> {
             ],
             if (description != null) ...[
               const SizedBox(height: 12),
-              Text(
+              HelmDirectionalText(
                 description,
                 key: const Key('destination-overview-description'),
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -436,7 +445,7 @@ class _PlaceRow extends StatelessWidget {
         ),
         if (short != null) ...[
           const SizedBox(height: 4),
-          Text(
+          HelmDirectionalText(
             short,
             key: Key('destination-place-short-${place.slug}'),
             style: theme.textTheme.bodyMedium,
