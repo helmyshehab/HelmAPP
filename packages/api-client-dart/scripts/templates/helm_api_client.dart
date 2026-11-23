@@ -129,10 +129,17 @@ class HelmApiClient {
     return MeResponse.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
-  Future<Map<String, dynamic>> listDestinations({String? country, String? q}) {
+  Future<Map<String, dynamic>> listDestinations({
+    String? country,
+    String? q,
+    int? limit,
+    int? offset,
+  }) {
     final params = <String, String>{};
     if (country != null) params['country'] = country;
     if (q != null) params['q'] = q;
+    if (limit != null) params['limit'] = '$limit';
+    if (offset != null) params['offset'] = '$offset';
     final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
     return _getJson('/v1/destinations$query');
   }

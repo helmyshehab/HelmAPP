@@ -300,7 +300,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      PrimaryScrollController.of(
+        tester.element(find.byKey(const Key('discover-list'))),
+      ).offset,
       greaterThan(0),
     );
     expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
@@ -343,7 +345,9 @@ void main() {
     await tester.pump();
 
     expect(
-      tester.state<ScrollableState>(find.byType(Scrollable)).position.pixels,
+      PrimaryScrollController.of(
+        tester.element(find.byKey(const Key('discover-list'))),
+      ).offset,
       greaterThan(0),
     );
     expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
@@ -836,5 +840,366 @@ void main() {
       Directionality.of(tester.element(find.byType(Scaffold))),
       TextDirection.ltr,
     );
+  });
+
+  Map<String, dynamic> destinationJson(int index, {String? id}) {
+    final n = index.toString().padLeft(12, '0');
+    return {
+      'id': id ?? '00000000-0000-0000-0000-$n',
+      'slug': 'place-$index',
+      'nameEn': 'Place $index',
+      'summaryEn': 'Summary $index',
+      'countryCode': 'ID',
+      'status': 'published',
+    };
+  }
+
+  List<Map<String, dynamic>> destinationPage(int start, int count) {
+    return [for (var i = start; i < start + count; i++) destinationJson(i)];
+  }
+
+  Future<void> jumpToBottom(WidgetTester tester, {bool settle = true}) async {
+    final listContext = tester.element(find.byKey(const Key('discover-list')));
+    final controller = PrimaryScrollController.of(listContext);
+    controller.jumpTo(controller.position.maxScrollExtent);
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
+  }
+
+  Future<void> jumpToTop(WidgetTester tester, {bool settle = true}) async {
+    final listContext = tester.element(find.byKey(const Key('discover-list')));
+    final controller = PrimaryScrollController.of(listContext);
+    controller.jumpTo(0);
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      await tester.pump();
+    }
+  }
+
+  Future<void> revealAndTap(WidgetTester tester, Key key) async {
+    await jumpToBottom(tester);
+    final finder = find.byKey(key);
+    expect(finder, findsOneWidget);
+    final button = tester.widget<ButtonStyleButton>(finder);
+    expect(button.onPressed, isNotNull);
+    button.onPressed!();
+  }
+
+  testWidgets('Discover pagination loads first page of 12 from 25',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    final offsets = <String?>[];
+    final mock = MockClient((request) async {
+      expect(request.url.queryParameters['limit'], '12');
+      offsets.add(request.url.queryParameters['offset']);
+      final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
+      return _jsonOk({
+        'items': destinationPage(offset, 12),
+        'total': 25,
+        'limit': 12,
+        'offset': offset,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    expect(offsets, ['0']);
+    expect(find.text('Place 0'), findsOneWidget);
+    expect(find.text('Place 12'), findsNothing);
+    expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsOneWidget);
+
+    await jumpToBottom(tester);
+    expect(find.byKey(const Key('discover-load-more')), findsOneWidget);
+    expect(find.text('Place 11'), findsOneWidget);
+  });
+
+  testWidgets('Discover pagination appends pages then hides Load more',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    final requests = <Map<String, String>>[];
+    final mock = MockClient((request) async {
+      requests.add(Map<String, String>.from(request.url.queryParameters));
+      final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
+      final remaining = 25 - offset;
+      final count = remaining < 12 ? remaining : 12;
+      return _jsonOk({
+        'items': destinationPage(offset, count),
+        'total': 25,
+        'limit': 12,
+        'offset': offset,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Place 12'), findsWidgets);
+    expect(find.text('Place 23'), findsWidgets);
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Place 24'), findsWidgets);
+    expect(find.byKey(const Key('discover-load-more')), findsNothing);
+
+    expect(
+      requests.map((r) => r['offset']).toList(),
+      ['0', '12', '24'],
+    );
+    expect(requests.every((r) => r['limit'] == '12'), isTrue);
+  });
+
+  testWidgets('Discover pagination preserves q and resets on search',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    final requests = <Map<String, String>>[];
+    final mock = MockClient((request) async {
+      final params = Map<String, String>.from(request.url.queryParameters);
+      requests.add(params);
+      final q = params['q'];
+      final offset = int.parse(params['offset'] ?? '0');
+      if (q == 'Ridge') {
+        return _jsonOk({
+          'items': [
+            {
+              'id': '22222222-2222-2222-2222-222222222222',
+              'slug': 'ridge',
+              'nameEn': 'Ridge',
+              'summaryEn': 'Featured ridge',
+              'countryCode': 'TH',
+              'status': 'published',
+            },
+          ],
+          'total': 1,
+          'limit': 12,
+          'offset': 0,
+        });
+      }
+      final remaining = 25 - offset;
+      final count = remaining < 12 ? remaining : 12;
+      return _jsonOk({
+        'items': destinationPage(offset, count),
+        'total': 25,
+        'limit': 12,
+        'offset': offset,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Place 12'), findsWidgets);
+
+    await jumpToTop(tester);
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'Ridge',
+    );
+    tester
+        .widget<ButtonStyleButton>(find.byKey(const Key('discover-search-submit')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
+    expect(find.text('Place 0'), findsNothing);
+    expect(find.byKey(const Key('discover-load-more')), findsNothing);
+    expect(requests.last['q'], 'Ridge');
+    expect(requests.last['limit'], '12');
+    expect(requests.last['offset'], '0');
+    expect(requests[1]['q'], isNull);
+    expect(requests[1]['offset'], '12');
+  });
+
+  testWidgets('Discover pagination advances offset past duplicate ids',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    final offsets = <String?>[];
+    final mock = MockClient((request) async {
+      offsets.add(request.url.queryParameters['offset']);
+      final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
+      if (offset == 0) {
+        return _jsonOk({
+          'items': destinationPage(0, 12),
+          'total': 30,
+          'limit': 12,
+          'offset': 0,
+        });
+      }
+      if (offset == 12) {
+        // Overlap first page ids; raw page count is still 12.
+        return _jsonOk({
+          'items': [
+            ...destinationPage(0, 6),
+            ...destinationPage(12, 6),
+          ],
+          'total': 30,
+          'limit': 12,
+          'offset': 12,
+        });
+      }
+      return _jsonOk({
+        'items': destinationPage(24, 6),
+        'total': 30,
+        'limit': 12,
+        'offset': 24,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Place 12'), findsWidgets);
+    expect(find.text('Place 17'), findsWidgets);
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+    expect(find.text('Place 24'), findsWidgets);
+    expect(offsets, ['0', '12', '24']);
+  });
+
+  testWidgets('Discover pagination shows page error and retries',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    var calls = 0;
+    final mock = MockClient((request) async {
+      calls += 1;
+      final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
+      if (offset == 0) {
+        return _jsonOk({
+          'items': destinationPage(0, 12),
+          'total': 25,
+          'limit': 12,
+          'offset': 0,
+        });
+      }
+      if (calls == 2) {
+        return http.Response('boom', 500);
+      }
+      return _jsonOk({
+        'items': destinationPage(12, 12),
+        'total': 25,
+        'limit': 12,
+        'offset': 12,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-page-error')), findsOneWidget);
+    expect(find.byKey(const Key('discover-page-retry')), findsOneWidget);
+    expect(find.text('Place 0'), findsWidgets);
+
+    tester
+        .widget<ButtonStyleButton>(find.byKey(const Key('discover-page-retry')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Place 12'), findsWidgets);
+    expect(find.byKey(const Key('discover-page-error')), findsNothing);
+    expect(calls, 3);
+  });
+
+  testWidgets('Discover pagination ignores stale page after search',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(400, 900);
+    addTearDown(tester.view.reset);
+
+    final pageGate = Completer<void>();
+    var calls = 0;
+    final mock = MockClient((request) async {
+      calls += 1;
+      final q = request.url.queryParameters['q'];
+      final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
+      if (calls == 1) {
+        return _jsonOk({
+          'items': destinationPage(0, 12),
+          'total': 25,
+          'limit': 12,
+          'offset': 0,
+        });
+      }
+      if (q == 'Ridge') {
+        return _jsonOk({
+          'items': [
+            {
+              'id': '22222222-2222-2222-2222-222222222222',
+              'slug': 'ridge',
+              'nameEn': 'Ridge',
+              'summaryEn': 'Featured ridge',
+              'countryCode': 'TH',
+              'status': 'published',
+            },
+          ],
+          'total': 1,
+          'limit': 12,
+          'offset': 0,
+        });
+      }
+      await pageGate.future;
+      return _jsonOk({
+        'items': destinationPage(offset, 12),
+        'total': 25,
+        'limit': 12,
+        'offset': offset,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await revealAndTap(tester, const Key('discover-load-more'));
+    await tester.pump();
+    expect(find.byKey(const Key('discover-page-loading')), findsOneWidget);
+
+    await jumpToTop(tester, settle: false);
+    expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'Ridge',
+    );
+    tester
+        .widget<ButtonStyleButton>(find.byKey(const Key('discover-search-submit')))
+        .onPressed!();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
+    expect(find.text('Place 12'), findsNothing);
+
+    pageGate.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
+    expect(find.text('Place 12'), findsNothing);
   });
 }
