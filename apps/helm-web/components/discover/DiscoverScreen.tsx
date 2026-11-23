@@ -1,5 +1,6 @@
 import type { DestinationPublic } from "@helm/api-client-ts";
 import { DiscoverDestinationList } from "./DiscoverDestinationList";
+import { DiscoverGlobe } from "./DiscoverGlobe";
 import { DiscoverSearch } from "./DiscoverSearch";
 import { HelmWordmark } from "./HelmWordmark";
 import { StatusPanel } from "./StatusPanel";
@@ -20,6 +21,8 @@ export function DiscoverScreen({
   const hasDestinations = total > 0 && destinations.length > 0;
   const activeQuery = query?.trim() ?? "";
   const isSearching = activeQuery.length > 0;
+  // Globe is full-catalog discovery, not a search results map.
+  const showGlobe = !isSearching;
 
   return (
     <main className="shell">
@@ -29,6 +32,8 @@ export function DiscoverScreen({
       </header>
 
       <DiscoverSearch query={activeQuery} />
+
+      {showGlobe ? <DiscoverGlobe locale={locale} /> : null}
 
       {hasDestinations ? (
         <DiscoverDestinationList
