@@ -540,4 +540,301 @@ void main() {
     expect(find.text('XX'), findsOneWidget);
     expect(find.text('Featured'), findsOneWidget);
   });
+
+  testWidgets('Discover search keeps field mounted while results load',
+      (tester) async {
+    final gate = Completer<void>();
+    var calls = 0;
+    final mock = MockClient((request) async {
+      calls += 1;
+      if (calls == 1) {
+        return _jsonOk({
+          'items': [
+            {
+              'id': '11111111-1111-1111-1111-111111111111',
+              'slug': 'harbor',
+              'nameEn': 'Harbor',
+              'summaryEn': 'A quiet harbor',
+              'countryCode': 'ID',
+              'status': 'published',
+            },
+          ],
+          'total': 1,
+          'limit': 20,
+          'offset': 0,
+        });
+      }
+      await gate.future;
+      return _jsonOk({
+        'items': [
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Ridge',
+            'summaryEn': 'Featured ridge',
+            'countryCode': 'TH',
+            'status': 'published',
+          },
+        ],
+        'total': 1,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'Ridge',
+    );
+    await tester.tap(find.byKey(const Key('discover-search-submit')));
+    await tester.pump();
+
+    expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const Key('discover-search-field')))
+          .controller
+          ?.text,
+      'Ridge',
+    );
+    expect(find.byKey(const Key('discover-loading')), findsOneWidget);
+    expect(find.byKey(const Key('discover-item-harbor')), findsNothing);
+
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
+    expect(find.byKey(const Key('discover-loading')), findsNothing);
+  });
+
+  testWidgets('Discover search submits q and lists filtered results',
+      (tester) async {
+    final queries = <String?>[];
+    final mock = MockClient((request) async {
+      expect(request.url.path, '/v1/destinations');
+      queries.add(request.url.queryParameters['q']);
+      final q = request.url.queryParameters['q'];
+      if (q == 'Ridge') {
+        return _jsonOk({
+          'items': [
+            {
+              'id': '22222222-2222-2222-2222-222222222222',
+              'slug': 'ridge',
+              'nameEn': 'Ridge',
+              'summaryEn': 'Featured ridge',
+              'countryCode': 'TH',
+              'isFeatured': true,
+              'status': 'published',
+            },
+          ],
+          'total': 1,
+          'limit': 20,
+          'offset': 0,
+        });
+      }
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Harbor',
+            'summaryEn': 'A quiet harbor',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Ridge',
+            'summaryEn': 'Featured ridge',
+            'countryCode': 'TH',
+            'isFeatured': true,
+            'status': 'published',
+          },
+        ],
+        'total': 2,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    expect(queries, [null]);
+    expect(find.text('Harbor'), findsOneWidget);
+    expect(find.byKey(const Key('discover-search-clear')), findsNothing);
+
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      '  Ridge  ',
+    );
+    await tester.tap(find.byKey(const Key('discover-search-submit')));
+    await tester.pumpAndSettle();
+
+    expect(queries, [null, 'Ridge']);
+    expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
+    expect(find.byKey(const Key('discover-item-harbor')), findsNothing);
+    expect(find.byKey(const Key('discover-search-clear')), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('discover-search-field'))).controller?.text,
+      'Ridge',
+    );
+  });
+
+  testWidgets('Discover search clear restores the full list', (tester) async {
+    final queries = <String?>[];
+    final mock = MockClient((request) async {
+      queries.add(request.url.queryParameters['q']);
+      final q = request.url.queryParameters['q'];
+      if (q == 'Ridge') {
+        return _jsonOk({
+          'items': [
+            {
+              'id': '22222222-2222-2222-2222-222222222222',
+              'slug': 'ridge',
+              'nameEn': 'Ridge',
+              'summaryEn': 'Featured ridge',
+              'countryCode': 'TH',
+              'status': 'published',
+            },
+          ],
+          'total': 1,
+          'limit': 20,
+          'offset': 0,
+        });
+      }
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Harbor',
+            'summaryEn': 'A quiet harbor',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
+          {
+            'id': '22222222-2222-2222-2222-222222222222',
+            'slug': 'ridge',
+            'nameEn': 'Ridge',
+            'summaryEn': 'Featured ridge',
+            'countryCode': 'TH',
+            'status': 'published',
+          },
+        ],
+        'total': 2,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'Ridge',
+    );
+    await tester.tap(find.byKey(const Key('discover-search-submit')));
+    await tester.pumpAndSettle();
+    expect(find.text('Harbor'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('discover-search-clear')));
+    await tester.pumpAndSettle();
+
+    expect(queries, [null, 'Ridge', null]);
+    expect(find.text('Harbor'), findsOneWidget);
+    expect(find.text('Ridge'), findsOneWidget);
+    expect(find.byKey(const Key('discover-search-clear')), findsNothing);
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('discover-search-field'))).controller?.text,
+      '',
+    );
+  });
+
+  testWidgets('Discover search empty results keep search and explain the miss',
+      (tester) async {
+    final mock = MockClient((request) async {
+      final q = request.url.queryParameters['q'];
+      if (q == 'zzzznofit') {
+        return _jsonOk({'items': [], 'total': 0, 'limit': 20, 'offset': 0});
+      }
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Harbor',
+            'summaryEn': 'A quiet harbor',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
+        ],
+        'total': 1,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'zzzznofit',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('discover-empty')), findsOneWidget);
+    expect(find.text('No matching destinations'), findsOneWidget);
+    expect(find.byKey(const Key('discover-empty-search')), findsOneWidget);
+    expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
+    expect(find.byKey(const Key('discover-search-clear')), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
+    expect(find.text('Harbor'), findsNothing);
+  });
+
+  testWidgets('Discover search field uses RTL for Arabic input', (tester) async {
+    final mock = MockClient((request) async {
+      return _jsonOk({
+        'items': [
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'harbor',
+            'nameEn': 'Harbor',
+            'nameAr': 'ميناء',
+            'summaryEn': 'A quiet harbor',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
+        ],
+        'total': 1,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const Key('discover-search-field')),
+      'ميناء',
+    );
+    await tester.pump();
+
+    expect(
+      tester.widget<TextField>(find.byKey(const Key('discover-search-field'))).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      Directionality.of(tester.element(find.byType(Scaffold))),
+      TextDirection.ltr,
+    );
+  });
 }
