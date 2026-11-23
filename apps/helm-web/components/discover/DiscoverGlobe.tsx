@@ -1,19 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { GlobeMethods } from "react-globe.gl";
 import {
   fetchAllGlobeDestinations,
   type GlobeDestination,
 } from "@/lib/destinations/globe-destinations";
-import { GlobePreview } from "./GlobePreview";
 
 const GlobeCanvas = dynamic(() => import("./GlobeCanvas"), {
   ssr: false,
@@ -32,28 +26,40 @@ type LoadState = "loading" | "ready" | "empty" | "unavailable";
 
 const EARTH_TEXTURE = "/globe/earth-blue-marble.jpg";
 const POINT_COLOR = "#177F83";
+const POINT_SELECTED_COLOR = "#F1A38D";
+const LABEL_COLOR = "#F7F5F0";
 const ATMOSPHERE = "#177F83";
+const POINT_ALTITUDE = 0.06;
+const POINT_ALTITUDE_SELECTED = 0.1;
+const POINT_RADIUS = 0.8;
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function DiscoverGlobe({ locale = "en" }: DiscoverGlobeProps) {
+function destinationHref(destination: GlobeDestination): string {
+  return `/destinations/${encodeURIComponent(destination.slug)}`;
+}
+
+export function DiscoverGlobe({ locale: _locale = "en" }: DiscoverGlobeProps) {
+  const router = useRouter();
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [destinations, setDestinations] = useState<GlobeDestination[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
   const [size, setSize] = useState({ width: 640, height: 420 });
   const [reduceMotion, setReduceMotion] = useState(false);
   const [globeFailed, setGlobeFailed] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [autoRotatePaused, setAutoRotatePaused] = useState(false);
 
-  const selected = useMemo(
-    () => destinations.find((item) => item.id === selectedId) ?? null,
-    [destinations, selectedId],
+  const openDestination = useCallback(
+    (destination: GlobeDestination) => {
+      router.push(destinationHref(destination));
+    },
+    [router],
   );
 
   useEffect(() => {
@@ -105,44 +111,50 @@ export function DiscoverGlobe({ locale = "en" }: DiscoverGlobeProps) {
       const controls = globe.controls();
       // Keep page scroll usable; rotate via drag only.
       controls.enableZoom = false;
-      controls.autoRotate = !reduceMotion;
+      controls.autoRotate = !reduceMotion && !autoRotatePaused;
       controls.autoRotateSpeed = 0.35;
     } catch {
       setGlobeFailed(true);
     }
-  }, [reduceMotion]);
+  }, [reduceMotion, autoRotatePaused]);
 
   useEffect(() => {
     configureControls();
   }, [configureControls, size]);
 
-  const selectDestination = useCallback(
-    (destination: GlobeDestination, keepExpanded: boolean) => {
+  const handleGlobeReady = useCallback(() => {
+    configureControls();
+    const first = destinations[0];
+    const globe = globeRef.current;
+    if (!first || !globe) return;
+    globe.pointOfView(
+      { lat: first.latitude, lng: first.longitude, altitude: 2 },
+      0,
+    );
+  }, [configureControls, destinations]);
+
+  const focusDestination = useCallback(
+    (destination: GlobeDestination) => {
       setSelectedId(destination.id);
-      setExpanded(keepExpanded);
+      setAutoRotatePaused(true);
       const globe = globeRef.current;
       if (!globe) return;
-      const duration = reduceMotion ? 0 : 800;
       try {
-        globe.pointOfView(
-          {
-            lat: destination.latitude,
-            lng: destination.longitude,
-            altitude: 1.85,
-          },
-          duration,
-        );
+        globe.controls().autoRotate = false;
       } catch {
-        // Point-of-view is progressive enhancement.
+        // Controls may be unavailable; POV still runs below.
       }
+      globe.pointOfView(
+        {
+          lat: destination.latitude,
+          lng: destination.longitude,
+          altitude: 2,
+        },
+        reduceMotion ? 0 : 1000,
+      );
     },
     [reduceMotion],
   );
-
-  const closePreview = useCallback(() => {
-    setSelectedId(null);
-    setExpanded(false);
-  }, []);
 
   if (loadState === "unavailable" || globeFailed) {
     return (
@@ -203,11 +215,8 @@ export function DiscoverGlobe({ locale = "en" }: DiscoverGlobeProps) {
             const next = destinations.find(
               (item) => item.id === event.target.value,
             );
-            if (!next) {
-              closePreview();
-              return;
-            }
-            selectDestination(next, expanded);
+            if (!next) return;
+            focusDestination(next);
           }}
         >
           <option value="">Choose a destination…</option>
@@ -237,27 +246,34 @@ export function DiscoverGlobe({ locale = "en" }: DiscoverGlobeProps) {
             pointsData={destinations}
             pointLat="latitude"
             pointLng="longitude"
-            pointAltitude={0.012}
-            pointRadius={0.45}
-            pointColor={() => POINT_COLOR}
-            pointLabel={(point) => (point as GlobeDestination).nameEn}
-            onGlobeReady={configureControls}
+            pointAltitude={(point) =>
+              (point as GlobeDestination).id === selectedId
+                ? POINT_ALTITUDE_SELECTED
+                : POINT_ALTITUDE
+            }
+            pointRadius={POINT_RADIUS}
+            pointColor={(point) =>
+              (point as GlobeDestination).id === selectedId
+                ? POINT_SELECTED_COLOR
+                : POINT_COLOR
+            }
             onPointClick={(point) => {
-              selectDestination(point as GlobeDestination, expanded);
+              openDestination(point as GlobeDestination);
             }}
+            labelsData={destinations}
+            labelLat="latitude"
+            labelLng="longitude"
+            labelText="nameEn"
+            labelColor={() => LABEL_COLOR}
+            labelAltitude={0.018}
+            labelSize={1.4}
+            labelIncludeDot={false}
+            onLabelClick={(label) => {
+              openDestination(label as GlobeDestination);
+            }}
+            onGlobeReady={handleGlobeReady}
           />
         </div>
-
-        {selected ? (
-          <GlobePreview
-            destination={selected}
-            expanded={expanded}
-            locale={locale}
-            onExpand={() => setExpanded(true)}
-            onCollapse={() => setExpanded(false)}
-            onClose={closePreview}
-          />
-        ) : null}
       </div>
     </section>
   );
