@@ -4,11 +4,13 @@ publish_to: "none"
 version: 0.0.1+1
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
+  # flutter_globe requires Dart >=3.6.
+  sdk: ">=3.6.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  flutter_globe: ^1.0.2
   helm_api_client:
     path: ../../packages/api-client-dart
   http: 1.2.2

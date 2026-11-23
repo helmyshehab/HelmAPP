@@ -858,6 +858,17 @@ void main() {
     return [for (var i = start; i < start + count; i++) destinationJson(i)];
   }
 
+  /// Globe pages use limit=100; Discover list pages use 12.
+  bool isGlobeCatalogRequest(http.BaseRequest request) =>
+      request.url.queryParameters['limit'] == '100';
+
+  http.Response emptyGlobeCatalog() => _jsonOk({
+        'items': <Object>[],
+        'total': 0,
+        'limit': 100,
+        'offset': 0,
+      });
+
   Future<void> jumpToBottom(WidgetTester tester, {bool settle = true}) async {
     final listContext = tester.element(find.byKey(const Key('discover-list')));
     final controller = PrimaryScrollController.of(listContext);
@@ -897,6 +908,7 @@ void main() {
 
     final offsets = <String?>[];
     final mock = MockClient((request) async {
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       expect(request.url.queryParameters['limit'], '12');
       offsets.add(request.url.queryParameters['offset']);
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
@@ -930,6 +942,7 @@ void main() {
 
     final requests = <Map<String, String>>[];
     final mock = MockClient((request) async {
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       requests.add(Map<String, String>.from(request.url.queryParameters));
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
       final remaining = 25 - offset;
@@ -970,6 +983,7 @@ void main() {
 
     final requests = <Map<String, String>>[];
     final mock = MockClient((request) async {
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       final params = Map<String, String>.from(request.url.queryParameters);
       requests.add(params);
       final q = params['q'];
@@ -1036,6 +1050,7 @@ void main() {
 
     final offsets = <String?>[];
     final mock = MockClient((request) async {
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       offsets.add(request.url.queryParameters['offset']);
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
       if (offset == 0) {
@@ -1086,9 +1101,10 @@ void main() {
     tester.view.physicalSize = const Size(400, 900);
     addTearDown(tester.view.reset);
 
-    var calls = 0;
+    var listCalls = 0;
     final mock = MockClient((request) async {
-      calls += 1;
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
+      listCalls += 1;
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
       if (offset == 0) {
         return _jsonOk({
@@ -1098,7 +1114,7 @@ void main() {
           'offset': 0,
         });
       }
-      if (calls == 2) {
+      if (listCalls == 2) {
         return http.Response('boom', 500);
       }
       return _jsonOk({
@@ -1126,7 +1142,7 @@ void main() {
 
     expect(find.text('Place 12'), findsWidgets);
     expect(find.byKey(const Key('discover-page-error')), findsNothing);
-    expect(calls, 3);
+    expect(listCalls, 3);
   });
 
   testWidgets('Discover pagination ignores stale page after search',
@@ -1136,12 +1152,13 @@ void main() {
     addTearDown(tester.view.reset);
 
     final pageGate = Completer<void>();
-    var calls = 0;
+    var listCalls = 0;
     final mock = MockClient((request) async {
-      calls += 1;
+      if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
+      listCalls += 1;
       final q = request.url.queryParameters['q'];
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
-      if (calls == 1) {
+      if (listCalls == 1) {
         return _jsonOk({
           'items': destinationPage(0, 12),
           'total': 25,

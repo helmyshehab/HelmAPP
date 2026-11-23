@@ -6,6 +6,7 @@ import '../config/api_config.dart';
 import '../discover/destination_card.dart';
 import '../discover/destination_list_item.dart';
 import '../discover/destination_overview_screen.dart';
+import '../discover/discover_globe.dart';
 import '../discover/discover_hero.dart';
 import '../discover/discover_search.dart';
 import '../theme/helm_colors.dart';
@@ -407,11 +408,18 @@ class _DiscoverTabState extends State<DiscoverTab> {
         );
       case _DiscoverLoadState.success:
         final editorialSlug = _editorialSlug;
+        final showGlobe = _activeQuery.isEmpty;
         return ListView(
           key: const Key('discover-list'),
           primary: true,
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
+            if (showGlobe)
+              DiscoverGlobe(
+                apiClient: _client,
+                seedItems: _items,
+                catalogComplete: _reachedEnd,
+              ),
             DiscoverHero(onBrowse: _scrollToDestinations),
             _searchSlot(),
             Column(
