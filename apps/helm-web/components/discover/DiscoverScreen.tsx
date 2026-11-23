@@ -1,5 +1,5 @@
 import type { DestinationPublic } from "@helm/api-client-ts";
-import { DestinationCard } from "./DestinationCard";
+import { DiscoverDestinationList } from "./DiscoverDestinationList";
 import { DiscoverSearch } from "./DiscoverSearch";
 import { HelmWordmark } from "./HelmWordmark";
 import { StatusPanel } from "./StatusPanel";
@@ -17,9 +17,6 @@ export function DiscoverScreen({
   locale = "en",
   query,
 }: DiscoverScreenProps) {
-  const leadId = destinations.find(
-    (destination) => destination.isFeatured === true,
-  )?.id;
   const hasDestinations = total > 0 && destinations.length > 0;
   const activeQuery = query?.trim() ?? "";
   const isSearching = activeQuery.length > 0;
@@ -34,22 +31,13 @@ export function DiscoverScreen({
       <DiscoverSearch query={activeQuery} />
 
       {hasDestinations ? (
-        <section aria-labelledby="published-destinations-heading">
-          <h2 id="published-destinations-heading" className="section-label">
-            Published destinations
-          </h2>
-          <ul className="destination-list">
-            {destinations.map((destination, index) => (
-              <DestinationCard
-                key={destination.id}
-                destination={destination}
-                locale={locale}
-                lead={destination.id === leadId}
-                span={index === 0 && destination.id === leadId}
-              />
-            ))}
-          </ul>
-        </section>
+        <DiscoverDestinationList
+          key={activeQuery || "all"}
+          initialDestinations={destinations}
+          total={total}
+          locale={locale}
+          query={activeQuery || undefined}
+        />
       ) : (
         <StatusPanel
           title={isSearching ? "No matching destinations" : "No destinations yet"}

@@ -3,6 +3,7 @@ import { DiscoverScreen } from "@/components/discover/DiscoverScreen";
 import { HelmWordmark } from "@/components/discover/HelmWordmark";
 import { StatusPanel } from "@/components/discover/StatusPanel";
 import { createPublicHelmClient } from "@/lib/api/helm-client";
+import { DISCOVER_PAGE_SIZE } from "@/lib/destinations/discover-page";
 
 type DiscoverPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -37,7 +38,8 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
     const client = createPublicHelmClient();
     const result = await client.listDestinations({
       ...(q ? { q } : {}),
-      limit: 50,
+      limit: DISCOVER_PAGE_SIZE,
+      offset: 0,
     });
     return (
       <DiscoverScreen
