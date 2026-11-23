@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_globe/flutter_globe.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 
-import '../geo/country_label.dart';
 import '../theme/helm_colors.dart';
 import '../theme/helm_tokens.dart';
 import '../theme/helm_typography.dart';
-import '../theme/helm_wrapping_text.dart';
 import 'destination_list_item.dart';
 import 'destination_overview_screen.dart';
 import 'globe_destinations.dart';
 
-/// Immersive Discover globe with compact/expanded destination preview.
+/// Immersive Discover globe with destination markers and keyboard picker.
 class DiscoverGlobe extends StatefulWidget {
   const DiscoverGlobe({
     super.key,
@@ -23,7 +21,6 @@ class DiscoverGlobe extends StatefulWidget {
 
   static const Key statusKey = Key('discover-globe-status');
   static const Key canvasKey = Key('discover-globe-canvas');
-  static const Key previewKey = Key('discover-globe-preview');
 
   final HelmApiClient apiClient;
 
@@ -51,8 +48,12 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
   _GlobeLoadState _state = _GlobeLoadState.loading;
   List<DestinationListItem> _destinations = const [];
   DestinationListItem? _selected;
-  bool _expanded = false;
+  bool _autoRotatePaused = false;
+  bool _didApplyInitialFocus = false;
   int _generation = 0;
+
+  static const double _markerSize = 6;
+  static const double _markerSizeSelected = 9;
 
   static final GlobeTheme _helmTheme = GlobeSkins.classic.copyWith(
     accentColor: HelmColors.teal,
@@ -80,8 +81,9 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
   void didChangeDependencies() {
     super.didChangeDependencies();
     // GlobeController.autoRotate drives the ticker; keep it aligned with
-    // MediaQuery.disableAnimations / the Globe.autoRotate prop.
-    _controller.autoRotate = !MediaQuery.disableAnimationsOf(context);
+    // MediaQuery.disableAnimations / the Globe.autoRotate prop, and honor
+    // a persistent pause after dropdown focus.
+    _syncAutoRotate();
   }
 
   @override
@@ -100,12 +102,18 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
     super.dispose();
   }
 
+  void _syncAutoRotate() {
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    _controller.autoRotate = !reduceMotion && !_autoRotatePaused;
+  }
+
   Future<void> _load() async {
     final generation = ++_generation;
     setState(() {
       _state = _GlobeLoadState.loading;
       _selected = null;
-      _expanded = false;
+      _autoRotatePaused = false;
+      _didApplyInitialFocus = false;
     });
 
     try {
@@ -123,6 +131,7 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
             ? _GlobeLoadState.empty
             : _GlobeLoadState.ready;
       });
+      // Do not touch MediaQuery here: _load may still run from initState.
     } catch (_) {
       if (!mounted || generation != _generation) return;
       setState(() => _state = _GlobeLoadState.unavailable);
@@ -131,6 +140,7 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
 
   List<GlobeMarker> get _markers {
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    final selectedId = _selected?.id;
     return [
       for (final item in _destinations)
         GlobeMarker(
@@ -138,22 +148,40 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
             latitude: item.latitude!,
             longitude: item.longitude!,
           ),
-          color: HelmColors.teal,
-          size: 6,
+          color: item.id == selectedId ? HelmColors.coral : HelmColors.teal,
+          size: item.id == selectedId ? _markerSizeSelected : _markerSize,
           pulse: !reduceMotion,
-          pulseColor: HelmColors.teal.withValues(alpha: 0.45),
+          pulseColor: (item.id == selectedId ? HelmColors.coral : HelmColors.teal)
+              .withValues(alpha: 0.45),
           label: item.nameEn,
           data: item,
         ),
     ];
   }
 
-  void _select(DestinationListItem item, {required bool keepExpanded}) {
-    setState(() {
-      _selected = item;
-      _expanded = keepExpanded;
+  void _applyInitialFocusIfNeeded() {
+    if (_didApplyInitialFocus || _destinations.isEmpty) return;
+    _didApplyInitialFocus = true;
+    final first = _destinations.first;
+    // Defer lookAt: onReady can fire during build; notifying the controller
+    // synchronously would throw and leave the canvas unmounted.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _controller.lookAt(
+        GlobeCoordinate(
+          latitude: first.latitude!,
+          longitude: first.longitude!,
+        ),
+      );
     });
+  }
+
+  void _focusDestination(DestinationListItem item) {
+    setState(() => _selected = item);
+    _autoRotatePaused = true;
+    _controller.stopAutoRotation();
     if (!mounted) return;
+
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final coordinate = GlobeCoordinate(
       latitude: item.latitude!,
@@ -165,18 +193,11 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
       _controller.flyTo(
         coordinate: coordinate,
         vsync: this,
-        duration: const Duration(milliseconds: 700),
+        duration: const Duration(milliseconds: 1000),
         curve: Curves.easeOutCubic,
         zoom: 1.2,
       );
     }
-  }
-
-  void _closePreview() {
-    setState(() {
-      _selected = null;
-      _expanded = false;
-    });
   }
 
   void _explore(DestinationListItem item) {
@@ -241,49 +262,28 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
                     border: Border.all(color: HelmColors.ivoryDivider),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Stack(
-                    children: [
-                      // Fixed-height stage keeps ListView scroll separate from globe drag.
-                      Positioned.fill(
-                        child: Globe(
-                          controller: _controller,
-                          markers: _markers,
-                          theme: _helmTheme,
-                          projection: GlobeProjection.perspective,
-                          autoRotate: !reduceMotion,
-                          autoRotateSpeed: 0.35,
-                          enableZoom: false,
-                          interactive: true,
-                          introAnimation: reduceMotion
-                              ? GlobeIntroAnimations.none
-                              : GlobeIntroAnimations.gentle,
-                          semanticLabel:
-                              'Interactive globe with published destinations',
-                          onMarkerTap: (marker) {
-                            final data = marker.data;
-                            if (data is DestinationListItem) {
-                              _select(data, keepExpanded: _expanded);
-                            }
-                          },
-                        ),
-                      ),
-                      if (_selected != null)
-                        Positioned(
-                          left: 12,
-                          right: 12,
-                          bottom: 12,
-                          child: _GlobePreview(
-                            key: DiscoverGlobe.previewKey,
-                            destination: _selected!,
-                            expanded: _expanded,
-                            onExpand: () => setState(() => _expanded = true),
-                            onCollapse: () =>
-                                setState(() => _expanded = false),
-                            onClose: _closePreview,
-                            onExplore: () => _explore(_selected!),
-                          ),
-                        ),
-                    ],
+                  // Fixed-height stage keeps ListView scroll separate from globe drag.
+                  child: Globe(
+                    controller: _controller,
+                    markers: _markers,
+                    theme: _helmTheme,
+                    projection: GlobeProjection.perspective,
+                    autoRotate: !reduceMotion && !_autoRotatePaused,
+                    autoRotateSpeed: 0.35,
+                    enableZoom: false,
+                    interactive: true,
+                    introAnimation: reduceMotion
+                        ? GlobeIntroAnimations.none
+                        : GlobeIntroAnimations.gentle,
+                    semanticLabel:
+                        'Interactive globe with published destinations',
+                    onReady: _applyInitialFocusIfNeeded,
+                    onMarkerTap: (marker) {
+                      final data = marker.data;
+                      if (data is DestinationListItem) {
+                        _explore(data);
+                      }
+                    },
                   ),
                 ),
               ),
@@ -317,10 +317,7 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
                         ),
                     ],
                     onChanged: (id) {
-                      if (id == null) {
-                        _closePreview();
-                        return;
-                      }
+                      if (id == null) return;
                       DestinationListItem? match;
                       for (final item in _destinations) {
                         if (item.id == id) {
@@ -329,7 +326,7 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
                         }
                       }
                       if (match == null) return;
-                      _select(match, keepExpanded: _expanded);
+                      _focusDestination(match);
                     },
                   ),
                 ),
@@ -338,172 +335,5 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
           ),
         );
     }
-  }
-}
-
-class _GlobePreview extends StatelessWidget {
-  const _GlobePreview({
-    super.key,
-    required this.destination,
-    required this.expanded,
-    required this.onExpand,
-    required this.onCollapse,
-    required this.onClose,
-    required this.onExplore,
-  });
-
-  final DestinationListItem destination;
-  final bool expanded;
-  final VoidCallback onExpand;
-  final VoidCallback onCollapse;
-  final VoidCallback onClose;
-  final VoidCallback onExplore;
-
-  @override
-  Widget build(BuildContext context) {
-    final tags = destination.tags.take(3).toList(growable: false);
-    final summary = destination.availableSummary;
-    final country = helmCountryLabel(destination.countryCode);
-
-    return Material(
-      color: HelmColors.deepOcean,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(HelmRadius.md),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      HelmWrappingText(
-                        destination.nameEn,
-                        style: const TextStyle(
-                          color: HelmColors.ivory,
-                          fontFamily: HelmFonts.fraunces,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          height: 1.25,
-                        ),
-                      ),
-                      if (destination.displayNameAr != null) ...[
-                        const SizedBox(height: 4),
-                        HelmWrappingText(
-                          destination.displayNameAr!,
-                          style: const TextStyle(
-                            color: HelmColors.ivory,
-                            fontFamily: HelmFonts.plexArabic,
-                            fontSize: 16,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                      if (country != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          country,
-                          style: const TextStyle(
-                            color: HelmColors.ivoryMuted,
-                            fontFamily: HelmFonts.outfit,
-                            fontSize: 13,
-                            height: 1.35,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Wrap(
-                  spacing: 6,
-                  children: [
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        minimumSize: const Size(44, 44),
-                        tapTargetSize: MaterialTapTargetSize.padded,
-                      ),
-                      onPressed: expanded ? onCollapse : onExpand,
-                      child: Text(expanded ? 'Collapse' : 'Expand'),
-                    ),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        minimumSize: const Size(44, 44),
-                        tapTargetSize: MaterialTapTargetSize.padded,
-                      ),
-                      onPressed: onClose,
-                      child: const Text('Close'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            if (expanded) ...[
-              if (summary != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  summary,
-                  style: const TextStyle(
-                    color: HelmColors.ivory,
-                    fontFamily: HelmFonts.outfit,
-                    fontSize: 14,
-                    height: 1.45,
-                  ),
-                ),
-              ],
-              if (tags.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    for (final tag in tags)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: HelmColors.ivoryDivider),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          tag.replaceAll('_', ' '),
-                          style: const TextStyle(
-                            color: HelmColors.ivory,
-                            fontFamily: HelmFonts.outfit,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ],
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: HelmColors.teal,
-                  foregroundColor: HelmColors.white,
-                  minimumSize: const Size(0, 44),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(HelmRadius.md),
-                  ),
-                ),
-                onPressed: onExplore,
-                child: const Text('Explore'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

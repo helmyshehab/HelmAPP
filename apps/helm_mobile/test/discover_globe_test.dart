@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:ui' show FakeAccessibilityFeatures;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
@@ -18,12 +15,6 @@ Widget _wrap(Widget child) {
 
 HelmApiClient _client(MockClient mock) =>
     HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
-
-http.Response _jsonOk(Object body) => http.Response(
-      jsonEncode(body),
-      200,
-      headers: {'content-type': 'application/json; charset=utf-8'},
-    );
 
 void main() {
   test('DestinationListItem parses plottable coordinates', () {
@@ -59,7 +50,8 @@ void main() {
     expect(withPlottableCoordinates([missing, bad]), isEmpty);
   });
 
-  testWidgets('DiscoverGlobe shows canvas for seeded plottable destinations',
+  testWidgets(
+      'DiscoverGlobe picker focuses without navigating or showing preview',
       (tester) async {
     // flutter_globe keeps a ticker alive; disable animations and avoid settle.
     tester.platformDispatcher.accessibilityFeaturesTestValue =
@@ -83,12 +75,14 @@ void main() {
       }),
     ];
 
+    var exploreCalls = 0;
     await tester.pumpWidget(
       _wrap(
         DiscoverGlobe(
           apiClient: _client(mock),
           seedItems: seed,
           catalogComplete: true,
+          onExplore: (_) => exploreCalls++,
         ),
       ),
     );
@@ -105,16 +99,12 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.byKey(DiscoverGlobe.previewKey), findsOneWidget);
-    expect(find.text('Expand'), findsOneWidget);
-    expect(find.text('Explore'), findsOneWidget);
-
-    await tester.tap(find.text('Expand'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    expect(find.text('Cultural heart of Bali'), findsOneWidget);
-    expect(find.text('culture'), findsOneWidget);
-    expect(find.text('extra'), findsNothing);
+    expect(exploreCalls, 0);
+    expect(find.text('Expand'), findsNothing);
+    expect(find.text('Explore'), findsNothing);
+    expect(find.text('Close'), findsNothing);
+    expect(find.text('Cultural heart of Bali'), findsNothing);
+    expect(find.byKey(DiscoverGlobe.canvasKey), findsOneWidget);
   });
 
   testWidgets('DiscoverGlobe stays fail-soft when catalog fetch fails',
