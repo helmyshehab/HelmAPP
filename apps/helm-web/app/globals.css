@@ -36,7 +36,8 @@ a {
 }
 
 a:focus-visible,
-button:focus-visible {
+button:focus-visible,
+input:focus-visible {
   outline: 2px solid var(--helm-teal);
   outline-offset: 3px;
 }
@@ -89,6 +90,105 @@ button:focus-visible {
   color: var(--helm-ivory);
   font-size: 1.125rem;
   line-height: 1.5;
+}
+
+.discover-search-section {
+  max-width: 46rem;
+  margin-top: 2rem;
+}
+
+.discover-search-section .section-label {
+  margin-top: 0;
+}
+
+.discover-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.discover-search-field {
+  display: flex;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.discover-search-label {
+  color: var(--helm-ivory);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.discover-search-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--helm-line);
+  border-radius: 0.85rem;
+  background: var(--helm-deep-ocean);
+  color: var(--helm-ivory);
+  font: inherit;
+  line-height: 1.4;
+}
+
+.discover-search-input::placeholder {
+  color: rgba(247, 245, 240, 0.55);
+}
+
+.discover-search-input::-webkit-search-cancel-button {
+  filter: invert(1);
+}
+
+.discover-search-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.discover-search-submit,
+.discover-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.7rem 1.15rem;
+  border-radius: 0.85rem;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.discover-search-submit {
+  border: 1px solid var(--helm-teal);
+  background: var(--helm-teal);
+  color: #ffffff;
+}
+
+.discover-search-submit:hover {
+  border-color: var(--helm-ivory);
+}
+
+.discover-search-submit:active {
+  border-color: var(--helm-midnight);
+}
+
+.discover-search-clear {
+  border: 1px solid var(--helm-line);
+  background: transparent;
+  color: var(--helm-ivory);
+}
+
+.discover-search-clear:hover {
+  border-color: rgba(247, 245, 240, 0.45);
+}
+
+.discover-search-clear:active {
+  border-color: var(--helm-ivory);
 }
 
 .section-label {
