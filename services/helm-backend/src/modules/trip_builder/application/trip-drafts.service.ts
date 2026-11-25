@@ -11,6 +11,7 @@ export type CreateTripDraftBody = {
   destinationId?: string | null;
   title?: string | null;
   constraints?: Record<string, unknown>;
+  clientRequestKey?: string;
 };
 
 export type UpdateTripDraftBody = {
@@ -31,6 +32,7 @@ export class TripDraftsService {
       destinationId: body.destinationId,
       title: body.title,
       constraints: body.constraints,
+      clientRequestKey: body.clientRequestKey,
     });
   }
 

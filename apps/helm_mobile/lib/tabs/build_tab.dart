@@ -6,6 +6,11 @@ import '../auth/traveler_session.dart';
 import '../build/draft_editor_screen.dart';
 import '../build/draft_title_patch.dart';
 import '../build/sign_in_panel.dart';
+import '../build/trip_gen/trip_answers.dart';
+import '../build/trip_gen/trip_flow_routes.dart';
+import '../build/trip_gen/trip_preview_draft.dart';
+import '../build/trip_gen/trip_preview_screen.dart';
+import '../build/trip_gen/trip_questionnaire_screen.dart';
 import '../config/api_config.dart';
 
 /// Build tab — private trip drafts for the signed-in traveler.
@@ -14,9 +19,11 @@ class BuildTab extends StatefulWidget {
     super.key,
     required this.auth,
     this.apiClient,
+    this.initialDestination,
   });
 
   final TravelerAuth auth;
+  final TripDestinationChoice? initialDestination;
 
   /// Injectable for tests; production uses [ApiConfig.apiBaseUrl].
   final HelmApiClient? apiClient;
@@ -37,10 +44,13 @@ class _BuildTabState extends State<BuildTab> {
   Object? _error;
   bool _creating = false;
   String? _boundUserId;
+  TripAnswers _tripAnswers = const TripAnswers();
+  TripDestinationChoice? _pendingDestination;
 
   @override
   void initState() {
     super.initState();
+    _pendingDestination = widget.initialDestination;
     final injected = widget.apiClient;
     if (injected != null) {
       _ownsHttpClient = false;
@@ -84,12 +94,48 @@ class _BuildTabState extends State<BuildTab> {
       return;
     }
     _loadDrafts();
+    if (_pendingDestination != null) {
+      final generation = widget.auth.authGeneration;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_isAuthCurrent(generation)) return;
+        final destination = _pendingDestination;
+        if (destination == null) return;
+        _pendingDestination = null;
+        _tripAnswers = _tripAnswers.copyWith(destination: destination);
+        _openTripBuilder();
+      });
+    }
   }
 
   void _clearPrivateDraftState() {
     _drafts = const [];
     _error = null;
     _creating = false;
+    _tripAnswers = const TripAnswers();
+  }
+
+  Future<void> _openTripBuilder() async {
+    // CTA always starts a new private draft lifecycle; reopen uses the list.
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: tripQuestionnaireRouteName),
+        builder: (_) => TripQuestionnaireScreen(
+          auth: widget.auth,
+          apiClient: _client,
+          initialAnswers: _tripAnswers,
+          onAnswersChanged: (next) {
+            _tripAnswers = next;
+          },
+        ),
+      ),
+    );
+    if (!mounted) return;
+    final session = widget.auth.session;
+    if (session != null && session.userId == _boundUserId) {
+      await _loadDrafts();
+    } else {
+      setState(() {});
+    }
   }
 
   Future<void> _loadDrafts() async {
@@ -140,7 +186,7 @@ class _BuildTabState extends State<BuildTab> {
       );
       if (!mounted || !_isAuthCurrent(generation)) return;
       setState(() => _creating = false);
-      await _openDraft(draft.id, session.userId);
+      await _openDraft(draft, session.userId);
       if (mounted && _isAuthCurrent(generation)) {
         await _loadDrafts();
       }
@@ -154,17 +200,51 @@ class _BuildTabState extends State<BuildTab> {
     }
   }
 
-  Future<void> _openDraft(String draftId, String ownerUserId) async {
+  Future<void> _openDraft(TripDraft draft, String ownerUserId) async {
+    final snapshot = tryParseUbudTripPreviewDraft(draft.constraints);
+    if (snapshot != null) {
+      _tripAnswers = snapshot.answers;
+      final plan = planFromUbudTripPreviewDraft(snapshot);
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          settings: const RouteSettings(name: tripPreviewRouteName),
+          builder: (_) => TripPreviewScreen(
+            plan: plan,
+            auth: widget.auth,
+            apiClient: _client,
+            draftId: draft.id,
+            initialFlightId: snapshot.flightId,
+            initialHotelSlug: snapshot.hotelSlug,
+            initialIncludedActivitySlugs: snapshot.includedActivitySlugs,
+            onAnswersChanged: (next) {
+              _tripAnswers = next;
+            },
+          ),
+        ),
+      );
+      if (!mounted) return;
+      final session = widget.auth.session;
+      if (session != null && session.userId == _boundUserId) {
+        await _loadDrafts();
+      }
+      return;
+    }
+
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => DraftEditorScreen(
           apiClient: _client,
           auth: widget.auth,
-          draftId: draftId,
+          draftId: draft.id,
           ownerUserId: ownerUserId,
         ),
       ),
     );
+    if (!mounted) return;
+    final session = widget.auth.session;
+    if (session != null && session.userId == _boundUserId) {
+      await _loadDrafts();
+    }
   }
 
   Future<void> _signOut() async {
@@ -184,6 +264,7 @@ class _BuildTabState extends State<BuildTab> {
         return Column(
           children: [
             _toolbar(),
+            _buildTripCta(),
             const Expanded(
               child: Center(
                 child: Text(
@@ -194,8 +275,8 @@ class _BuildTabState extends State<BuildTab> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: FilledButton(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: OutlinedButton(
                 key: const Key('build-create'),
                 onPressed: _creating ? null : _createDraft,
                 child: Text(_creating ? 'Creating…' : 'New draft'),
@@ -207,6 +288,7 @@ class _BuildTabState extends State<BuildTab> {
         return Column(
           children: [
             _toolbar(),
+            _buildTripCta(),
             Expanded(
               child: Center(
                 child: Padding(
@@ -249,6 +331,7 @@ class _BuildTabState extends State<BuildTab> {
                 child: Text(_creating ? 'Creating…' : 'New draft'),
               ),
             ),
+            _buildTripCta(),
             Expanded(
               child: ListView.separated(
                 key: const Key('build-draft-list'),
@@ -262,7 +345,7 @@ class _BuildTabState extends State<BuildTab> {
                     subtitle: Text('Updated ${draft.updatedAt}'),
                     onTap: session == null
                         ? null
-                        : () => _openDraft(draft.id, session.userId),
+                        : () => _openDraft(draft, session.userId),
                   );
                 },
               ),
@@ -270,6 +353,28 @@ class _BuildTabState extends State<BuildTab> {
           ],
         );
     }
+  }
+
+  Widget _buildTripCta() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FilledButton(
+            key: const Key('build-my-trip'),
+            onPressed: _openTripBuilder,
+            child: const Text('Build my trip'),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Local Ubud trip preview — no paid AI in this demo.',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _toolbar({Widget? trailing}) {

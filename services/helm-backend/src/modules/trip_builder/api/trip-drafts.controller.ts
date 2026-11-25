@@ -23,6 +23,7 @@ const createTripDraftBody = z
     destinationId: z.string().uuid().nullable().optional(),
     title: z.string().max(200).nullable().optional(),
     constraints: jsonObject.optional(),
+    clientRequestKey: z.string().min(1).max(128).optional(),
   })
   .strict();
 

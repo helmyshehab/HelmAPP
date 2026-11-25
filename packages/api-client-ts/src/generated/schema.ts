@@ -118,6 +118,9 @@ export interface paths {
          *     `destinationId` and `title` may be null or omitted.
          *     `constraints` must be a JSON object when provided (defaults to `{}`).
          *     Status is always set to `draft` by the server.
+         *     When `clientRequestKey` is provided, create is idempotent for that
+         *     authenticated owner: replaying the same key returns the original draft
+         *     (same `id`) instead of inserting a second row.
          */
         post: operations["createTripDraft"];
         delete?: never;
@@ -649,6 +652,12 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+            /**
+             * @description Optional owner-scoped idempotency key. Replaying create with the
+             *     same key for the same authenticated subject returns the original
+             *     draft without creating another row.
+             */
+            clientRequestKey?: string;
         };
         /**
          * @description Partial update. Omitted fields are preserved.

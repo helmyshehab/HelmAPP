@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:http/http.dart' as http;
 
+import '../build/trip_gen/trip_answers.dart';
 import '../config/api_config.dart';
+import '../discover/country_overview_screen.dart';
 import '../discover/destination_list_item.dart';
 import '../discover/destination_overview_screen.dart';
 
-/// Discover tab — published destination list with overview navigation.
+/// Discover groups published destinations by country.
 class DiscoverTab extends StatefulWidget {
-  const DiscoverTab({super.key, this.apiClient});
+  const DiscoverTab({super.key, this.apiClient, this.onBuildTrip});
+
+  final ValueChanged<TripDestinationChoice>? onBuildTrip;
 
   /// Injectable for tests; production uses [ApiConfig.apiBaseUrl].
   final HelmApiClient? apiClient;
@@ -26,7 +30,8 @@ class _DiscoverTabState extends State<DiscoverTab> {
   late final HelmApiClient _client;
 
   _DiscoverLoadState _state = _DiscoverLoadState.loading;
-  List<DestinationListItem> _items = const [];
+  Map<String, List<DestinationListItem>> _destinationsByCountry = const {};
+  Map<String, String> _countryNames = const {};
   Object? _error;
 
   @override
@@ -62,12 +67,32 @@ class _DiscoverTabState extends State<DiscoverTab> {
     });
 
     try {
-      final response = await _client.listDestinations();
-      final items = DestinationListItem.parseItems(response);
+      final destinations = <String, List<DestinationListItem>>{};
+      await for (final page in _pages(_client.listDestinations)) {
+        for (final destination in DestinationListItem.parseItems(page)) {
+          final code = destination.countryCode;
+          if (code == null || code.isEmpty) continue;
+          destinations.putIfAbsent(code, () => []).add(destination);
+        }
+      }
+      final names = <String, String>{};
+      if (destinations.isNotEmpty) {
+        await for (final page in _pages(_client.listGeoCountries)) {
+          final items = page['items'] as List<dynamic>;
+          for (final item in items.whereType<Map<String, dynamic>>()) {
+            final code = item['code'] as String;
+            if (destinations.containsKey(code)) {
+              names[code] = item['nameEn'] as String;
+            }
+          }
+          if (names.length == destinations.length) break;
+        }
+      }
       if (!mounted) return;
       setState(() {
-        _items = items;
-        _state = items.isEmpty
+        _destinationsByCountry = destinations;
+        _countryNames = names;
+        _state = destinations.isEmpty
             ? _DiscoverLoadState.empty
             : _DiscoverLoadState.success;
       });
@@ -78,6 +103,49 @@ class _DiscoverTabState extends State<DiscoverTab> {
         _state = _DiscoverLoadState.failure;
       });
     }
+  }
+
+  Stream<Map<String, dynamic>> _pages(
+    Future<Map<String, dynamic>> Function({int? limit, int? offset}) fetch,
+  ) async* {
+    var offset = 0;
+    while (mounted) {
+      final page = await fetch(limit: 100, offset: offset);
+      if (!mounted) return;
+      yield page;
+      final count = (page['items'] as List<dynamic>).length;
+      offset += count;
+      if (count == 0 || offset >= (page['total'] as int)) return;
+    }
+  }
+
+  String _countryName(String code) => _countryNames[code] ?? code;
+
+  void _openCountry(String code) {
+    final navigator = Navigator.of(context);
+    final discoverRoute = ModalRoute.of(context);
+    navigator.push<void>(MaterialPageRoute(
+      builder: (_) => CountryOverviewScreen(
+        countryCode: code,
+        countryName: _countryName(code),
+        destinations: _destinationsByCountry[code]!,
+        onDestinationSelected: (_, destination) {
+          navigator.push<void>(MaterialPageRoute(
+            builder: (_) => DestinationOverviewScreen(
+              slug: destination.slug,
+              apiClient: _client,
+              onBuildTrip:
+                  destination.slug == 'ubud' && widget.onBuildTrip != null
+                      ? () {
+                          navigator.popUntil((route) => route == discoverRoute);
+                          widget.onBuildTrip?.call(TripDestinationChoice.ubud);
+                        }
+                      : null,
+            ),
+          ));
+        },
+      ),
+    ));
   }
 
   @override
@@ -94,7 +162,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
           child: Padding(
             padding: EdgeInsets.all(24),
             child: Text(
-              'No destinations yet',
+              'No countries yet',
               key: Key('discover-empty'),
               textAlign: TextAlign.center,
             ),
@@ -108,7 +176,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Could not load destinations',
+                  'Could not load countries',
                   key: const Key('discover-failure'),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium,
@@ -130,28 +198,20 @@ class _DiscoverTabState extends State<DiscoverTab> {
           ),
         );
       case _DiscoverLoadState.success:
+        final codes = _destinationsByCountry.keys.toList()
+          ..sort((a, b) => _countryName(a).compareTo(_countryName(b)));
         return ListView.separated(
           key: const Key('discover-list'),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: _items.length,
+          itemCount: codes.length,
           separatorBuilder: (_, __) => const Divider(height: 1),
           itemBuilder: (context, index) {
-            final item = _items[index];
-            final summary = item.availableSummary;
+            final code = codes[index];
             return ListTile(
-              key: Key('discover-item-${item.slug}'),
-              title: Text(item.nameEn),
-              subtitle: summary != null ? Text(summary) : null,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => DestinationOverviewScreen(
-                      slug: item.slug,
-                      apiClient: _client,
-                    ),
-                  ),
-                );
-              },
+              key: Key('discover-country-$code'),
+              title: Text(_countryName(code)),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _openCountry(code),
             );
           },
         );

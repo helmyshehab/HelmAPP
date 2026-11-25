@@ -242,6 +242,41 @@ test('trip drafts: owner CRUD, cross-owner 404, denied PATCH unchanged, 401 with
     assert.equal(getAAgain.json.title, null);
     assert.equal(getAAgain.json.destinationId, null);
     assert.deepEqual(getAAgain.json.constraints, { party: 3, pace: 'busy' });
+
+    // Owner-scoped create idempotency: same clientRequestKey returns original id.
+    const idempotencyKey = `create-key-${randomUUID()}`;
+    const firstKeyed = await httpJson(baseUrl, 'POST', '/v1/trips/drafts', tokenA, {
+      title: 'Idempotent draft',
+      constraints: { party: 2 },
+      clientRequestKey: idempotencyKey,
+    });
+    assert.equal(firstKeyed.status, 201, JSON.stringify(firstKeyed.json));
+    const keyedId = String(firstKeyed.json.id);
+
+    const replayKeyed = await httpJson(baseUrl, 'POST', '/v1/trips/drafts', tokenA, {
+      title: 'Should not create another',
+      constraints: { party: 99 },
+      clientRequestKey: idempotencyKey,
+    });
+    assert.equal(replayKeyed.status, 201, JSON.stringify(replayKeyed.json));
+    assert.equal(replayKeyed.json.id, keyedId);
+    assert.equal(replayKeyed.json.title, 'Idempotent draft');
+    assert.deepEqual(replayKeyed.json.constraints, { party: 2 });
+
+    const listAfterReplay = await httpJson(baseUrl, 'GET', '/v1/trips/drafts', tokenA);
+    assert.equal(listAfterReplay.status, 200);
+    const keyedMatches = (listAfterReplay.json.items as Json[]).filter(
+      (item) => item.id === keyedId,
+    );
+    assert.equal(keyedMatches.length, 1);
+
+    // Keys are owner-scoped: B can reuse the same key without colliding.
+    const bKeyed = await httpJson(baseUrl, 'POST', '/v1/trips/drafts', tokenB, {
+      title: 'B keyed draft',
+      clientRequestKey: idempotencyKey,
+    });
+    assert.equal(bKeyed.status, 201, JSON.stringify(bKeyed.json));
+    assert.notEqual(bKeyed.json.id, keyedId);
   } catch (err) {
     primaryError = err;
   } finally {

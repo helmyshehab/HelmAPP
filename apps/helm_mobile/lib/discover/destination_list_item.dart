@@ -7,6 +7,7 @@ class DestinationListItem {
     this.nameAr,
     this.summaryEn,
     this.summaryAr,
+    this.countryCode,
   });
 
   final String id;
@@ -15,6 +16,7 @@ class DestinationListItem {
   final String? nameAr;
   final String? summaryEn;
   final String? summaryAr;
+  final String? countryCode;
 
   /// Prefer English summary; fall back to Arabic when English is absent.
   String? get availableSummary {
@@ -33,6 +35,7 @@ class DestinationListItem {
       nameAr: json['nameAr'] as String?,
       summaryEn: json['summaryEn'] as String?,
       summaryAr: json['summaryAr'] as String?,
+      countryCode: (json['countryCode'] as String?)?.trim().toUpperCase(),
     );
   }
 

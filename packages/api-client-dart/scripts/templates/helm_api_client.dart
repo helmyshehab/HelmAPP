@@ -292,11 +292,13 @@ class HelmApiClient {
     String? destinationId,
     String? title,
     Map<String, dynamic>? constraints,
+    String? clientRequestKey,
   }) async {
     final body = <String, dynamic>{};
     if (destinationId != null) body['destinationId'] = destinationId;
     if (title != null) body['title'] = title;
     if (constraints != null) body['constraints'] = constraints;
+    if (clientRequestKey != null) body['clientRequestKey'] = clientRequestKey;
     final res = await _http.post(
       _u('/v1/trips/drafts'),
       headers: {
@@ -366,10 +368,17 @@ class HelmApiClient {
     return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
-  Future<Map<String, dynamic>> listDestinations({String? country, String? q}) {
+  Future<Map<String, dynamic>> listDestinations({
+    String? country,
+    String? q,
+    int? limit,
+    int? offset,
+  }) {
     final params = <String, String>{};
     if (country != null) params['country'] = country;
     if (q != null) params['q'] = q;
+    if (limit != null) params['limit'] = '$limit';
+    if (offset != null) params['offset'] = '$offset';
     final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
     return _getJson('/v1/destinations$query');
   }
@@ -403,9 +412,15 @@ class HelmApiClient {
 
   Future<Map<String, dynamic>> listCatalogTags() => _getJson('/v1/catalog/tags');
 
-  Future<Map<String, dynamic>> listGeoCountries({String? q}) {
+  Future<Map<String, dynamic>> listGeoCountries({
+    String? q,
+    int? limit,
+    int? offset,
+  }) {
     final params = <String, String>{};
     if (q != null) params['q'] = q;
+    if (limit != null) params['limit'] = '$limit';
+    if (offset != null) params['offset'] = '$offset';
     final query = params.isEmpty ? '' : '?${Uri(queryParameters: params).query}';
     return _getJson('/v1/geo/countries$query');
   }

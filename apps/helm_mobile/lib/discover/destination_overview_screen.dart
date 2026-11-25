@@ -14,11 +14,13 @@ class DestinationOverviewScreen extends StatefulWidget {
     super.key,
     required this.slug,
     required this.apiClient,
+    this.onBuildTrip,
     this.placesPageSize = kDestinationPlacesPageSize,
   });
 
   final String slug;
   final HelmApiClient apiClient;
+  final VoidCallback? onBuildTrip;
   final int placesPageSize;
 
   @override
@@ -279,6 +281,13 @@ class _DestinationOverviewScreenState extends State<DestinationOverviewScreen> {
                   for (final tag in detail.tags)
                     Chip(label: Text(tag.replaceAll('_', ' '))),
                 ],
+              ),
+            ],
+            if (widget.onBuildTrip case final onBuildTrip?) ...[
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: onBuildTrip,
+                child: const Text('Build my trip'),
               ),
             ],
             const SizedBox(height: 24),

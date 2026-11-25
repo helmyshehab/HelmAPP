@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+
+import 'trip_planner.dart';
+
+class TripDemoModeScreen extends StatefulWidget {
+  const TripDemoModeScreen({
+    super.key,
+    required this.destinationName,
+    required this.days,
+    required this.onBack,
+  });
+
+  final String destinationName;
+  final List<TripPreviewDay> days;
+  final VoidCallback onBack;
+
+  @override
+  State<TripDemoModeScreen> createState() => _TripDemoModeScreenState();
+}
+
+class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
+  int _dayIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final day = widget.days[_dayIndex];
+    final dayCount = widget.days.length;
+    return PopScope<void>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) widget.onBack();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(onPressed: widget.onBack),
+          title: const Text('Demo Trip Mode'),
+        ),
+        body: ListView(
+          key: ValueKey(day.dayNumber),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          children: [
+            Card(
+              margin: EdgeInsets.zero,
+              color: theme.colorScheme.primaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.destinationName,
+                        style: theme.textTheme.headlineMedium),
+                    Text('${day.title} of $dayCount',
+                        style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    const Text('Sample itinerary from demo checkout'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed:
+                      _dayIndex == 0 ? null : () => setState(() => _dayIndex--),
+                  child: const Text('Previous day'),
+                ),
+                TextButton(
+                  onPressed: _dayIndex == dayCount - 1
+                      ? null
+                      : () => setState(() => _dayIndex++),
+                  child: const Text('Next day'),
+                ),
+              ],
+            ),
+            const Divider(),
+            if (day.stops.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Text('Open time to explore at your pace.'),
+              ),
+            for (final stop in day.stops)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.place_outlined),
+                title: Text(stop.place.nameEn),
+                subtitle: Text([
+                  if (stop.roleLabel != TripPreviewStop.unscheduledRole)
+                    stop.roleLabel,
+                  if (stop.place.area case final area?) area,
+                  stop.place.shortDescriptionEn,
+                ].join(' · ')),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
