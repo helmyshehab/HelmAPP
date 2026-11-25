@@ -120,6 +120,23 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/trips/drafts/{id}/itinerary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the caller's private itinerary for a trip draft */
+        get: operations["getTripDraftItinerary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -219,6 +236,26 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+        };
+        TripDraftItineraryItem: {
+            /** Format: uuid */
+            id: string;
+            /** @description 1-based order within the parent day */
+            position: number;
+            title: string | null;
+            notes: string | null;
+        };
+        TripDraftItineraryDay: {
+            /** Format: uuid */
+            id: string;
+            /** @description 1-based order within the parent draft */
+            position: number;
+            label: string | null;
+            items: components["schemas"]["TripDraftItineraryItem"][];
+        };
+        TripDraftItineraryResponse: {
+            /** @description Days ordered by ascending position */
+            days: components["schemas"]["TripDraftItineraryDay"][];
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
@@ -451,6 +488,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            /** @description Missing or invalid access token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Trip draft missing or not owned by caller */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getTripDraftItinerary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Owner-scoped itinerary for the draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftItineraryResponse"];
+                };
+            };
+            /** @description Validation failed */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
                 };
             };
             /** @description Missing or invalid access token */

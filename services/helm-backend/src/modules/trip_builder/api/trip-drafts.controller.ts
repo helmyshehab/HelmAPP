@@ -55,6 +55,15 @@ export class TripDraftsController {
     return this.tripDrafts.create(requireUser(user), body);
   }
 
+  @Get(':id/itinerary')
+  getItinerary(
+    @CurrentUser() user: AuthPrincipal | undefined,
+    @Param('id') id: string,
+  ) {
+    assertUuid(id);
+    return this.tripDrafts.getItinerary(requireUser(user), id);
+  }
+
   @Get(':id')
   get(
     @CurrentUser() user: AuthPrincipal | undefined,

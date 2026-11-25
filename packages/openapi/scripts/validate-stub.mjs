@@ -13,6 +13,8 @@ for (const path of [
   "/v1/ready",
   "/v1/meta",
   "/v1/me",
+  "/v1/trips/drafts",
+  "/v1/trips/drafts/{id}/itinerary",
   "/v1/destinations",
   "/v1/catalog/places",
   "/v1/catalog/categories",
@@ -31,6 +33,10 @@ for (const path of [
 }
 if (!spec.includes("bearerAuth")) {
   console.error("openapi.yaml must define bearerAuth security scheme");
+  process.exit(1);
+}
+if (!spec.includes("operationId: getTripDraftItinerary")) {
+  console.error("openapi.yaml must define getTripDraftItinerary");
   process.exit(1);
 }
 if (!spec.includes("Conflict:") || !spec.includes('"#/components/responses/Conflict"')) {
