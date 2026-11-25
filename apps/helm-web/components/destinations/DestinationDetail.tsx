@@ -41,7 +41,7 @@ export function DestinationDetail({
       <header className="detail-hero">
         <h1 className="detail-title">{destination.nameEn}</h1>
         {destination.nameAr ? (
-          <p className="detail-title-ar">{destination.nameAr}</p>
+          <p className="detail-title-ar" lang="ar" dir="rtl">{destination.nameAr}</p>
         ) : null}
         <p className="detail-country">{countryLabel}</p>
       </header>

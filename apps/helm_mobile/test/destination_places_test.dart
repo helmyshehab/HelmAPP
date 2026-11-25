@@ -47,6 +47,7 @@ Map<String, dynamic> _place({
   required String nameEn,
   required String category,
   String? shortDescriptionEn,
+  String? shortDescriptionAr,
 }) {
   return {
     'id': id,
@@ -55,7 +56,7 @@ Map<String, dynamic> _place({
     'nameAr': nameEn,
     'category': category,
     'shortDescriptionEn': shortDescriptionEn,
-    'shortDescriptionAr': null,
+    'shortDescriptionAr': shortDescriptionAr,
     'status': 'published',
   };
 }
@@ -415,5 +416,68 @@ void main() {
     expect(find.text('Place B'), findsOneWidget);
     expect(page2Attempts, 2);
     expect(offsets, ['0', '1', '1']);
+  });
+
+  testWidgets('place short copy keeps English and directs Arabic fallback',
+      (tester) async {
+    final mock = MockClient((request) async {
+      if (request.url.path.startsWith('/v1/destinations/')) {
+        return _jsonOk(_detailPayload(slug: 'ubud', nameEn: 'Ubud'));
+      }
+      return _jsonOk({
+        'items': [
+          _place(
+            id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            slug: 'english-place',
+            nameEn: 'English Place',
+            category: 'cultural_site',
+            shortDescriptionEn: 'English short',
+            shortDescriptionAr: 'وصف لا يُعرض',
+          ),
+          _place(
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            slug: 'arabic-place',
+            nameEn: 'Arabic Place',
+            category: 'restaurant',
+            shortDescriptionEn: '  ',
+            shortDescriptionAr: 'وصف عربي',
+          ),
+        ],
+        'total': 2,
+        'limit': 20,
+        'offset': 0,
+      });
+    });
+
+    await tester.pumpWidget(
+      _wrap(
+        DestinationOverviewScreen(
+          slug: 'ubud',
+          apiClient: _client(mock),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('English short'), findsOneWidget);
+    expect(find.text('وصف لا يُعرض'), findsNothing);
+    expect(find.text('وصف عربي'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('English short')).textDirection,
+      TextDirection.ltr,
+    );
+    expect(
+      tester.widget<Text>(find.text('وصف عربي')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      tester.widget<Text>(find.text('English Place')).textDirection,
+      isNull,
+    );
+    expect(
+      Directionality.of(tester.element(find.byType(Scaffold))),
+      TextDirection.ltr,
+    );
+    expect(tester.takeException(), isNull);
   });
 }

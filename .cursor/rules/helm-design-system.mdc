@@ -1,0 +1,59 @@
+---
+description: HELM brand, color, type, imagery, and component foundations for traveler web, admin, and Flutter UI
+globs: apps/helm-web/**/*.tsx, apps/helm-web/**/*.css, apps/helm-web/next.config.ts, apps/helm-admin/**/*.tsx, apps/helm-admin/**/*.css, apps/helm-admin/next.config.ts, apps/helm_mobile/**/*.dart, apps/helm_mobile/pubspec.yaml
+alwaysApply: false
+---
+
+# HELM design system
+
+Official identity: **HELM | حِلْم**. Preserve that Arabic spelling, including the kasra.
+
+The Arabic wordmark is custom, refined Naskh-inspired calligraphy with visible تشكيل. IBM Plex Sans Arabic is the Arabic interface font. Do not present it, or any other generic Arabic UI font, as the finished wordmark. Until an approved wordmark asset is in the repo, render accessible temporary text with the exact spelling. Do not generate or invent a logo.
+
+## Color
+
+Approved palette:
+
+- Midnight `#0C1B2A` — dark discovery surfaces
+- Deep Ocean `#163747` — dark discovery panels
+- Teal `#177F83` — primary interactive accent
+- Coral `#F1A38D` — selective accent
+- Ivory `#F7F5F0` — light planning and admin surfaces
+
+Brand colors are not interchangeable foregrounds and backgrounds. Text, focus, control boundaries, and interactive states must meet WCAG on the surface they actually sit on.
+
+Approved contrast:
+
+- Ivory on Midnight: about 15.98:1. Discovery text.
+- Ivory on Deep Ocean: about 11.53:1. Discovery text on raised panels.
+- White on Teal: about 4.77:1. Teal control labels.
+- Teal on Ivory: about 4.38:1. Large text and non-text UI only. Insufficient for normal-size WCAG AA text.
+- Teal on Midnight: about 3.65:1. Large text and focus rings only. Insufficient for normal-size WCAG AA text.
+- Coral on Ivory: about 1.86:1. Insufficient as a standalone control boundary. Pair a coral fill with a Midnight or Deep Ocean edge, and put Midnight or Deep Ocean text on the fill.
+
+Small text and links on Ivory use Midnight or Deep Ocean. A semantic danger, success, or neutral token needs a stated contrast reason and review before it becomes a visual convention.
+
+## Type
+
+- English headings: Fraunces.
+- English UI and body: Outfit.
+- Arabic UI: IBM Plex Sans Arabic.
+- Arabic branding: the separate Naskh-inspired wordmark.
+
+Arabic runs use `lang="ar"` and RTL direction. Keep diacritics visible and line spacing comfortable. Keep decorative calligraphy off long-form Arabic interface copy.
+
+## Components and styling
+
+Use soft, refined radii on buttons, cards, inputs, and bottom sheets. Every interactive control has a clear primary, secondary, disabled, loading, hover, and focus treatment. Traveler surfaces stay spacious. Admin stays denser and still accessible.
+
+Share token names across Next.js and Flutter. Implement them in the platform's current system:
+
+- Traveler web: existing global CSS.
+- Admin: existing CSS Modules and global tokens.
+- Flutter: `ThemeData` and reusable widgets.
+
+Do not add a styling library, UI package, or design dependency without separate approval.
+
+## Imagery and invented data
+
+Use destination photography only when published data supplies a resolvable image URL and alt text. When an image is unavailable, use a deliberate text presentation and omit the image frame. Do not invent images, prices, ratings, availability, or booking states.

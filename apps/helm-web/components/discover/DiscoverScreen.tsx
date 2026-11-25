@@ -1,51 +1,57 @@
 import type { DestinationPublic } from "@helm/api-client-ts";
-import { DestinationCard } from "./DestinationCard";
+import { DiscoverDestinationList } from "./DiscoverDestinationList";
+import { DiscoverGlobe } from "./DiscoverGlobe";
+import { DiscoverSearch } from "./DiscoverSearch";
+import { HelmWordmark } from "./HelmWordmark";
 import { StatusPanel } from "./StatusPanel";
-import { prioritizeDiscoverDestinations } from "@/lib/destinations/present";
 
 type DiscoverScreenProps = {
   destinations: DestinationPublic[];
   total: number;
   locale?: string;
+  query?: string;
 };
 
 export function DiscoverScreen({
   destinations,
   total,
   locale = "en",
+  query,
 }: DiscoverScreenProps) {
-  const ordered = prioritizeDiscoverDestinations(destinations);
+  const hasDestinations = total > 0 && destinations.length > 0;
+  const activeQuery = query?.trim() ?? "";
+  const isSearching = activeQuery.length > 0;
+  // Globe is full-catalog discovery, not a search results map.
+  const showGlobe = !isSearching;
 
   return (
     <main className="shell">
-      <p className="eyebrow">Traveler · Discover</p>
-      <h1 className="brand-mark">
-        Helm
-        <span>حلم · Discover</span>
-      </h1>
-      <p className="lede">
-        Browse published destinations for your next trip. Start with Ubud when
-        it is live on the catalog.
-      </p>
+      <header className="discover-hero">
+        <HelmWordmark />
+        <p className="lede">Browse published destinations.</p>
+      </header>
 
-      {total === 0 || ordered.length === 0 ? (
-        <StatusPanel
-          title="No destinations yet"
-          body="The public catalog has no published destinations right now. Check back once destinations are published."
+      <DiscoverSearch query={activeQuery} />
+
+      {showGlobe ? <DiscoverGlobe locale={locale} /> : null}
+
+      {hasDestinations ? (
+        <DiscoverDestinationList
+          key={activeQuery || "all"}
+          initialDestinations={destinations}
+          total={total}
+          locale={locale}
+          query={activeQuery || undefined}
         />
       ) : (
-        <>
-          <p className="section-label">Published destinations</p>
-          <ul className="destination-list">
-            {ordered.map((destination) => (
-              <DestinationCard
-                key={destination.id}
-                destination={destination}
-                locale={locale}
-              />
-            ))}
-          </ul>
-        </>
+        <StatusPanel
+          title={isSearching ? "No matching destinations" : "No destinations yet"}
+          body={
+            isSearching
+              ? `No published destinations match “${activeQuery}”. Clear the search to browse the full catalog.`
+              : "The public catalog has no published destinations right now. Check back once destinations are published."
+          }
+        />
       )}
     </main>
   );

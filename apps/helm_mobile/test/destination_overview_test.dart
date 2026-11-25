@@ -8,6 +8,7 @@ import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
 import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
 import 'package:helm_mobile/discover/destination_detail.dart';
+import 'package:helm_mobile/discover/destination_overview_screen.dart';
 import 'package:helm_mobile/main.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
 import 'package:http/http.dart' as http;
@@ -18,26 +19,7 @@ Widget _wrap(Widget child) {
 }
 
 HelmApiClient _client(MockClient mock) =>
-    HelmApiClient(
-      baseUrl: 'https://api.test',
-      httpClient: MockClient((request) async {
-        if (request.url.path == '/v1/geo/countries') {
-          return _jsonOk({
-            'items': [{'code': 'ID', 'nameEn': 'Indonesia'}],
-            'total': 1,
-          });
-        }
-        final forwarded = http.Request(request.method, request.url)
-          ..headers.addAll(request.headers)
-          ..bodyBytes = request.bodyBytes;
-        return http.Response.fromStream(await mock.send(forwarded));
-      }),
-    );
-
-Future<void> _openIndonesia(WidgetTester tester) async {
-  await tester.tap(find.byKey(const Key('discover-country-ID')));
-  await tester.pumpAndSettle();
-}
+    HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
 
 /// UTF-8 JSON body — charset header selects utf8 (http 1.2.2 has no encoding:).
 http.Response _jsonOk(Object body) => http.Response(
@@ -114,8 +96,8 @@ void main() {
         'offset': 0,
       });
 
-  testWidgets('Indonesia to Ubud resumes Build after sign-in',
-      (tester) async {
+
+  testWidgets('Ubud overview resumes Build after sign-in', (tester) async {
     final auth = FakeTravelerAuth();
     addTearDown(auth.dispose);
     final client = _client(MockClient((request) async {
@@ -138,9 +120,9 @@ void main() {
     }));
 
     await tester.pumpWidget(
-        MaterialApp(home: HelmShell(auth: auth, apiClient: client)));
+      MaterialApp(home: HelmShell(auth: auth, apiClient: client)),
+    );
     await tester.pumpAndSettle();
-    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Build my trip'));
@@ -148,7 +130,8 @@ void main() {
     expect(find.byKey(const Key('build-signed-out')), findsOneWidget);
 
     auth.setSession(
-        const TravelerSession(userId: 'traveler', accessToken: 'token'));
+      const TravelerSession(userId: 'traveler', accessToken: 'token'),
+    );
     await tester.pumpAndSettle();
     final ubud = tester.widget<RadioListTile<TripDestinationChoice>>(
       find.byKey(const Key('trip-destination-ubud')),
@@ -159,8 +142,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('trip-destination-ubud')), findsNothing);
     expect(
-        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
-        1);
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+      1,
+    );
   });
 
   testWidgets('tapping a destination row opens overview and loads by slug',
@@ -196,7 +180,6 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     // Flush the tap, then advance the route transition so overview builds.
     await tester.pump();
@@ -235,7 +218,6 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-missing')));
     await tester.pumpAndSettle();
 
@@ -278,7 +260,6 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     await tester.pumpAndSettle();
 
@@ -320,7 +301,6 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('destination-overview-ubud')), findsOneWidget);
@@ -328,12 +308,87 @@ void main() {
     await tester.tap(find.byKey(const Key('destination-overview-back')));
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('discover-list')), findsOneWidget);
     expect(find.byKey(const Key('discover-item-ubud')), findsOneWidget);
     expect(find.byKey(const Key('destination-overview-ubud')), findsNothing);
+  });
 
-    await tester.pageBack();
+  testWidgets('overview directs Arabic copy and keeps the scaffold LTR',
+      (tester) async {
+    final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return emptyPlaces();
+      }
+      expect(request.url.path, '/v1/destinations/demo');
+      return _jsonOk({
+        'id': '11111111-1111-1111-1111-111111111111',
+        'slug': 'demo',
+        'nameEn': 'Harbor',
+        'nameAr': 'ميناء',
+        'summaryEn': 'English summary',
+        'summaryAr': 'ملخص لا يُعرض',
+        'descriptionEn': '   ',
+        'descriptionAr': 'وصف عربي',
+        'countryCode': 'XX',
+        'tags': const <String>['culture'],
+        'status': 'published',
+      });
+    });
+
+    await tester.pumpWidget(
+      _wrap(
+        DestinationOverviewScreen(
+          slug: 'demo',
+          apiClient: _client(mock),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('discover-list')), findsOneWidget);
-    expect(find.byKey(const Key('discover-country-ID')), findsOneWidget);
+
+    expect(find.text('English summary'), findsOneWidget);
+    expect(find.text('ملخص لا يُعرض'), findsNothing);
+    expect(find.text('وصف عربي'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.text('ميناء')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      tester.widget<Text>(find.text('English summary')).textDirection,
+      TextDirection.ltr,
+    );
+    expect(
+      tester.widget<Text>(find.text('وصف عربي')).textDirection,
+      TextDirection.rtl,
+    );
+    expect(
+      tester.widget<Text>(find.byKey(const Key('destination-overview-name'))).textDirection,
+      isNull,
+    );
+    expect(tester.widget<Text>(find.text('XX')).textDirection, isNull);
+    expect(
+      Directionality.of(tester.element(find.byType(DestinationOverviewScreen))),
+      TextDirection.ltr,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.linear(2),
+            ),
+            child: child!,
+          );
+        },
+        home: Scaffold(
+          body: DestinationOverviewScreen(
+            slug: 'demo',
+            apiClient: _client(mock),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }
