@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:helm_api_client/helm_api_client.dart';
 
 import 'auth/fake_traveler_auth.dart';
 import 'auth/supabase_traveler_auth.dart';
 import 'auth/traveler_session.dart';
+import 'build/trip_gen/trip_answers.dart';
 import 'tabs/build_tab.dart';
 import 'tabs/discover_tab.dart';
 import 'tabs/packages_tab.dart';
@@ -39,9 +41,10 @@ class HelmApp extends StatelessWidget {
 }
 
 class HelmShell extends StatefulWidget {
-  const HelmShell({super.key, required this.auth});
+  const HelmShell({super.key, required this.auth, this.apiClient});
 
   final TravelerAuth auth;
+  final HelmApiClient? apiClient;
 
   @override
   State<HelmShell> createState() => _HelmShellState();
@@ -49,12 +52,23 @@ class HelmShell extends StatefulWidget {
 
 class _HelmShellState extends State<HelmShell> {
   int index = 0;
+  TripDestinationChoice? _buildDestination;
 
   @override
   Widget build(BuildContext context) {
     final tabs = <Widget>[
-      const DiscoverTab(),
-      BuildTab(auth: widget.auth),
+      DiscoverTab(
+        apiClient: widget.apiClient,
+        onBuildTrip: (destination) => setState(() {
+          _buildDestination = destination;
+          index = 1;
+        }),
+      ),
+      BuildTab(
+        auth: widget.auth,
+        apiClient: widget.apiClient,
+        initialDestination: _buildDestination,
+      ),
       const PackagesTab(),
       const TripsTab(),
       const ProfileTab(),
@@ -65,7 +79,10 @@ class _HelmShellState extends State<HelmShell> {
       body: tabs[index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
-        onDestinationSelected: (value) => setState(() => index = value),
+        onDestinationSelected: (value) => setState(() {
+          if (value != index) _buildDestination = null;
+          index = value;
+        }),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),

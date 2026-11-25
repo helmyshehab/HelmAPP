@@ -140,6 +140,9 @@ paths:
         `destinationId` and `title` may be null or omitted.
         `constraints` must be a JSON object when provided (defaults to `{}`).
         Status is always set to `draft` by the server.
+        When `clientRequestKey` is provided, create is idempotent for that
+        authenticated owner: replaying the same key returns the original draft
+        (same `id`) instead of inserting a second row.
       tags: [trips]
       security:
         - bearerAuth: []
@@ -1169,6 +1172,14 @@ components:
           type: object
           additionalProperties: true
           description: Must be a JSON object; defaults to `{}` when omitted
+        clientRequestKey:
+          type: string
+          minLength: 1
+          maxLength: 128
+          description: |
+            Optional owner-scoped idempotency key. Replaying create with the
+            same key for the same authenticated subject returns the original
+            draft without creating another row.
     UpdateTripDraftRequest:
       type: object
       description: |

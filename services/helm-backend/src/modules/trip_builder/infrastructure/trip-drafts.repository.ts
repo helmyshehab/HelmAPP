@@ -21,6 +21,8 @@ export type CreateTripDraftInput = {
   destinationId?: string | null;
   title?: string | null;
   constraints?: Record<string, unknown>;
+  /** Owner-scoped idempotency key; replay returns the original draft. */
+  clientRequestKey?: string;
 };
 
 export type UpdateTripDraftInput = {
@@ -76,10 +78,16 @@ export class TripDraftsRepository {
     const title = input.title === undefined ? null : input.title;
     const constraints = input.constraints ?? {};
     const constraintsJson = JSON.stringify(constraints);
+    const clientRequestKey =
+      input.clientRequestKey === undefined || input.clientRequestKey === ''
+        ? null
+        : input.clientRequestKey;
 
     const destinationSql =
       destinationId === null ? sql`null` : sql`${destinationId}::uuid`;
     const titleSql = title === null ? sql`null` : sql`${title}`;
+    const clientRequestKeySql =
+      clientRequestKey === null ? sql`null` : sql`${clientRequestKey}`;
 
     try {
       const rows = await db.execute(sql`
@@ -88,14 +96,16 @@ export class TripDraftsRepository {
           destination_id,
           title,
           constraints_json,
-          status
+          status,
+          client_request_key
         )
         values (
           ${input.userId}::uuid,
           ${destinationSql},
           ${titleSql},
           ${constraintsJson}::jsonb,
-          'draft'::trips.trip_draft_status
+          'draft'::trips.trip_draft_status,
+          ${clientRequestKeySql}
         )
         returning
           id::text as "id",
@@ -113,6 +123,16 @@ export class TripDraftsRepository {
       return row;
     } catch (err) {
       if (err instanceof AppException) throw err;
+      if (
+        clientRequestKey !== null &&
+        isUniqueViolation(err)
+      ) {
+        const existing = await this.getForOwnerByClientRequestKey(
+          input.userId,
+          clientRequestKey,
+        );
+        if (existing) return existing;
+      }
       if (isForeignKeyViolation(err)) {
         throw AppException.validation(
           'Invalid destination or missing customer account for trip draft',
@@ -120,6 +140,28 @@ export class TripDraftsRepository {
       }
       throw err instanceof Error ? err : new Error(collectErrorText(err));
     }
+  }
+
+  async getForOwnerByClientRequestKey(
+    userId: string,
+    clientRequestKey: string,
+  ): Promise<TripDraftRow | null> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        id::text as "id",
+        destination_id::text as "destinationId",
+        title as "title",
+        constraints_json as "constraints",
+        status::text as "status",
+        created_at as "createdAt",
+        updated_at as "updatedAt"
+      from trips.trip_drafts
+      where user_id = ${userId}::uuid
+        and client_request_key = ${clientRequestKey}
+      limit 1
+    `);
+    return mapRow(asRowArray(rows)[0]);
   }
 
   async listForOwner(userId: string): Promise<TripDraftRow[]> {
@@ -342,6 +384,10 @@ function asRowArray(result: unknown): unknown[] {
 
 function isForeignKeyViolation(err: unknown): boolean {
   return collectErrorCode(err) === '23503';
+}
+
+function isUniqueViolation(err: unknown): boolean {
+  return collectErrorCode(err) === '23505';
 }
 
 function collectErrorText(err: unknown): string {

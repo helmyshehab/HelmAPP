@@ -223,6 +223,12 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+            /**
+             * @description Optional owner-scoped idempotency key. Replaying create with the
+             *     same key for the same authenticated subject returns the original
+             *     draft without creating another row.
+             */
+            clientRequestKey?: string;
         };
         /**
          * @description Partial update. Omitted fields are preserved.

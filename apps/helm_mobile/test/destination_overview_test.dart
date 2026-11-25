@@ -4,7 +4,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
+import 'package:helm_mobile/auth/fake_traveler_auth.dart';
+import 'package:helm_mobile/auth/traveler_session.dart';
+import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
 import 'package:helm_mobile/discover/destination_detail.dart';
+import 'package:helm_mobile/main.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -14,7 +18,26 @@ Widget _wrap(Widget child) {
 }
 
 HelmApiClient _client(MockClient mock) =>
-    HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
+    HelmApiClient(
+      baseUrl: 'https://api.test',
+      httpClient: MockClient((request) async {
+        if (request.url.path == '/v1/geo/countries') {
+          return _jsonOk({
+            'items': [{'code': 'ID', 'nameEn': 'Indonesia'}],
+            'total': 1,
+          });
+        }
+        final forwarded = http.Request(request.method, request.url)
+          ..headers.addAll(request.headers)
+          ..bodyBytes = request.bodyBytes;
+        return http.Response.fromStream(await mock.send(forwarded));
+      }),
+    );
+
+Future<void> _openIndonesia(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('discover-country-ID')));
+  await tester.pumpAndSettle();
+}
 
 /// UTF-8 JSON body — charset header selects utf8 (http 1.2.2 has no encoding:).
 http.Response _jsonOk(Object body) => http.Response(
@@ -91,6 +114,55 @@ void main() {
         'offset': 0,
       });
 
+  testWidgets('Indonesia to Ubud resumes Build after sign-in',
+      (tester) async {
+    final auth = FakeTravelerAuth();
+    addTearDown(auth.dispose);
+    final client = _client(MockClient((request) async {
+      switch (request.url.path) {
+        case '/v1/destinations':
+          return _jsonOk({
+            'items': [_listItem(slug: 'ubud', nameEn: 'Ubud')],
+            'total': 1,
+            'limit': 20,
+            'offset': 0,
+          });
+        case '/v1/destinations/ubud':
+          return _jsonOk(_detailPayload(slug: 'ubud', nameEn: 'Ubud'));
+        case '/v1/trips/drafts':
+          return _jsonOk({'items': []});
+        default:
+          if (request.url.path.endsWith('/bootstrap')) return _jsonOk({});
+          return emptyPlaces();
+      }
+    }));
+
+    await tester.pumpWidget(
+        MaterialApp(home: HelmShell(auth: auth, apiClient: client)));
+    await tester.pumpAndSettle();
+    await _openIndonesia(tester);
+    await tester.tap(find.byKey(const Key('discover-item-ubud')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Build my trip'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('build-signed-out')), findsOneWidget);
+
+    auth.setSession(
+        const TravelerSession(userId: 'traveler', accessToken: 'token'));
+    await tester.pumpAndSettle();
+    final ubud = tester.widget<RadioListTile<TripDestinationChoice>>(
+      find.byKey(const Key('trip-destination-ubud')),
+    );
+    expect(ubud.groupValue, TripDestinationChoice.ubud);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('trip-destination-ubud')), findsNothing);
+    expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        1);
+  });
+
   testWidgets('tapping a destination row opens overview and loads by slug',
       (tester) async {
     final gate = Completer<void>();
@@ -124,6 +196,7 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
+    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     // Flush the tap, then advance the route transition so overview builds.
     await tester.pump();
@@ -162,6 +235,7 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
+    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-missing')));
     await tester.pumpAndSettle();
 
@@ -204,6 +278,7 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
+    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     await tester.pumpAndSettle();
 
@@ -245,6 +320,7 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
+    await _openIndonesia(tester);
     await tester.tap(find.byKey(const Key('discover-item-ubud')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('destination-overview-ubud')), findsOneWidget);
@@ -252,8 +328,12 @@ void main() {
     await tester.tap(find.byKey(const Key('destination-overview-back')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('discover-list')), findsOneWidget);
     expect(find.byKey(const Key('discover-item-ubud')), findsOneWidget);
     expect(find.byKey(const Key('destination-overview-ubud')), findsNothing);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('discover-list')), findsOneWidget);
+    expect(find.byKey(const Key('discover-country-ID')), findsOneWidget);
   });
 }
