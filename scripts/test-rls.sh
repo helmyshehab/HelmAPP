@@ -26,4 +26,7 @@ psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$ROOT/supabase/tests/rls_revocation.
 echo "Running trip drafts ownership harness"
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$ROOT/supabase/tests/rls_trip_drafts.sql"
 
+echo "Running trip itinerary ownership harness"
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$ROOT/supabase/tests/rls_trip_itinerary.sql"
+
 echo "RLS tests passed."
