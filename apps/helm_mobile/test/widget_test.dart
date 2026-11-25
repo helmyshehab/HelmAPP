@@ -65,7 +65,7 @@ void main() {
 
   testWidgets('HelmApp still boots with default Discover client', (tester) async {
     // Avoid network: pump only until first frame (loading), then dispose.
-    await tester.pumpWidget(const HelmApp());
+    await tester.pumpWidget(HelmApp());
     expect(find.text('Helm حلم'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
   });

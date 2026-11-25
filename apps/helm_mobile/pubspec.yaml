@@ -12,6 +12,7 @@ dependencies:
   helm_api_client:
     path: ../../packages/api-client-dart
   http: 1.2.2
+  supabase_flutter: ^2.15.4
 
 dev_dependencies:
   flutter_test:

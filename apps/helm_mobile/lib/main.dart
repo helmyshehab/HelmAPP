@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
-import 'tabs/discover_tab.dart';
-import 'tabs/build_tab.dart';
-import 'tabs/packages_tab.dart';
-import 'tabs/trips_tab.dart';
-import 'tabs/profile_tab.dart';
 
-void main() {
-  runApp(const HelmApp());
+import 'auth/fake_traveler_auth.dart';
+import 'auth/supabase_traveler_auth.dart';
+import 'auth/traveler_session.dart';
+import 'tabs/build_tab.dart';
+import 'tabs/discover_tab.dart';
+import 'tabs/packages_tab.dart';
+import 'tabs/profile_tab.dart';
+import 'tabs/trips_tab.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final auth = await createTravelerAuth();
+  runApp(HelmApp(auth: auth));
 }
 
-/// Helm حلم — Step 2 shell with five empty tabs (no product features).
+/// Helm حلم — traveler shell with Discover + Build draft flow.
 class HelmApp extends StatelessWidget {
-  const HelmApp({super.key});
+  HelmApp({
+    super.key,
+    TravelerAuth? auth,
+  }) : auth = auth ?? FakeTravelerAuth();
+
+  /// Injected auth for tests; production uses [createTravelerAuth] from [main].
+  final TravelerAuth auth;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +33,15 @@ class HelmApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B3D2E)),
         useMaterial3: true,
       ),
-      home: const HelmShell(),
+      home: HelmShell(auth: auth),
     );
   }
 }
 
 class HelmShell extends StatefulWidget {
-  const HelmShell({super.key});
+  const HelmShell({super.key, required this.auth});
+
+  final TravelerAuth auth;
 
   @override
   State<HelmShell> createState() => _HelmShellState();
@@ -36,16 +50,16 @@ class HelmShell extends StatefulWidget {
 class _HelmShellState extends State<HelmShell> {
   int index = 0;
 
-  static const tabs = <Widget>[
-    DiscoverTab(),
-    BuildTab(),
-    PackagesTab(),
-    TripsTab(),
-    ProfileTab(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final tabs = <Widget>[
+      const DiscoverTab(),
+      BuildTab(auth: widget.auth),
+      const PackagesTab(),
+      const TripsTab(),
+      const ProfileTab(),
+    ];
+
     return Scaffold(
       appBar: AppBar(title: const Text('Helm حلم')),
       body: tabs[index],
@@ -53,11 +67,26 @@ class _HelmShellState extends State<HelmShell> {
         selectedIndex: index,
         onDestinationSelected: (value) => setState(() => index = value),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.explore_outlined), label: 'Discover'),
-          NavigationDestination(icon: Icon(Icons.auto_awesome_outlined), label: 'Build'),
-          NavigationDestination(icon: Icon(Icons.card_travel_outlined), label: 'Packages'),
-          NavigationDestination(icon: Icon(Icons.map_outlined), label: 'Trips'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            label: 'Discover',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            label: 'Build',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.card_travel_outlined),
+            label: 'Packages',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            label: 'Trips',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
         ],
       ),
     );
