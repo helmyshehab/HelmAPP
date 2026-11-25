@@ -143,6 +143,62 @@ class TripDraftListResponse {
       );
 }
 
+class TripDraftItineraryItem {
+  TripDraftItineraryItem({
+    required this.id,
+    required this.position,
+    this.title,
+    this.notes,
+  });
+  final String id;
+  final int position;
+  final String? title;
+  final String? notes;
+
+  factory TripDraftItineraryItem.fromJson(Map<String, dynamic> json) =>
+      TripDraftItineraryItem(
+        id: json['id'] as String,
+        position: json['position'] as int,
+        title: json['title'] as String?,
+        notes: json['notes'] as String?,
+      );
+}
+
+class TripDraftItineraryDay {
+  TripDraftItineraryDay({
+    required this.id,
+    required this.position,
+    required this.items,
+    this.label,
+  });
+  final String id;
+  final int position;
+  final String? label;
+  final List<TripDraftItineraryItem> items;
+
+  factory TripDraftItineraryDay.fromJson(Map<String, dynamic> json) =>
+      TripDraftItineraryDay(
+        id: json['id'] as String,
+        position: json['position'] as int,
+        label: json['label'] as String?,
+        items: (json['items'] as List<dynamic>)
+            .map((e) => TripDraftItineraryItem.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
+class TripDraftItineraryResponse {
+  TripDraftItineraryResponse({required this.days});
+  final List<TripDraftItineraryDay> days;
+
+  factory TripDraftItineraryResponse.fromJson(Map<String, dynamic> json) =>
+      TripDraftItineraryResponse(
+        days: (json['days'] as List<dynamic>)
+            .map((e) => TripDraftItineraryDay.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+}
+
 const Object _omit = Object();
 
 /// Generated Helm حلم API client (meta/identity + catalog discovery + trip drafts).
@@ -267,6 +323,22 @@ class HelmApiClient {
       throw Exception('getTripDraft failed: ${res.statusCode}');
     }
     return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripDraftItineraryResponse> getTripDraftItinerary({
+    required String accessToken,
+    required String id,
+  }) async {
+    final res = await _http.get(
+      _u('/v1/trips/drafts/${Uri.encodeComponent(id)}/itinerary'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('getTripDraftItinerary failed: ${res.statusCode}');
+    }
+    return TripDraftItineraryResponse.fromJson(
+      jsonDecode(res.body) as Map<String, dynamic>,
+    );
   }
 
   Future<TripDraft> updateTripDraft({

@@ -232,6 +232,43 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/trips/drafts/{id}/itinerary:
+    get:
+      operationId: getTripDraftItinerary
+      summary: Get the caller's private itinerary for a trip draft
+      description: |
+        Returns ordered days and nested items for a draft owned by the
+        verified JWT subject. Days and items are ordered by ascending
+        `position`. An owned draft with no itinerary returns `{ "days": [] }`.
+        A day with no items returns `items: []`. Nullable `label`, `title`,
+        and `notes` are preserved as stored.
+        Returns 400 when `{id}` is not a UUID.
+        Returns 404 when the draft is missing or owned by another customer
+        (same public error in both cases).
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/TripDraftId"
+      responses:
+        "200":
+          description: Owner-scoped itinerary for the draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraftItineraryResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          description: Database is not configured or unavailable
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -1151,6 +1188,58 @@ components:
           type: object
           additionalProperties: true
           description: Must be a JSON object when provided
+    TripDraftItineraryItem:
+      type: object
+      required:
+        - id
+        - position
+        - title
+        - notes
+      properties:
+        id:
+          type: string
+          format: uuid
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based order within the parent day
+        title:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    TripDraftItineraryDay:
+      type: object
+      required:
+        - id
+        - position
+        - label
+        - items
+      properties:
+        id:
+          type: string
+          format: uuid
+        position:
+          type: integer
+          minimum: 1
+          description: 1-based order within the parent draft
+        label:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TripDraftItineraryItem"
+    TripDraftItineraryResponse:
+      type: object
+      required: [days]
+      properties:
+        days:
+          type: array
+          description: Days ordered by ascending position
+          items:
+            $ref: "#/components/schemas/TripDraftItineraryDay"
     AppRole:
       type: string
       enum: [customer, operator, administrator, super-administrator]
@@ -2252,7 +2341,7 @@ tags:
   - name: identity
     description: Authenticated identity foundation and customer account/profile bootstrap
   - name: trips
-    description: Authenticated private trip drafts (owner-scoped)
+    description: Authenticated private trip drafts and read-only itineraries (owner-scoped)
   - name: catalog
     description: Public travel catalog discovery (published entries only)
   - name: geo
