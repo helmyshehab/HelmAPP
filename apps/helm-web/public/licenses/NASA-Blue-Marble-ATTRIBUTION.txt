@@ -1,0 +1,15 @@
+Earth texture: NASA Blue Marble imagery
+File: /globe/earth-blue-marble.jpg
+
+Source distribution used for packaging:
+  three-globe example image (earth-blue-marble.jpg)
+  https://github.com/vasturiano/three-globe
+
+Underlying imagery:
+  NASA Earth Observatory / Visible Earth Blue Marble composites.
+  NASA media is generally not subject to copyright in the United States
+  when used for informational visualization. Credit NASA as the source.
+  Do not imply NASA endorsement of HELM | حِلْم.
+
+Guidelines:
+  https://www.nasa.gov/nasa-brand-center/images-and-media/

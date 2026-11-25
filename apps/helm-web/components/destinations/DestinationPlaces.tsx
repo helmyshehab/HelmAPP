@@ -65,7 +65,7 @@ export function DestinationPlaces({
               <li key={place.id} className="place-item">
                 <p className="place-name">{place.nameEn}</p>
                 {place.nameAr ? (
-                  <p className="place-name-ar">{place.nameAr}</p>
+                  <p className="place-name-ar" lang="ar" dir="rtl">{place.nameAr}</p>
                 ) : null}
                 <p className="place-meta">{formatCategory(place.category)}</p>
                 {description ? (

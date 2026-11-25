@@ -3,8 +3,10 @@
 Flutter app for **Helm حلم**.
 
 Five-tab shell (Discover / Build / Packages / Trips / Profile). Discover loads
-published destinations via the generated `helm_api_client` (`listDestinations`).
-Build lists and edits private trip drafts after traveler sign-in.
+published destinations via the generated `helm_api_client` (`listDestinations`),
+with search, pagination, and an interactive globe. Build lists and edits private
+trip drafts after traveler sign-in (questionnaire, planner, preview, and demo
+checkout for Ubud).
 
 Uses `helm_api_client` from `packages/api-client-dart` (generated — do not hand-edit).
 

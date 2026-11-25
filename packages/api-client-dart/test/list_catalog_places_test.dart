@@ -81,4 +81,51 @@ void main() {
       expect(captured.query, isEmpty);
     });
   });
+
+  group('listDestinations pagination', () {
+    test('sends optional limit and offset when provided', () async {
+      late Uri captured;
+      final mock = MockClient((request) async {
+        captured = request.url;
+        return http.Response(
+          '{"items":[],"total":0}',
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+      final client = HelmApiClient(
+        baseUrl: 'https://api.example.com',
+        httpClient: mock,
+      );
+
+      await client.listDestinations(q: 'ubud', limit: 12, offset: 24);
+
+      expect(captured.path, '/v1/destinations');
+      expect(captured.queryParameters['q'], 'ubud');
+      expect(captured.queryParameters['limit'], '12');
+      expect(captured.queryParameters['offset'], '24');
+    });
+
+    test('omits limit and offset when not provided', () async {
+      late Uri captured;
+      final mock = MockClient((request) async {
+        captured = request.url;
+        return http.Response(
+          '{"items":[],"total":0}',
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+      final client = HelmApiClient(
+        baseUrl: 'https://api.example.com',
+        httpClient: mock,
+      );
+
+      await client.listDestinations(q: 'ubud');
+
+      expect(captured.queryParameters['q'], 'ubud');
+      expect(captured.queryParameters.containsKey('limit'), isFalse);
+      expect(captured.queryParameters.containsKey('offset'), isFalse);
+    });
+  });
 }

@@ -8,25 +8,6 @@ export type DestinationDetailFields = DestinationPublic & {
   shortDescriptionAr?: string | null;
 };
 
-const FEATURED_DEMO_SLUG = "ubud";
-
-export function isFeaturedDemoDestination(slug: string): boolean {
-  return slug === FEATURED_DEMO_SLUG;
-}
-
-/** Put Ubud first when present; keep relative order otherwise. */
-export function prioritizeDiscoverDestinations(
-  items: DestinationPublic[],
-): DestinationPublic[] {
-  const featured: DestinationPublic[] = [];
-  const rest: DestinationPublic[] = [];
-  for (const item of items) {
-    if (isFeaturedDemoDestination(item.slug)) featured.push(item);
-    else rest.push(item);
-  }
-  return [...featured, ...rest];
-}
-
 export function formatTagLabel(tag: string): string {
   return tag.replace(/_/g, " ");
 }

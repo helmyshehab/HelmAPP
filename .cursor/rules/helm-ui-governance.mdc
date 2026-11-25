@@ -1,0 +1,38 @@
+---
+description: Always-on HELM UI governance. Read the design system and interaction rules before any user-facing work.
+alwaysApply: true
+---
+
+# HELM UI governance
+
+Before proposing or implementing any user-facing feature, read `.cursor/rules/helm-design-system.mdc` and `.cursor/rules/helm-interactions.mdc`, even when the task begins in a backend file or a planning conversation.
+
+## Reuse
+
+For a backend-enabled button, screen, dashboard, or feature, reuse the approved HELM design system and interaction conventions. Routine reuse does not need a new design approval.
+
+## Approval before a new characteristic
+
+Get explicit design approval before introducing any of these:
+
+- Navigation model
+- Visual characteristic
+- Interaction pattern
+- Component convention
+- Typography or color system
+- Animation behavior
+- Significant information-hierarchy change
+
+A semantic danger, success, or neutral token is a new color convention and needs that review.
+
+## Design approval is not code approval
+
+Design approval does not authorize unrestricted repository edits. Follow INSPECT → PROPOSE → APPROVE → IMPLEMENT → TEST → COMMIT → PUSH → PR. Commit, push, and open a PR only after explicit authorization for that step. Prefer small, independently reviewable diffs. An approved future decision, including hiding Flutter's Build, Packages, Trips, and Profile tabs, is not permission to implement it.
+
+## One identity, platform-specific layout
+
+Keep one recognizable HELM identity across the Next.js traveler website, the Flutter traveler app, and the Next.js admin dashboard. Do not force identical layouts. Admin may be denser and must keep the approved type, color, accessibility, and component principles.
+
+## Repository integrity
+
+Leave unrelated uncommitted work untouched. Do not invent API capabilities. Do not add dependencies silently. Do not change an established UI characteristic without approval.

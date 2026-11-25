@@ -10,6 +10,8 @@ import 'tabs/discover_tab.dart';
 import 'tabs/packages_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/trips_tab.dart';
+import 'theme/helm_theme.dart';
+import 'theme/helm_wordmark.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,11 +32,10 @@ class HelmApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Helm حلم',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B3D2E)),
-        useMaterial3: true,
-      ),
+      title: HelmWordmark.label,
+      theme: HelmTheme.light(),
+      darkTheme: HelmTheme.dark(),
+      themeMode: ThemeMode.system,
       home: HelmShell(auth: auth),
     );
   }
@@ -74,8 +75,27 @@ class _HelmShellState extends State<HelmShell> {
       const ProfileTab(),
     ];
 
+    final scaler = MediaQuery.textScalerOf(context);
+    final fontSize = Theme.of(context).textTheme.titleLarge?.fontSize ?? 22;
+    // The title slot is the screen width minus the toolbar's middle insets.
+    // One line keeps the compact bar; two lines grow it, including diacritics.
+    final titleSlot =
+        HelmWordmark.titleSlotWidth(MediaQuery.sizeOf(context).width);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Helm حلم')),
+      appBar: AppBar(
+        toolbarHeight: HelmWordmark.toolbarHeight(
+          maxWidth: titleSlot,
+          fontSize: fontSize,
+          textScaler: scaler,
+        ),
+        // The app bar clamps title scaling at 1.34. Restore the system
+        // scaler so large text still reaches the lockup.
+        title: MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: scaler),
+          child: const HelmWordmark(),
+        ),
+      ),
       body: tabs[index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,

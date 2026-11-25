@@ -1,4 +1,4 @@
-/// Parsed published destination for the Discover list.
+/// Parsed published destination for the Discover list and globe.
 class DestinationListItem {
   const DestinationListItem({
     required this.id,
@@ -8,6 +8,10 @@ class DestinationListItem {
     this.summaryEn,
     this.summaryAr,
     this.countryCode,
+    this.latitude,
+    this.longitude,
+    this.isFeatured = false,
+    this.tags = const [],
   });
 
   final String id;
@@ -17,6 +21,21 @@ class DestinationListItem {
   final String? summaryEn;
   final String? summaryAr;
   final String? countryCode;
+  final double? latitude;
+  final double? longitude;
+  final bool isFeatured;
+  final List<String> tags;
+
+  /// True when both coordinates are finite and within geographic bounds.
+  bool get hasPlottableCoordinates {
+    final lat = latitude;
+    final lon = longitude;
+    if (lat == null || lon == null) return false;
+    if (!lat.isFinite || !lon.isFinite) return false;
+    if (lat < -90 || lat > 90) return false;
+    if (lon < -180 || lon > 180) return false;
+    return true;
+  }
 
   /// Prefer English summary; fall back to Arabic when English is absent.
   String? get availableSummary {
@@ -27,6 +46,18 @@ class DestinationListItem {
     return null;
   }
 
+  String? get displayNameAr {
+    final ar = nameAr?.trim();
+    if (ar == null || ar.isEmpty) return null;
+    return ar;
+  }
+
+  String? get displayCountryCode {
+    final code = countryCode?.trim();
+    if (code == null || code.isEmpty) return null;
+    return code;
+  }
+
   factory DestinationListItem.fromJson(Map<String, dynamic> json) {
     return DestinationListItem(
       id: json['id'] as String,
@@ -35,7 +66,11 @@ class DestinationListItem {
       nameAr: json['nameAr'] as String?,
       summaryEn: json['summaryEn'] as String?,
       summaryAr: json['summaryAr'] as String?,
-      countryCode: (json['countryCode'] as String?)?.trim().toUpperCase(),
+      countryCode: json['countryCode'] as String?,
+      latitude: _parseCoordinate(json['latitude']),
+      longitude: _parseCoordinate(json['longitude']),
+      isFeatured: json['isFeatured'] == true,
+      tags: _parseTags(json['tags']),
     );
   }
 
@@ -47,4 +82,19 @@ class DestinationListItem {
         .map((e) => DestinationListItem.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
+}
+
+List<String> _parseTags(Object? raw) {
+  if (raw is! List) return const [];
+  return raw
+      .whereType<String>()
+      .map((tag) => tag.trim())
+      .where((tag) => tag.isNotEmpty)
+      .toList(growable: false);
+}
+
+double? _parseCoordinate(Object? raw) {
+  if (raw is num) return raw.toDouble();
+  if (raw is String) return double.tryParse(raw.trim());
+  return null;
 }
