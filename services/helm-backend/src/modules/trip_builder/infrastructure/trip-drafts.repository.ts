@@ -34,6 +34,24 @@ export type UpdateTripDraftInput = {
   patchConstraints: boolean;
 };
 
+export type TripDraftItineraryItem = {
+  id: string;
+  position: number;
+  title: string | null;
+  notes: string | null;
+};
+
+export type TripDraftItineraryDay = {
+  id: string;
+  position: number;
+  label: string | null;
+  items: TripDraftItineraryItem[];
+};
+
+export type TripDraftItinerary = {
+  days: TripDraftItineraryDay[];
+};
+
 /**
  * Owner-scoped trip draft persistence.
  * Nest uses the table owner role (bypasses RLS), so every query filters by JWT subject.
@@ -143,6 +161,37 @@ export class TripDraftsRepository {
     return mapRow(asRowArray(rows)[0]);
   }
 
+  /**
+   * Owner-scoped itinerary read. Returns null when the draft is missing or
+   * not owned. An owned draft with no days returns `{ days: [] }`.
+   * Uses a fixed query count (ownership + one days/items join).
+   */
+  async getItineraryForOwner(
+    userId: string,
+    draftId: string,
+  ): Promise<TripDraftItinerary | null> {
+    const owned = await this.getForOwner(userId, draftId);
+    if (!owned) return null;
+
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        d.id::text as "dayId",
+        d.position as "dayPosition",
+        d.label as "dayLabel",
+        i.id::text as "itemId",
+        i.position as "itemPosition",
+        i.title as "itemTitle",
+        i.notes as "itemNotes"
+      from trips.itinerary_days d
+      left join trips.itinerary_items i on i.day_id = d.id
+      where d.draft_id = ${draftId}::uuid
+      order by d.position asc, i.position asc nulls last
+    `);
+
+    return { days: assembleItineraryDays(asRowArray(rows)) };
+  }
+
   async updateForOwner(input: UpdateTripDraftInput): Promise<TripDraftRow | null> {
     const db = this.requireDb();
     if (!input.patchDestinationId && !input.patchTitle && !input.patchConstraints) {
@@ -208,6 +257,54 @@ function mapRow(raw: unknown): TripDraftRow | null {
     createdAt: toIso(r.createdAt),
     updatedAt: toIso(r.updatedAt),
   };
+}
+
+function assembleItineraryDays(rawRows: unknown[]): TripDraftItineraryDay[] {
+  const days: TripDraftItineraryDay[] = [];
+  const indexByDayId = new Map<string, number>();
+
+  for (const raw of rawRows) {
+    if (!raw || typeof raw !== 'object') continue;
+    const r = raw as Record<string, unknown>;
+    const dayId = typeof r.dayId === 'string' ? r.dayId : '';
+    if (!dayId) continue;
+
+    let dayIndex = indexByDayId.get(dayId);
+    if (dayIndex === undefined) {
+      dayIndex = days.length;
+      indexByDayId.set(dayId, dayIndex);
+      days.push({
+        id: dayId,
+        position: toPositiveInt(r.dayPosition),
+        label: r.dayLabel == null ? null : String(r.dayLabel),
+        items: [],
+      });
+    }
+
+    const itemId =
+      r.itemId == null || r.itemId === '' ? null : String(r.itemId);
+    if (!itemId) continue;
+
+    days[dayIndex]!.items.push({
+      id: itemId,
+      position: toPositiveInt(r.itemPosition),
+      title: r.itemTitle == null ? null : String(r.itemTitle),
+      notes: r.itemNotes == null ? null : String(r.itemNotes),
+    });
+  }
+
+  return days;
+}
+
+function toPositiveInt(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.trunc(value);
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return Math.trunc(parsed);
+  }
+  return 0;
 }
 
 function normalizeConstraints(value: unknown): Record<string, unknown> {

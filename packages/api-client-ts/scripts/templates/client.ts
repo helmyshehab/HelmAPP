@@ -16,6 +16,10 @@ export type TripDraft = components["schemas"]["TripDraft"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
 export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
 export type UpdateTripDraftRequest = components["schemas"]["UpdateTripDraftRequest"];
+export type TripDraftItineraryResponse =
+  components["schemas"]["TripDraftItineraryResponse"];
+export type TripDraftItineraryDay = components["schemas"]["TripDraftItineraryDay"];
+export type TripDraftItineraryItem = components["schemas"]["TripDraftItineraryItem"];
 export type DestinationListResponse = components["schemas"]["DestinationListResponse"];
 export type DestinationPublic = components["schemas"]["DestinationPublic"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
@@ -146,6 +150,21 @@ export function createHelmClient(options: HelmClientOptions) {
       });
       if (!res.ok) throw new Error(`getTripDraft failed: ${res.status}`);
       return (await res.json()) as TripDraft;
+    },
+    async getTripDraftItinerary(
+      id: string,
+      accessToken?: string,
+    ): Promise<TripDraftItineraryResponse> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("getTripDraftItinerary requires an access token");
+      const res = await fetchImpl(
+        `${base}/v1/trips/drafts/${encodeURIComponent(id)}/itinerary`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (!res.ok) throw new Error(`getTripDraftItinerary failed: ${res.status}`);
+      return (await res.json()) as TripDraftItineraryResponse;
     },
     async updateTripDraft(
       id: string,

@@ -153,6 +153,33 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/trips/drafts/{id}/itinerary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the caller's private itinerary for a trip draft
+         * @description Returns ordered days and nested items for a draft owned by the
+         *     verified JWT subject. Days and items are ordered by ascending
+         *     `position`. An owned draft with no itinerary returns `{ "days": [] }`.
+         *     A day with no items returns `items: []`. Nullable `label`, `title`,
+         *     and `notes` are preserved as stored.
+         *     Returns 400 when `{id}` is not a UUID.
+         *     Returns 404 when the draft is missing or owned by another customer
+         *     (same public error in both cases).
+         */
+        get: operations["getTripDraftItinerary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -635,6 +662,26 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+        };
+        TripDraftItineraryItem: {
+            /** Format: uuid */
+            id: string;
+            /** @description 1-based order within the parent day */
+            position: number;
+            title: string | null;
+            notes: string | null;
+        };
+        TripDraftItineraryDay: {
+            /** Format: uuid */
+            id: string;
+            /** @description 1-based order within the parent draft */
+            position: number;
+            label: string | null;
+            items: components["schemas"]["TripDraftItineraryItem"][];
+        };
+        TripDraftItineraryResponse: {
+            /** @description Days ordered by ascending position */
+            days: components["schemas"]["TripDraftItineraryDay"][];
         };
         /** @enum {string} */
         AppRole: "customer" | "operator" | "administrator" | "super-administrator";
@@ -1464,6 +1511,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TripDraft"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description Database is not configured or unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getTripDraftItinerary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Owner-scoped itinerary for the draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftItineraryResponse"];
                 };
             };
             400: components["responses"]["BadRequest"];
