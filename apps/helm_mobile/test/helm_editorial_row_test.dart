@@ -56,130 +56,131 @@ void main() {
 
   testWidgets('shows cover image with accessible alt and keeps row tappable',
       (tester) async {
-    installTestNetworkImages();
-    var taps = 0;
+    await withTestNetworkImages(() async {
+      var taps = 0;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: HelmEditorialRow(
-            rowKey: const Key('row'),
-            title: 'Ubud',
-            imageUrl: 'https://cdn.example.com/ubud.jpg',
-            imageAlt: 'Rice terraces near Ubud',
-            onTap: () => taps += 1,
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HelmEditorialRow(
+              rowKey: const Key('row'),
+              title: 'Ubud',
+              imageUrl: 'https://cdn.example.com/ubud.jpg',
+              imageAlt: 'Rice terraces near Ubud',
+              onTap: () => taps += 1,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.byType(Image), findsOneWidget);
-    final image = tester.widget<Image>(find.byType(Image));
-    expect(image.fit, BoxFit.cover);
-    expect(image.semanticLabel, 'Rice terraces near Ubud');
+      expect(find.byType(Image), findsOneWidget);
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(image.fit, BoxFit.cover);
+      expect(image.semanticLabel, 'Rice terraces near Ubud');
 
-    await tester.tap(find.byKey(const Key('row')));
-    expect(taps, 1);
+      await tester.tap(find.byKey(const Key('row')));
+      expect(taps, 1);
+    });
   });
 
   testWidgets('failed network image falls back to text-only row', (tester) async {
-    installTestNetworkImages(failHosts: {'broken.example'});
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: HelmEditorialRow(
-            title: 'Ubud',
-            imageUrl: 'https://broken.example/missing.jpg',
-            imageAlt: 'Missing cover',
-            onTap: () {},
+    await withTestNetworkImages(() async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HelmEditorialRow(
+              title: 'Ubud',
+              imageUrl: 'https://broken.example/missing.jpg',
+              imageAlt: 'Missing cover',
+              onTap: () {},
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+      );
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.byType(Image), findsNothing);
-    expect(find.text('Ubud'), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      expect(find.byType(Image), findsNothing);
+      expect(find.text('Ubud'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, failHosts: {'broken.example'});
   });
 
   testWidgets('DestinationCard passes cover from list item', (tester) async {
-    installTestNetworkImages();
+    await withTestNetworkImages(() async {
+      final item = DestinationListItem(
+        id: '1',
+        slug: 'ubud',
+        nameEn: 'Ubud',
+        nameAr: 'أبود',
+        coverImageUrl: 'https://cdn.example.com/ubud.jpg',
+        coverAltEn: 'Rice terraces',
+        coverAltAr: 'مدرجات الأرز',
+      );
 
-    final item = DestinationListItem(
-      id: '1',
-      slug: 'ubud',
-      nameEn: 'Ubud',
-      nameAr: 'أبود',
-      coverImageUrl: 'https://cdn.example.com/ubud.jpg',
-      coverAltEn: 'Rice terraces',
-      coverAltAr: 'مدرجات الأرز',
-    );
-
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('en'),
-        home: Scaffold(
-          body: DestinationCard(
-            item: item,
-            onTap: () {},
-          ),
-        ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-
-    expect(find.byType(Image), findsOneWidget);
-    expect(
-      tester.widget<Image>(find.byType(Image)).semanticLabel,
-      'Rice terraces',
-    );
-    expect(find.byKey(const Key('discover-item-ubud')), findsOneWidget);
-  });
-
-  testWidgets('DestinationCard uses Arabic cover alt for ar locale',
-      (tester) async {
-    installTestNetworkImages();
-
-    final item = DestinationListItem(
-      id: '1',
-      slug: 'ubud',
-      nameEn: 'Ubud',
-      coverImageUrl: 'https://cdn.example.com/ubud.jpg',
-      coverAltEn: 'Rice terraces',
-      coverAltAr: 'مدرجات الأرز',
-    );
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Localizations(
-          locale: const Locale('ar'),
-          delegates: const <LocalizationsDelegate<dynamic>>[
-            DefaultWidgetsLocalizations.delegate,
-            DefaultMaterialLocalizations.delegate,
-          ],
-          child: Scaffold(
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          home: Scaffold(
             body: DestinationCard(
               item: item,
               onTap: () {},
             ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
-    expect(
-      tester.widget<Image>(find.byType(Image)).semanticLabel,
-      'مدرجات الأرز',
-    );
+      expect(find.byType(Image), findsOneWidget);
+      expect(
+        tester.widget<Image>(find.byType(Image)).semanticLabel,
+        'Rice terraces',
+      );
+      expect(find.byKey(const Key('discover-item-ubud')), findsOneWidget);
+    });
+  });
+
+  testWidgets('DestinationCard uses Arabic cover alt for ar locale',
+      (tester) async {
+    await withTestNetworkImages(() async {
+      final item = DestinationListItem(
+        id: '1',
+        slug: 'ubud',
+        nameEn: 'Ubud',
+        coverImageUrl: 'https://cdn.example.com/ubud.jpg',
+        coverAltEn: 'Rice terraces',
+        coverAltAr: 'مدرجات الأرز',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Localizations(
+            locale: const Locale('ar'),
+            delegates: const <LocalizationsDelegate<dynamic>>[
+              DefaultWidgetsLocalizations.delegate,
+              DefaultMaterialLocalizations.delegate,
+            ],
+            child: Scaffold(
+              body: DestinationCard(
+                item: item,
+                onTap: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(
+        tester.widget<Image>(find.byType(Image)).semanticLabel,
+        'مدرجات الأرز',
+      );
+    });
   });
 
   testWidgets('row tap invokes onTap', (tester) async {

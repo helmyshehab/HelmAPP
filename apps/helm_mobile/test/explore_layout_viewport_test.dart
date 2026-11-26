@@ -30,9 +30,6 @@ Future<void> _pumpExplore(
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = explorePhone;
   addTearDown(tester.view.reset);
-  if (includeCover) {
-    installTestNetworkImages();
-  }
   final mock = MockClient((request) async {
     if (request.url.path.contains('/geo/countries')) {
       return _jsonOk({
@@ -137,40 +134,47 @@ void main() {
 
   testWidgets('Explore 390x844 light: cover renders without breaking layout',
       (tester) async {
-    await _pumpExplore(tester, theme: HelmTheme.light(), includeCover: true);
+    await withTestNetworkImages(() async {
+      await _pumpExplore(tester, theme: HelmTheme.light(), includeCover: true);
 
-    expect(tester.takeException(), isNull);
-    expect(find.byType(Image), findsOneWidget);
-    expect(
-      tester.widget<Image>(find.byType(Image)).semanticLabel,
-      'Rice terraces near Ubud',
-    );
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Image), findsOneWidget);
+      expect(
+        tester.widget<Image>(find.byType(Image)).semanticLabel,
+        'Rice terraces near Ubud',
+      );
 
-    final row = tester.getRect(find.byKey(const Key('discover-item-ubud')));
-    expect(row.left, greaterThanOrEqualTo(0));
-    expect(row.right, lessThanOrEqualTo(explorePhone.width + 0.5));
-    expect(row.width, lessThanOrEqualTo(explorePhone.width));
+      final row = tester.getRect(find.byKey(const Key('discover-item-ubud')));
+      expect(row.left, greaterThanOrEqualTo(0));
+      expect(row.right, lessThanOrEqualTo(explorePhone.width + 0.5));
+      expect(row.width, lessThanOrEqualTo(explorePhone.width));
 
-    // Destination without cover stays text-only.
-    final canggu = tester.getRect(find.byKey(const Key('discover-item-canggu')));
-    expect(canggu.width, lessThanOrEqualTo(explorePhone.width));
+      // Destination without cover stays text-only.
+      final canggu =
+          tester.getRect(find.byKey(const Key('discover-item-canggu')));
+      expect(canggu.width, lessThanOrEqualTo(explorePhone.width));
+    });
   });
 
   testWidgets('Explore 390x844 dark: cover + missing cover coexist',
       (tester) async {
-    await _pumpExplore(tester, theme: HelmTheme.dark(), includeCover: true);
+    await withTestNetworkImages(() async {
+      await _pumpExplore(tester, theme: HelmTheme.dark(), includeCover: true);
 
-    expect(tester.takeException(), isNull);
-    expect(find.byType(Image), findsOneWidget);
-    expect(
-      tester.widget<Material>(find.byKey(const Key('discover-item-ubud'))).color,
-      HelmTheme.darkScheme.surfaceContainer,
-    );
-    expect(
-      tester
-          .widget<Material>(find.byKey(const Key('discover-item-canggu')))
-          .color,
-      HelmTheme.darkScheme.surfaceContainer,
-    );
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Image), findsOneWidget);
+      expect(
+        tester
+            .widget<Material>(find.byKey(const Key('discover-item-ubud')))
+            .color,
+        HelmTheme.darkScheme.surfaceContainer,
+      );
+      expect(
+        tester
+            .widget<Material>(find.byKey(const Key('discover-item-canggu')))
+            .color,
+        HelmTheme.darkScheme.surfaceContainer,
+      );
+    });
   });
 }

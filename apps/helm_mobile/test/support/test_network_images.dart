@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Minimal valid 1×1 PNG used by [installTestNetworkImages].
+/// Minimal valid 1×1 PNG used by [withTestNetworkImages].
 const List<int> kTestPngBytes = <int>[
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
   0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
@@ -14,16 +14,25 @@ const List<int> kTestPngBytes = <int>[
   0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ];
 
-/// Installs a test [HttpClient] for [Image.network] via Flutter's debug hook.
+/// Runs [body] with a test [HttpClient] for [Image.network] via Flutter's
+/// [debugNetworkImageHttpClientProvider] hook (re-read on every request).
 ///
 /// Hosts in [failHosts] return HTTP 404. All others return [kTestPngBytes].
-void installTestNetworkImages({Set<String> failHosts = const {}}) {
+/// Restores the previous provider in `finally` so Flutter 3.27 painting
+/// invariant checks (which run before `addTearDown`) see a clean value.
+Future<T> withTestNetworkImages<T>(
+  Future<T> Function() body, {
+  Set<String> failHosts = const {},
+}) async {
+  final HttpClientProvider? previous = debugNetworkImageHttpClientProvider;
   debugNetworkImageHttpClientProvider = () {
     return _TestImageHttpClient(failHosts: failHosts);
   };
-  addTearDown(() {
-    debugNetworkImageHttpClientProvider = null;
-  });
+  try {
+    return await body();
+  } finally {
+    debugNetworkImageHttpClientProvider = previous;
+  }
 }
 
 class _TestImageHttpClient implements HttpClient {
