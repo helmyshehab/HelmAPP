@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/painting.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 /// Minimal valid 1×1 PNG used by [withTestNetworkImages].
 const List<int> kTestPngBytes = <int>[
