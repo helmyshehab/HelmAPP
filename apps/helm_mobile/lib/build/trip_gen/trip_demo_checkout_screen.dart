@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'trip_demo_pricing.dart';
 import 'trip_demo_mode_screen.dart';
+import 'trip_demo_pricing.dart';
 import 'trip_planner.dart';
 
 class TripDemoCheckoutScreen extends StatefulWidget {
@@ -25,6 +25,7 @@ class TripDemoCheckoutScreen extends StatefulWidget {
 class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
   bool _completed = false;
   bool _showTripMode = false;
+  final _confirmedServices = <_DemoBookingService>{};
 
   @override
   Widget build(BuildContext context) {
@@ -39,45 +40,98 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
     final estimate = widget.estimate;
     return Scaffold(
       appBar: AppBar(title: const Text('Demo checkout')),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          if (_completed) ...[
-            Text('Demo payment complete', style: textTheme.headlineSmall),
-            const SizedBox(height: 8),
-          ],
-          Text(widget.tripLabel, style: textTheme.titleLarge),
-          const SizedBox(height: 16),
-          Text('Estimated group total', style: textTheme.labelLarge),
-          Text(
-            formatDemoEgp(estimate.totalEgp),
-            key: const Key('trip-demo-checkout-total'),
-            style: textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 12),
-          Text('Flights · ${formatDemoEgp(estimate.flightTotalEgp)}'),
-          Text('Stay · ${formatDemoEgp(estimate.lodgingTotalEgp)}'),
-          Text('Activities · ${formatDemoEgp(estimate.activitiesTotalEgp)}'),
-          const SizedBox(height: 16),
-          Text(
-            _completed
-                ? 'This simulation created no charge or booking.'
-                : 'You can try this checkout without payment details. This simulation creates no charge or booking.',
-          ),
-          const SizedBox(height: 24),
-          if (_completed)
-            FilledButton(
-              onPressed: () => setState(() => _showTripMode = true),
-              child: const Text('Preview Trip Mode'),
+      body: _completed
+          ? _buildBookingProgress(context)
+          : ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                Text(widget.tripLabel, style: textTheme.titleLarge),
+                const SizedBox(height: 16),
+                Text('Estimated group total', style: textTheme.labelLarge),
+                Text(
+                  formatDemoEgp(estimate.totalEgp),
+                  key: const Key('trip-demo-checkout-total'),
+                  style: textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 12),
+                Text('Flights · ${formatDemoEgp(estimate.flightTotalEgp)}'),
+                Text('Stay · ${formatDemoEgp(estimate.lodgingTotalEgp)}'),
+                Text(
+                    'Activities · ${formatDemoEgp(estimate.activitiesTotalEgp)}'),
+                const SizedBox(height: 16),
+                const Text(
+                  'You can try this checkout without payment details. This simulation creates no charge or booking.',
+                ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: () => setState(() => _completed = true),
+                  child: const Text('Simulate payment'),
+                ),
+              ],
             ),
-          FilledButton(
-            onPressed: _completed
-                ? () => Navigator.of(context).pop()
-                : () => setState(() => _completed = true),
-            child: Text(_completed ? 'Back to trip' : 'Simulate payment'),
-          ),
-        ],
-      ),
     );
   }
+
+  Widget _buildBookingProgress(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final services = [
+      _DemoBookingService.flights,
+      _DemoBookingService.stay,
+      if (widget.estimate.activitiesTotalEgp > 0)
+        _DemoBookingService.activities,
+    ];
+    final tripReady = _confirmedServices.length == services.length;
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Text('Demo payment complete', style: textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        Text(widget.tripLabel),
+        Text('Simulated total · ${formatDemoEgp(widget.estimate.totalEgp)}'),
+        const SizedBox(height: 20),
+        Text('Booking progress', style: textTheme.titleLarge),
+        Text(
+            '${_confirmedServices.length} of ${services.length} services confirmed'),
+        const SizedBox(height: 8),
+        const Text(
+            'Simulate staff confirming each service. No actual bookings are made.'),
+        const SizedBox(height: 8),
+        for (final service in services)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(service.label),
+            subtitle: Text(_confirmedServices.contains(service)
+                ? 'Confirmed'
+                : 'Awaiting confirmation'),
+            trailing: TextButton(
+              key: Key('trip-demo-confirm-${service.name}'),
+              onPressed: _confirmedServices.contains(service)
+                  ? null
+                  : () => setState(() => _confirmedServices.add(service)),
+              child: Text('Confirm ${service.label.toLowerCase()}'),
+            ),
+          ),
+        const SizedBox(height: 16),
+        FilledButton(
+          onPressed:
+              tripReady ? () => setState(() => _showTripMode = true) : null,
+          child: const Text('Preview Trip Mode'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Back to trip'),
+        ),
+      ],
+    );
+  }
+}
+
+enum _DemoBookingService {
+  flights('Flights'),
+  stay('Stay'),
+  activities('Activities');
+
+  const _DemoBookingService(this.label);
+
+  final String label;
 }
