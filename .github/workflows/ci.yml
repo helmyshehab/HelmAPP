@@ -89,6 +89,26 @@ jobs:
       - run: pnpm --filter helm-web typecheck
       - run: pnpm --filter helm-admin typecheck
 
+  mobile-flutter:
+    name: Flutter mobile analysis and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FLUTTER_VERSION: "3.27.4"
+    defaults:
+      run:
+        working-directory: apps/helm_mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        run: |
+          git clone --quiet --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
+      - run: flutter pub get
+      - run: flutter analyze --no-pub lib test tool
+      - run: flutter test --no-pub
+
   migrations-apply:
     name: Migration apply reproducibility
     runs-on: ubuntu-latest
