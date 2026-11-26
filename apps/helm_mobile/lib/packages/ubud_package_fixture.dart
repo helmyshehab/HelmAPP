@@ -1,10 +1,10 @@
 import '../build/trip_gen/trip_answers.dart';
 import '../build/trip_gen/trip_preview_draft.dart';
 
-/// Local curated package idea for Packages → Customize in Build.
+/// Curated Ubud package idea shaped as [ubud_trip_preview] v1.
 ///
-/// Shaped as [ubud_trip_preview] v1 so Build can open the existing editor.
-/// Not backed by `packages.packages`, OpenAPI, or admin authoring.
+/// Used by the offline demo mock and focused tests. Production Packages loads
+/// published packages from the API; this fixture stays the demo payload.
 class UbudPackageFixture {
   const UbudPackageFixture({
     required this.id,

@@ -53,6 +53,24 @@ Map<String, dynamic> _draftJson({
       'updatedAt': '2026-01-02T00:00:00.000Z',
     };
 
+Map<String, dynamic> _packageJson({Map<String, dynamic>? content}) {
+  final fixture = ubudCulturePackageFixture;
+  return {
+    'id': fixture.id,
+    'slug': fixture.id,
+    'titleEn': fixture.title,
+    'titleAr': fixture.title,
+    'summaryEn': fixture.summary,
+    'summaryAr': fixture.summary,
+    'durationDays': fixture.snapshot.answers.nights,
+    'destinationSlug': 'ubud',
+    'content': content ?? fixture.snapshot.toConstraints(),
+  };
+}
+
+bool _isPackagesList(http.Request request) =>
+    request.method == 'GET' && request.url.path.endsWith('/packages');
+
 Finder _previewScrollable() => find
     .descendant(
       of: find.byKey(const Key('trip-preview')),
@@ -99,7 +117,12 @@ void main() {
     final auth = FakeTravelerAuth();
     final client = HelmApiClient(
       baseUrl: 'https://api.test',
-      httpClient: MockClient((_) async => http.Response('unused', 500)),
+      httpClient: MockClient((request) async {
+        if (_isPackagesList(request)) {
+          return _json({'items': [_packageJson()]});
+        }
+        return http.Response('unexpected ${request.method} ${request.url}', 500);
+      }),
     );
 
     await tester.pumpWidget(
@@ -115,7 +138,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text(ubudCulturePackageFixture.title), findsOneWidget);
-    expect(find.text(ubudCulturePackageFixture.demoDefaultsLabel), findsOneWidget);
+    expect(find.textContaining('ubud-village-hotel'), findsOneWidget);
     expect(find.text('Customize in Build'), findsOneWidget);
     auth.dispose();
   });
@@ -124,6 +147,9 @@ void main() {
     'Customize opens Build editor with package defaults after sign-in',
     (tester) async {
       final mock = MockClient((request) async {
+        if (_isPackagesList(request)) {
+          return _json({'items': [_packageJson()]});
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
         }
@@ -184,6 +210,9 @@ void main() {
       Map<String, dynamic>? storedConstraints;
       var createCalls = 0;
       final mock = MockClient((request) async {
+        if (_isPackagesList(request)) {
+          return _json({'items': [_packageJson()]});
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
         }

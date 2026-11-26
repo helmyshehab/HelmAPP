@@ -8,6 +8,7 @@ import 'package:helm_mobile/build/trip_gen/trip_demo_pricing.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
 import 'package:helm_mobile/build/trip_gen/ubud_demo_catalog.dart';
 import 'package:helm_mobile/main.dart' show HelmShell;
+import 'package:helm_mobile/packages/ubud_package_fixture.dart';
 import 'package:helm_mobile/theme/helm_theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -83,6 +84,21 @@ class _DemoApi {
                   'category': place.category,
                   'shortDescriptionEn': place.shortDescriptionEn,
                 },
+          ]);
+        case '/v1/packages':
+          final fixture = ubudCulturePackageFixture;
+          return _page(query, [
+            {
+              'id': fixture.id,
+              'slug': fixture.id,
+              'titleEn': fixture.title,
+              'titleAr': fixture.title,
+              'summaryEn': fixture.summary,
+              'summaryAr': fixture.summary,
+              'durationDays': fixture.snapshot.answers.nights,
+              'destinationSlug': 'ubud',
+              'content': fixture.snapshot.toConstraints(),
+            },
           ]);
       }
     }

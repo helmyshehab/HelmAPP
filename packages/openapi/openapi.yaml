@@ -437,6 +437,192 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
+  /v1/packages:
+    get:
+      operationId: listPackages
+      summary: List published Build-compatible packages
+      description: |
+        Returns only packages with `publish_status=published` and validated
+        `ubud_trip_preview` v1 content. Legacy metadata-only rows are omitted.
+      tags: [packages]
+      security: []
+      responses:
+        "200":
+          description: Published packages travelers can customize in Build
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackagePublicListResponse"
+  /v1/packages/{slug}:
+    get:
+      operationId: getPackage
+      summary: Get a published Build-compatible package by slug
+      tags: [packages]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Published package
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackagePublic"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/packages:
+    get:
+      operationId: adminListPackages
+      summary: List all packages for staff
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Staff package list (includes unpublished and legacy rows)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdminListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      operationId: adminCreatePackage
+      summary: Create an unpublished package
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePackageRequest"
+      responses:
+        "201":
+          description: Created unpublished package
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/admin/packages/{id}:
+    get:
+      operationId: adminGetPackage
+      summary: Get a package for staff editing
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      responses:
+        "200":
+          description: Staff package detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: adminUpdatePackage
+      summary: Update an unpublished package
+      description: |
+        Published packages must be unpublished before content or titles can change.
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePackageRequest"
+      responses:
+        "200":
+          description: Updated unpublished package
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/admin/packages/{id}/unpublish:
+    post:
+      operationId: adminUnpublishPackage
+      summary: Unpublish a package before editing
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      responses:
+        "200":
+          description: Package is unpublished
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /v1/admin/packages/{id}/publish:
+    post:
+      operationId: adminPublishPackage
+      summary: Publish a Build-compatible Ubud package
+      description: |
+        Validates ubud_trip_preview v1 content, Build selections, itinerary
+        consistency, and that hotel/stops are published Ubud places.
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      responses:
+        "200":
+          description: Package is published
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -1096,6 +1282,13 @@ components:
         type: string
         format: uuid
     TripDraftId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PackageId:
       name: id
       in: path
       required: true
@@ -2569,6 +2762,171 @@ components:
                     type: string
                   message:
                     type: string
+    PackagePublishStatus:
+      type: string
+      enum: [unpublished, published]
+    PackagePublic:
+      type: object
+      required:
+        - id
+        - slug
+        - titleEn
+        - titleAr
+        - summaryEn
+        - summaryAr
+        - durationDays
+        - destinationSlug
+        - content
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        titleEn:
+          type: string
+        titleAr:
+          type: string
+        summaryEn:
+          type: string
+          nullable: true
+        summaryAr:
+          type: string
+          nullable: true
+        durationDays:
+          type: integer
+        destinationSlug:
+          type: string
+        content:
+          type: object
+          additionalProperties: true
+          description: Validated ubud_trip_preview v1 JSON for Customize in Build
+    PackagePublicListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PackagePublic"
+    PackageAdmin:
+      type: object
+      required:
+        - id
+        - destinationId
+        - destinationSlug
+        - slug
+        - titleEn
+        - titleAr
+        - summaryEn
+        - summaryAr
+        - durationDays
+        - publishStatus
+        - marketCode
+        - content
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        destinationId:
+          type: string
+          format: uuid
+        destinationSlug:
+          type: string
+        slug:
+          type: string
+        titleEn:
+          type: string
+        titleAr:
+          type: string
+        summaryEn:
+          type: string
+          nullable: true
+        summaryAr:
+          type: string
+          nullable: true
+        durationDays:
+          type: integer
+        publishStatus:
+          $ref: "#/components/schemas/PackagePublishStatus"
+        marketCode:
+          type: string
+        content:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    PackageAdminListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PackageAdmin"
+    CreatePackageRequest:
+      type: object
+      additionalProperties: false
+      required: [destinationId, slug, titleEn, titleAr]
+      properties:
+        destinationId:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 128
+        titleEn:
+          type: string
+          maxLength: 200
+        titleAr:
+          type: string
+          maxLength: 200
+        summaryEn:
+          type: string
+          maxLength: 2000
+          nullable: true
+        summaryAr:
+          type: string
+          maxLength: 2000
+          nullable: true
+        marketCode:
+          type: string
+          maxLength: 64
+        content:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: Optional ubud_trip_preview v1 JSON; nights derive durationDays
+    UpdatePackageRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        titleEn:
+          type: string
+          maxLength: 200
+        titleAr:
+          type: string
+          maxLength: 200
+        summaryEn:
+          type: string
+          maxLength: 2000
+          nullable: true
+        summaryAr:
+          type: string
+          maxLength: 2000
+          nullable: true
+        content:
+          type: object
+          additionalProperties: true
+          nullable: true
     Problem:
       type: object
       description: RFC 7807 problem+json
@@ -2594,10 +2952,14 @@ tags:
     description: Authenticated identity foundation and customer account/profile bootstrap
   - name: trips
     description: Authenticated private trip drafts and read-only itineraries (owner-scoped)
+  - name: packages
+    description: Public curated packages travelers can customize in Build
   - name: catalog
     description: Public travel catalog discovery (published entries only)
   - name: geo
     description: Public read-only geographic reference lookups (countries, cities)
+  - name: packages-admin
+    description: Staff package authoring, unpublish-before-edit, and publish validation
   - name: catalog-admin
     description: Staff catalog curation, lifecycle, and curated JSON import
   - name: audit-admin
