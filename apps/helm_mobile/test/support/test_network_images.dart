@@ -63,7 +63,7 @@ class _TestImageHttpClient implements HttpClient {
 class _TestImageHttpRequest implements HttpClientRequest {
   _TestImageHttpRequest({required this.url, required this.fail});
 
-  @override
+  // Not an HttpClientRequest getter on current Dart SDKs; kept for request routing.
   final Uri url;
   final bool fail;
 
