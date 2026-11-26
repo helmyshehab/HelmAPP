@@ -9,6 +9,7 @@ const NAV = [
   { href: "/destinations", label: "Destinations" },
   { href: "/places", label: "Places" },
   { href: "/import", label: "Import" },
+  { href: "/demo-bookings", label: "Demo Bookings" },
 ] as const;
 
 type StaffShellProps = {

@@ -183,6 +183,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/trips/demo-bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List up to 25 recent demo bookings or find an exact booking ID */
+        get: operations["listStaffDemoTripBookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/trips/demo-bookings/{id}/services/{kind}": {
         parameters: {
             query?: never;
@@ -760,6 +777,19 @@ export interface components {
             };
             /** Format: date-time */
             createdAt: string;
+        };
+        StaffDemoTripBooking: {
+            /** Format: uuid */
+            id: string;
+            title: string | null;
+            /** @enum {string} */
+            status: "pending_confirmation" | "confirmed";
+            services: components["schemas"]["DemoBookingService"][];
+            /** Format: date-time */
+            createdAt: string;
+        };
+        StaffDemoTripBookingList: {
+            items: components["schemas"]["StaffDemoTripBooking"][];
         };
         DemoBookingService: {
             /** @enum {string} */
@@ -1687,6 +1717,31 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+        };
+    };
+    listStaffDemoTripBookings: {
+        parameters: {
+            query?: {
+                id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff booking summaries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffDemoTripBookingList"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
         };
     };
     confirmDemoBookingService: {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
 import { z } from 'zod';
 import { CurrentUser } from '../../common/auth/current-user.decorator';
 import { Roles } from '../../common/auth/roles.decorator';
@@ -35,6 +35,15 @@ export class DemoTripBookingsController {
 @Controller('admin/trips/demo-bookings')
 export class DemoTripBookingStaffController {
   constructor(@Inject(DemoTripBookingsService) private readonly bookings: DemoTripBookingsService) {}
+
+  @Get()
+  @Roles('operator', 'administrator', 'super-administrator')
+  list(
+    @Query(new ZodValidationPipe(z.object({ id: z.string().uuid().optional() })))
+    query: { id?: string },
+  ) {
+    return this.bookings.listForStaff(query.id);
+  }
 
   @Patch(':id/services/:kind')
   @Roles('operator', 'administrator', 'super-administrator')
