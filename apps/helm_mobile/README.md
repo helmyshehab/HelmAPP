@@ -10,6 +10,21 @@ checkout for Ubud).
 
 Uses `helm_api_client` from `packages/api-client-dart` (generated — do not hand-edit).
 
+## Local demo
+
+From `apps/helm_mobile`, use Flutter 3.27 or newer with Dart 3.6 or newer.
+
+```bash
+flutter pub get
+flutter run -d chrome --target tool/demo_main.dart
+```
+
+Open **Ubud → Build my trip**. Use `demo@example.com` and `demo1234` on the
+demo sign-in screen. The demo uses a local catalog and in-memory drafts, so
+reloading clears your drafts. Checkout is simulated. It needs no Supabase
+project or API credentials. For Android, replace `-d chrome` with your device
+ID from `flutter devices`.
+
 ## API base URL
 
 Configurable at launch:
