@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { parseUbudPackageContent } from '../src/modules/packages/domain/ubud-package-content.ts';
 import {
   isBuildCompatiblePackageContent,
-  parseUbudPackageContent,
   requiredPublishedSlugs,
-} from '../src/modules/packages/domain/ubud-package-content.ts';
+} from '../src/modules/packages/domain/trip-preview-content.ts';
 
 const validContent = {
   kind: 'ubud_trip_preview',

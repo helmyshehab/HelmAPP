@@ -58,8 +58,8 @@ export class PackagesRepository {
           ${opts.buildCompatibleOnly} = false
           or (
             p.content is not null
-            and p.content ->> 'kind' = 'ubud_trip_preview'
             and (p.content ->> 'version')::int = 1
+            and p.content ->> 'kind' in ('ubud_trip_preview', 'trip_preview')
           )
         )
       order by p.updated_at desc, p.slug asc

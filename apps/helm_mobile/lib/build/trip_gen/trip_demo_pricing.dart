@@ -78,6 +78,8 @@ const demoHotelOptions = <DemoHotelOption>[
   DemoHotelOption(slug: 'ubud-komaneka-bisma', tier: DemoHotelTier.upgrade),
   DemoHotelOption(slug: 'ubud-alila-ubud', tier: DemoHotelTier.upgrade),
   DemoHotelOption(slug: 'ubud-capella-ubud', tier: DemoHotelTier.upgrade),
+  // Istanbul local estimate only — server demo quote remains Ubud-only.
+  DemoHotelOption(slug: 'istanbul-ajia-hotel', tier: DemoHotelTier.base),
 ];
 
 DemoHotelOption? demoHotelBySlug(String slug) {
@@ -100,6 +102,10 @@ const demoActivityRateEgpPerTraveler = <String, int>{
   'ubud-sacred-monkey-forest': 350,
   'ubud-campuhan-ridge-walk': 0,
   'ubud-tirta-empul': 400,
+  // Istanbul local estimate only — not used for server quotes.
+  'hagia-sophia-exterior': 0,
+  'istanbul-grand-bazaar': 0,
+  'istanbul-galata-tower': 250,
 };
 
 bool isPricedDemoActivity(UbudDemoPlace place) =>

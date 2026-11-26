@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
 import {
+  expectedDestinationSlugForContent,
   isBuildCompatiblePackageContent,
-  parseUbudPackageContent,
+  parseBuildCompatiblePackageContent,
   requiredPublishedSlugs,
-} from '../domain/ubud-package-content';
+} from '../domain/trip-preview-content';
 import { PackagesRepository, type PackageRow } from '../infrastructure/packages.repository';
 
 export type PackagePublic = {
@@ -87,7 +88,7 @@ export class PackagesService {
     let content: Record<string, unknown> | null = input.content ?? null;
     let durationDays = 5;
     if (content !== null) {
-      const parsed = parseUbudPackageContent(content);
+      const parsed = parseBuildCompatiblePackageContent(content);
       content = parsed as unknown as Record<string, unknown>;
       durationDays = parsed.answers.nights;
     }
@@ -130,7 +131,7 @@ export class PackagesService {
     let durationDays: number | undefined;
     let content = input.content;
     if (content !== undefined && content !== null) {
-      const parsed = parseUbudPackageContent(content);
+      const parsed = parseBuildCompatiblePackageContent(content);
       content = parsed as unknown as Record<string, unknown>;
       durationDays = parsed.answers.nights;
     } else if (content === null) {
@@ -160,13 +161,22 @@ export class PackagesService {
     if (!existing.content) {
       throw AppException.validation('Add Build-compatible package content before publishing');
     }
-    if (existing.destinationSlug !== 'ubud') {
-      throw AppException.validation('v1 package publishing supports the Ubud destination only');
+
+    const parsed = parseBuildCompatiblePackageContent(existing.content);
+    const expectedDestination = expectedDestinationSlugForContent(parsed);
+    if (existing.destinationSlug !== expectedDestination) {
+      throw AppException.validation(
+        `Package destination must be ${expectedDestination} for this content`,
+      );
     }
 
-    const parsed = parseUbudPackageContent(existing.content);
-    if (parsed.answers.destination !== 'ubud' && parsed.answers.destination !== 'surprise') {
-      throw AppException.validation('Package trip destination must be Ubud or surprise→Ubud');
+    if (expectedDestination === 'ubud') {
+      const dest = parsed.answers.destination;
+      if (dest !== 'ubud' && dest !== 'surprise') {
+        throw AppException.validation('Package trip destination must be Ubud or surprise→Ubud');
+      }
+    } else if (parsed.answers.destination !== 'istanbul') {
+      throw AppException.validation('Istanbul packages require answers.destination = istanbul');
     }
 
     const needed = requiredPublishedSlugs(parsed);
@@ -177,7 +187,7 @@ export class PackagesService {
     const missing = needed.filter((slug) => !published.includes(slug));
     if (missing.length > 0) {
       throw AppException.validation(
-        `Hotel and itinerary stops must be published Ubud places (missing: ${missing.join(', ')})`,
+        `Hotel and itinerary stops must be published ${expectedDestination} places (missing: ${missing.join(', ')})`,
       );
     }
 

@@ -1,7 +1,7 @@
 /// Traveler questionnaire answers for the local Build trip-preview demo.
 library;
 
-enum TripDestinationChoice { ubud, surprise }
+enum TripDestinationChoice { ubud, surprise, istanbul }
 
 enum TripLifestyle { culture, adventure, food, relaxed }
 
@@ -125,5 +125,7 @@ String destinationChoiceLabel(TripDestinationChoice choice) {
       return 'Ubud';
     case TripDestinationChoice.surprise:
       return 'Surprise me';
+    case TripDestinationChoice.istanbul:
+      return 'Istanbul';
   }
 }
