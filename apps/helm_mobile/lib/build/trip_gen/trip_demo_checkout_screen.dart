@@ -11,12 +11,14 @@ class TripDemoCheckoutScreen extends StatefulWidget {
     required this.estimate,
     required this.destinationName,
     required this.days,
+    this.onBookingsConfirmed,
   });
 
   final String tripLabel;
   final TripDemoEstimate estimate;
   final String destinationName;
   final List<TripPreviewDay> days;
+  final VoidCallback? onBookingsConfirmed;
 
   @override
   State<TripDemoCheckoutScreen> createState() => _TripDemoCheckoutScreenState();
@@ -107,7 +109,13 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
               key: Key('trip-demo-confirm-${service.name}'),
               onPressed: _confirmedServices.contains(service)
                   ? null
-                  : () => setState(() => _confirmedServices.add(service)),
+                  : () {
+                      if (_confirmedServices.contains(service)) return;
+                      setState(() => _confirmedServices.add(service));
+                      if (_confirmedServices.length == services.length) {
+                        widget.onBookingsConfirmed?.call();
+                      }
+                    },
               child: Text('Confirm ${service.label.toLowerCase()}'),
             ),
           ),

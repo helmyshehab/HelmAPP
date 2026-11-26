@@ -6,6 +6,7 @@ import 'package:helm_api_client/helm_api_client.dart';
 
 import '../../auth/traveler_session.dart';
 import '../draft_title_patch.dart';
+import 'confirmed_demo_trip.dart';
 import 'trip_answers.dart';
 import 'trip_demo_checkout_screen.dart';
 import 'trip_demo_pricing.dart';
@@ -32,6 +33,7 @@ class TripPreviewScreen extends StatefulWidget {
     this.initialIncludedActivitySlugs,
     this.onAnswersChanged,
     this.onDraftIdChanged,
+    this.onDemoTripConfirmed,
   });
 
   final TripPreviewPlan plan;
@@ -47,6 +49,7 @@ class TripPreviewScreen extends StatefulWidget {
 
   final ValueChanged<TripAnswers>? onAnswersChanged;
   final ValueChanged<String>? onDraftIdChanged;
+  final ValueChanged<ConfirmedDemoTrip>? onDemoTripConfirmed;
 
   @override
   State<TripPreviewScreen> createState() => _TripPreviewScreenState();
@@ -143,6 +146,14 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         estimate: estimate,
         destinationName: plan.destinationName,
         days: days,
+        onBookingsConfirmed: () {
+          if (_cleared || !_isAuthCurrent(_boundGeneration)) return;
+          widget.onDemoTripConfirmed?.call(ConfirmedDemoTrip(
+            label: _tripLabel(plan),
+            destinationName: plan.destinationName,
+            days: days,
+          ));
+        },
       ),
     );
     _checkoutRoute = route;
