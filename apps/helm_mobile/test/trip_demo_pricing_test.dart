@@ -94,8 +94,8 @@ void main() {
     expect(over.isOverBudget, isTrue);
   });
 
-  test('demo hotels expose three base and three upgrade curated slugs', () {
-    expect(demoHotelsInTier(DemoHotelTier.base), hasLength(3));
+  test('demo hotels expose Ubud curated tiers plus Istanbul base lodging', () {
+    expect(demoHotelsInTier(DemoHotelTier.base), hasLength(4));
     expect(demoHotelsInTier(DemoHotelTier.upgrade), hasLength(3));
     expect(
       demoHotelOptions.map((h) => h.slug).toSet(),
@@ -106,6 +106,7 @@ void main() {
         'ubud-komaneka-bisma',
         'ubud-alila-ubud',
         'ubud-capella-ubud',
+        'istanbul-ajia-hotel',
       },
     );
   });
