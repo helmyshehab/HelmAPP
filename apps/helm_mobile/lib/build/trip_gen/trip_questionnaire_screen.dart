@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 
 import '../../auth/traveler_session.dart';
+import 'confirmed_demo_trip.dart';
 import 'trip_answers.dart';
 import 'trip_flow_routes.dart';
 import 'trip_planner.dart';
@@ -19,6 +20,7 @@ class TripQuestionnaireScreen extends StatefulWidget {
     this.returnAnswersOnSubmit = false,
     this.draftId,
     this.onDraftIdChanged,
+    this.onDemoTripConfirmed,
   });
 
   final TravelerAuth auth;
@@ -32,6 +34,7 @@ class TripQuestionnaireScreen extends StatefulWidget {
   /// Optional draft id when continuing an already-saved preview.
   final String? draftId;
   final ValueChanged<String>? onDraftIdChanged;
+  final ValueChanged<ConfirmedDemoTrip>? onDemoTripConfirmed;
 
   @override
   State<TripQuestionnaireScreen> createState() =>
@@ -156,6 +159,7 @@ class _TripQuestionnaireScreenState extends State<TripQuestionnaireScreen> {
         apiClient: widget.apiClient,
         draftId: _draftId,
         onAnswersChanged: _updateFromPreview,
+        onDemoTripConfirmed: widget.onDemoTripConfirmed,
         onDraftIdChanged: (id) {
           _draftId = id;
           widget.onDraftIdChanged?.call(id);

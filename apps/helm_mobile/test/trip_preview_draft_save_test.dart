@@ -6,8 +6,10 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
 import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
+import 'package:helm_mobile/build/trip_gen/trip_demo_checkout_screen.dart';
 import 'package:helm_mobile/build/trip_gen/trip_planner.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
+import 'package:helm_mobile/main.dart' show HelmShell;
 import 'package:helm_mobile/tabs/build_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -111,6 +113,28 @@ TripPreviewPlan _samplePlan() {
 
 void main() {
   testWidgets(
+      'demo booking skips activity confirmation when activities cost nothing',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: TripDemoCheckoutScreen(
+        tripLabel: 'Ubud trip',
+        quote: TripDraftQuote.fromJson({
+          ..._quoteJson(),
+          'activitiesTotalEgp': 0,
+          'totalEgp': 88500,
+        }),
+        destinationName: 'Ubud',
+        days: _samplePlan().days,
+        validateQuote: () async => true,
+      ),
+    ));
+    await tester.tap(find.text('Simulate payment'));
+    await tester.pumpAndSettle();
+    expect(find.text('0 of 2 services confirmed'), findsOneWidget);
+    expect(find.byKey(const Key('trip-demo-confirm-activities')), findsNothing);
+  });
+
+  testWidgets(
     'save and reopen restores edited day order, activities, and estimate',
     (tester) async {
       Map<String, dynamic>? storedConstraints;
@@ -173,11 +197,14 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: BuildTab(auth: auth, apiClient: client),
-          ),
+          home: HelmShell(auth: auth, apiClient: client),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
+      await tester.tap(find.text('Build'));
       await tester.pumpAndSettle();
       await _fillAndOpenPreview(tester);
 
@@ -289,7 +316,27 @@ void main() {
       expect(find.text('Demo payment complete'), findsOneWidget);
       expect(quoteReadCalls, 2);
       expect(createCalls, 1);
-      await tester.tap(find.text('Preview Trip Mode'));
+      final openTripMode =
+          find.widgetWithText(FilledButton, 'Preview Trip Mode');
+      expect(find.text('0 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+
+      Future<void> confirmService(String service) async {
+        final button = find.byKey(Key('trip-demo-confirm-$service'));
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(tester.widget<TextButton>(button).onPressed, isNull);
+      }
+
+      await confirmService('flights');
+      expect(find.text('1 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+      await confirmService('stay');
+      await confirmService('activities');
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(openTripMode);
+      await tester.tap(openTripMode);
       await tester.pumpAndSettle();
       expect(find.text('Demo Trip Mode'), findsOneWidget);
       expect(find.text('Day 1 of 2'), findsOneWidget);
@@ -313,6 +360,8 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(find.text('Back to trip'));
       await tester.tap(find.text('Back to trip'));
       await tester.pumpAndSettle();
       expect(_estimateTotal(tester), editedTotal);
@@ -398,6 +447,26 @@ void main() {
           find.byKey(Key('trip-stop-${originalTarget.last.place.slug}'));
       expect(tester.getTopLeft(addedStop).dy,
           lessThan(tester.getTopLeft(lastStop).dy));
+
+      Navigator.of(tester.element(find.byKey(const Key('trip-preview')))).pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      final confirmedTrip = find.byKey(const Key('trips-confirmed-demo'));
+      expect(confirmedTrip, findsOneWidget);
+      await tester.tap(confirmedTrip);
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsOneWidget);
+      await tester.tap(find.text('Next day'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ayung River White-Water Rafting'), findsOneWidget);
+
+      auth.setSession(
+          const TravelerSession(userId: 'user-b', accessToken: 'token-b'));
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsNothing);
+      expect(confirmedTrip, findsNothing);
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
 
       auth.dispose();
     },

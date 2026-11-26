@@ -7,12 +7,12 @@ class TripDemoModeScreen extends StatefulWidget {
     super.key,
     required this.destinationName,
     required this.days,
-    required this.onBack,
+    this.onBack,
   });
 
   final String destinationName;
   final List<TripPreviewDay> days;
-  final VoidCallback onBack;
+  final VoidCallback? onBack;
 
   @override
   State<TripDemoModeScreen> createState() => _TripDemoModeScreenState();
@@ -27,13 +27,15 @@ class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
     final day = widget.days[_dayIndex];
     final dayCount = widget.days.length;
     return PopScope<void>(
-      canPop: false,
+      canPop: widget.onBack == null,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) widget.onBack();
+        if (!didPop) widget.onBack?.call();
       },
       child: Scaffold(
         appBar: AppBar(
-          leading: BackButton(onPressed: widget.onBack),
+          leading: widget.onBack == null
+              ? null
+              : BackButton(onPressed: widget.onBack),
           title: const Text('Demo Trip Mode'),
         ),
         body: ListView(
