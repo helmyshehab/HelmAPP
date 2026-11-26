@@ -15,6 +15,13 @@ void main() {
     expect(helmCountryLabel(null), isNull);
   });
 
+  test('country labels prefer cached English names by ISO code', () {
+    const names = {'ID': 'Indonesia', 'TH': 'Thailand'};
+    expect(helmCountryLabel('ID', namesByCode: names), 'Indonesia');
+    expect(helmCountryLabel(' th ', namesByCode: names), 'Thailand');
+    expect(helmCountryLabel('XX', namesByCode: names), 'XX');
+  });
+
   test('wide tokens gain break opportunities and short words do not', () {
     const style = TextStyle(fontSize: 40, height: 1.25);
     const scaler = TextScaler.linear(3.12);

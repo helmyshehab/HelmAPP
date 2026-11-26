@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_globe/flutter_globe.dart';
 import 'package:helm_api_client/helm_api_client.dart';
@@ -5,11 +7,14 @@ import 'package:helm_api_client/helm_api_client.dart';
 import '../theme/helm_colors.dart';
 import '../theme/helm_tokens.dart';
 import '../theme/helm_typography.dart';
+import '../theme/helm_wrapping_text.dart';
 import 'destination_list_item.dart';
 import 'destination_overview_screen.dart';
 import 'globe_destinations.dart';
 
-/// Immersive Discover globe with destination markers and keyboard picker.
+/// Immersive Explore globe with destination markers and compact preview.
+///
+/// Non-globe browsing stays available via the destination list below.
 class DiscoverGlobe extends StatefulWidget {
   const DiscoverGlobe({
     super.key,
@@ -21,6 +26,12 @@ class DiscoverGlobe extends StatefulWidget {
 
   static const Key statusKey = Key('discover-globe-status');
   static const Key canvasKey = Key('discover-globe-canvas');
+  static const Key previewKey = Key('discover-globe-preview');
+  static const Key exploreKey = Key('discover-globe-explore');
+  static const Key dismissKey = Key('discover-globe-preview-dismiss');
+
+  /// Idle pause before auto-rotation resumes after a marker focus.
+  static const Duration idleResumeDelay = Duration(seconds: 8);
 
   final HelmApiClient apiClient;
 
@@ -33,12 +44,12 @@ class DiscoverGlobe extends StatefulWidget {
   final void Function(DestinationListItem item)? onExplore;
 
   @override
-  State<DiscoverGlobe> createState() => _DiscoverGlobeState();
+  DiscoverGlobeState createState() => DiscoverGlobeState();
 }
 
 enum _GlobeLoadState { loading, ready, empty, unavailable }
 
-class _DiscoverGlobeState extends State<DiscoverGlobe>
+class DiscoverGlobeState extends State<DiscoverGlobe>
     with TickerProviderStateMixin {
   final GlobeController _controller = GlobeController(
     autoRotate: true,
@@ -51,6 +62,7 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
   bool _autoRotatePaused = false;
   bool _didApplyInitialFocus = false;
   int _generation = 0;
+  Timer? _idleResumeTimer;
 
   static const double _markerSize = 6;
   static const double _markerSizeSelected = 9;
@@ -80,9 +92,6 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // GlobeController.autoRotate drives the ticker; keep it aligned with
-    // MediaQuery.disableAnimations / the Globe.autoRotate prop, and honor
-    // a persistent pause after dropdown focus.
     _syncAutoRotate();
   }
 
@@ -98,8 +107,14 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
 
   @override
   void dispose() {
+    _cancelIdleResume();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _cancelIdleResume() {
+    _idleResumeTimer?.cancel();
+    _idleResumeTimer = null;
   }
 
   void _syncAutoRotate() {
@@ -107,8 +122,24 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
     _controller.autoRotate = !reduceMotion && !_autoRotatePaused;
   }
 
+  void _scheduleIdleResume() {
+    _cancelIdleResume();
+    if (!mounted) return;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (reduceMotion) return;
+
+    _idleResumeTimer = Timer(DiscoverGlobe.idleResumeDelay, () {
+      if (!mounted) return;
+      setState(() {
+        _autoRotatePaused = false;
+        _syncAutoRotate();
+      });
+    });
+  }
+
   Future<void> _load() async {
     final generation = ++_generation;
+    _cancelIdleResume();
     setState(() {
       _state = _GlobeLoadState.loading;
       _selected = null;
@@ -127,11 +158,9 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
       if (!mounted || generation != _generation) return;
       setState(() {
         _destinations = plotted;
-        _state = plotted.isEmpty
-            ? _GlobeLoadState.empty
-            : _GlobeLoadState.ready;
+        _state =
+            plotted.isEmpty ? _GlobeLoadState.empty : _GlobeLoadState.ready;
       });
-      // Do not touch MediaQuery here: _load may still run from initState.
     } catch (_) {
       if (!mounted || generation != _generation) return;
       setState(() => _state = _GlobeLoadState.unavailable);
@@ -163,8 +192,6 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
     if (_didApplyInitialFocus || _destinations.isEmpty) return;
     _didApplyInitialFocus = true;
     final first = _destinations.first;
-    // Defer lookAt: onReady can fire during build; notifying the controller
-    // synchronously would throw and leave the canvas unmounted.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _controller.lookAt(
@@ -177,9 +204,13 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
   }
 
   void _focusDestination(DestinationListItem item) {
-    setState(() => _selected = item);
-    _autoRotatePaused = true;
+    setState(() {
+      _selected = item;
+      _autoRotatePaused = true;
+    });
     _controller.stopAutoRotation();
+    _syncAutoRotate();
+    _scheduleIdleResume();
     if (!mounted) return;
 
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
@@ -200,6 +231,21 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
     }
   }
 
+  /// Test hook: marker taps are package-internal and hard to drive in widgets.
+  @visibleForTesting
+  void focusDestinationForTest(DestinationListItem item) {
+    _focusDestination(item);
+  }
+
+  void _dismissPreview() {
+    _cancelIdleResume();
+    setState(() {
+      _selected = null;
+      _autoRotatePaused = false;
+      _syncAutoRotate();
+    });
+  }
+
   void _explore(DestinationListItem item) {
     final custom = widget.onExplore;
     if (custom != null) {
@@ -211,6 +257,102 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
         builder: (_) => DestinationOverviewScreen(
           slug: item.slug,
           apiClient: widget.apiClient,
+        ),
+      ),
+    );
+  }
+
+  Widget _compactPreview(DestinationListItem item) {
+    final scheme = Theme.of(context).colorScheme;
+    final summary = item.availableSummary;
+
+    return Material(
+      key: DiscoverGlobe.previewKey,
+      color: scheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(HelmRadius.md)),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(HelmSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: HelmWrappingText(
+                    item.nameEn,
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontFamily: HelmFonts.fraunces,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  key: DiscoverGlobe.dismissKey,
+                  tooltip: 'Dismiss selection',
+                  onPressed: _dismissPreview,
+                  style: IconButton.styleFrom(
+                    minimumSize: const Size(44, 44),
+                    tapTargetSize: MaterialTapTargetSize.padded,
+                  ),
+                  icon: Icon(
+                    Icons.close,
+                    color: scheme.onSurfaceVariant,
+                    size: 20,
+                  ),
+                ),
+              ],
+            ),
+            if (summary != null) ...[
+              const SizedBox(height: HelmSpacing.sm),
+              Text(
+                summary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontFamily: HelmFonts.outfit,
+                  fontFamilyFallback: HelmFonts.arabicFallback,
+                  fontSize: 15,
+                  height: 1.4,
+                ),
+              ),
+            ],
+            const SizedBox(height: HelmSpacing.md),
+            FilledButton(
+              key: DiscoverGlobe.exploreKey,
+              style: FilledButton.styleFrom(
+                backgroundColor: HelmColors.teal,
+                foregroundColor: HelmColors.white,
+                minimumSize: const Size(0, 44),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                tapTargetSize: MaterialTapTargetSize.padded,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(HelmRadius.md),
+                  ),
+                ),
+                textStyle: const TextStyle(
+                  fontFamily: HelmFonts.outfit,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                ),
+              ),
+              onPressed: () => _explore(item),
+              child: const Text('Explore destination'),
+            ),
+          ],
         ),
       ),
     );
@@ -240,19 +382,21 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
             'The interactive globe is unavailable right now. Browse destinations below.',
             key: DiscoverGlobe.statusKey,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: HelmColors.ivoryMuted,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
         );
       case _GlobeLoadState.ready:
         final reduceMotion = MediaQuery.disableAnimationsOf(context);
+        final selected = _selected;
         return Padding(
           padding: const EdgeInsets.only(bottom: HelmSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Semantics(
-                label: 'Interactive destination globe',
+                label: 'Interactive destination globe. '
+                    'Published destinations are also listed below.',
                 child: Container(
                   key: DiscoverGlobe.canvasKey,
                   height: 320,
@@ -262,7 +406,6 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
                     border: Border.all(color: HelmColors.ivoryDivider),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  // Fixed-height stage keeps ListView scroll separate from globe drag.
                   child: Globe(
                     controller: _controller,
                     markers: _markers,
@@ -281,56 +424,16 @@ class _DiscoverGlobeState extends State<DiscoverGlobe>
                     onMarkerTap: (marker) {
                       final data = marker.data;
                       if (data is DestinationListItem) {
-                        _explore(data);
+                        _focusDestination(data);
                       }
                     },
                   ),
                 ),
               ),
-              const SizedBox(height: HelmSpacing.sm),
-              InputDecorator(
-                decoration: InputDecoration(
-                  labelText: 'Select a destination',
-                  labelStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontFamily: HelmFonts.outfit,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(HelmRadius.md),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    key: const Key('discover-globe-picker'),
-                    value: _selected?.id,
-                    isExpanded: true,
-                    hint: const Text('Choose a destination…'),
-                    items: [
-                      for (final item in _destinations)
-                        DropdownMenuItem(
-                          value: item.id,
-                          child: Text(item.nameEn),
-                        ),
-                    ],
-                    onChanged: (id) {
-                      if (id == null) return;
-                      DestinationListItem? match;
-                      for (final item in _destinations) {
-                        if (item.id == id) {
-                          match = item;
-                          break;
-                        }
-                      }
-                      if (match == null) return;
-                      _focusDestination(match);
-                    },
-                  ),
-                ),
-              ),
+              if (selected != null) ...[
+                const SizedBox(height: HelmSpacing.md),
+                _compactPreview(selected),
+              ],
             ],
           ),
         );

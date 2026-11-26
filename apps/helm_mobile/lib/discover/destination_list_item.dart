@@ -12,6 +12,9 @@ class DestinationListItem {
     this.longitude,
     this.isFeatured = false,
     this.tags = const [],
+    this.coverImageUrl,
+    this.coverAltEn,
+    this.coverAltAr,
   });
 
   final String id;
@@ -25,6 +28,15 @@ class DestinationListItem {
   final double? longitude;
   final bool isFeatured;
   final List<String> tags;
+
+  /// Server-resolved public cover URL from `cover.url` (optional).
+  final String? coverImageUrl;
+
+  /// Optional English cover alt from `cover.altTextEn`.
+  final String? coverAltEn;
+
+  /// Optional Arabic cover alt from `cover.altTextAr`.
+  final String? coverAltAr;
 
   /// True when both coordinates are finite and within geographic bounds.
   bool get hasPlottableCoordinates {
@@ -58,7 +70,26 @@ class DestinationListItem {
     return code;
   }
 
+  /// Prefer English cover alt; fall back to Arabic.
+  String? get availableCoverAlt {
+    final en = coverAltEn?.trim();
+    if (en != null && en.isNotEmpty) return en;
+    final ar = coverAltAr?.trim();
+    if (ar != null && ar.isNotEmpty) return ar;
+    return null;
+  }
+
+  /// Language-aware cover description for accessibility (`ar` prefers Arabic).
+  String? coverAltForLanguage(String languageCode) {
+    if (languageCode.toLowerCase() == 'ar') {
+      final ar = coverAltAr?.trim();
+      if (ar != null && ar.isNotEmpty) return ar;
+    }
+    return availableCoverAlt;
+  }
+
   factory DestinationListItem.fromJson(Map<String, dynamic> json) {
+    final cover = _parseCover(json['cover']);
     return DestinationListItem(
       id: json['id'] as String,
       slug: json['slug'] as String,
@@ -71,6 +102,9 @@ class DestinationListItem {
       longitude: _parseCoordinate(json['longitude']),
       isFeatured: json['isFeatured'] == true,
       tags: _parseTags(json['tags']),
+      coverImageUrl: cover.url,
+      coverAltEn: cover.altEn,
+      coverAltAr: cover.altAr,
     );
   }
 
@@ -82,6 +116,29 @@ class DestinationListItem {
         .map((e) => DestinationListItem.fromJson(Map<String, dynamic>.from(e)))
         .toList();
   }
+}
+
+class _ParsedCover {
+  const _ParsedCover({this.url, this.altEn, this.altAr});
+  final String? url;
+  final String? altEn;
+  final String? altAr;
+}
+
+_ParsedCover _parseCover(Object? raw) {
+  if (raw is! Map) return const _ParsedCover();
+  final map = Map<String, dynamic>.from(raw);
+  return _ParsedCover(
+    url: _optionalNonEmptyString(map['url']),
+    altEn: _optionalNonEmptyString(map['altTextEn']),
+    altAr: _optionalNonEmptyString(map['altTextAr']),
+  );
+}
+
+String? _optionalNonEmptyString(Object? raw) {
+  if (raw is! String) return null;
+  final trimmed = raw.trim();
+  return trimmed.isEmpty ? null : trimmed;
 }
 
 List<String> _parseTags(Object? raw) {

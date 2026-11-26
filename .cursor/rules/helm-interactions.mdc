@@ -18,13 +18,14 @@ Search and browsing stay usable when the globe cannot load. Show published desti
 
 ## Flutter discovery
 
-Discovery order:
+Explore (Discover tab) order:
 
-1. Immersive interactive globe
-2. Accessible discovery dock
-3. Search and destination browsing
+1. Explore heading
+2. Search
+3. Interactive globe (hidden while a search query is active)
+4. Published destination browsing
 
-The dock is an explicit control to reach browsing. Essential actions have a visible control. Do not require a swipe for them.
+Search and browsing stay usable when the globe cannot load. Essential actions have a visible control. Do not require a swipe for them. The former Browse destinations dock is removed; the destination list sits below the globe. The globe has no standalone destination dropdown — marker focus opens a compact preview with an explicit Explore control, and the destination list remains the non-globe alternative.
 
 ## Flutter navigation
 

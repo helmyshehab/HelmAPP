@@ -5,11 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
+import 'package:helm_mobile/theme/helm_theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 Widget _wrap(Widget child) {
-  return MaterialApp(home: Scaffold(body: child));
+  return MaterialApp(
+    theme: HelmTheme.light(),
+    darkTheme: HelmTheme.dark(),
+    home: Scaffold(body: child),
+  );
 }
 
 HelmApiClient _client(MockClient mock) =>
@@ -22,11 +27,22 @@ http.Response _jsonOk(Object body) => http.Response(
       headers: {'content-type': 'application/json; charset=utf-8'},
     );
 
+bool _isGeoCountries(http.BaseRequest request) =>
+    request.url.path.contains('/geo/countries');
+
+http.Response _emptyCountries() => _jsonOk({
+      'items': <Object>[],
+      'total': 0,
+      'limit': 100,
+      'offset': 0,
+    });
+
 void main() {
   testWidgets('Discover shows loading while destinations request is in flight',
       (tester) async {
     final gate = Completer<void>();
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       await gate.future;
       return _jsonOk({'items': [], 'total': 0, 'limit': 20, 'offset': 0});
     });
@@ -34,6 +50,7 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     expect(find.byKey(const Key('discover-loading')), findsOneWidget);
     expect(find.byKey(const Key('discover-browse')), findsNothing);
+    expect(find.byKey(const Key('explore-heading')), findsNothing);
 
     gate.complete();
     await tester.pumpAndSettle();
@@ -42,6 +59,7 @@ void main() {
   testWidgets('Discover shows empty state when API returns no items',
       (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       return _jsonOk({'items': [], 'total': 0, 'limit': 20, 'offset': 0});
     });
 
@@ -50,15 +68,17 @@ void main() {
 
     expect(find.byKey(const Key('discover-empty')), findsOneWidget);
     expect(find.text('No destinations yet'), findsOneWidget);
+    expect(find.byKey(const Key('explore-heading')), findsOneWidget);
     expect(find.byKey(const Key('discover-browse')), findsNothing);
   });
 
   testWidgets('Discover shows failure with Retry and reloads on tap',
       (tester) async {
-    var calls = 0;
+    var destinationCalls = 0;
     final mock = MockClient((request) async {
-      calls += 1;
-      if (calls == 1) {
+      if (_isGeoCountries(request)) return _emptyCountries();
+      destinationCalls += 1;
+      if (destinationCalls == 1) {
         return http.Response('boom', 500);
       }
       return _jsonOk({
@@ -93,12 +113,13 @@ void main() {
     expect(find.byKey(const Key('discover-list')), findsOneWidget);
     expect(find.text('Ubud'), findsOneWidget);
     expect(find.text('Cultural heart of Bali'), findsOneWidget);
-    expect(calls, 2);
+    expect(destinationCalls, 2);
   });
 
   testWidgets('Discover lists destination names and available summaries',
       (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       expect(request.url.path, '/v1/destinations');
       return _jsonOk({
         'items': [
@@ -141,6 +162,7 @@ void main() {
   testWidgets('Discover keeps English summaries and directs Arabic fallbacks',
       (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       return _jsonOk({
         'items': [
           {
@@ -191,9 +213,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Discover features only API-featured destinations and caps tags',
+  testWidgets('Explore rows are uniform without featured chips or tags',
       (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) {
+        return _jsonOk({
+          'items': [
+            {'code': 'ID', 'nameEn': 'Indonesia'},
+            {'code': 'TH', 'nameEn': 'Thailand'},
+            {'code': 'GR', 'nameEn': 'Greece'},
+          ],
+          'total': 3,
+          'limit': 100,
+          'offset': 0,
+        });
+      }
       return _jsonOk({
         'items': [
           {
@@ -238,53 +272,63 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    expect(find.text('Featured'), findsNWidgets(2));
-    expect(find.text('ID'), findsOneWidget);
-    expect(find.text('TH'), findsOneWidget);
-    expect(find.text('rice terrace'), findsOneWidget);
-    expect(find.text('temple'), findsOneWidget);
-    expect(find.text('walk'), findsOneWidget);
-    expect(find.text('extra tag'), findsNothing);
-    expect(find.text('extra_tag'), findsNothing);
+    expect(find.text('Featured'), findsNothing);
+    expect(find.text('Indonesia'), findsOneWidget);
+    expect(find.text('Thailand'), findsOneWidget);
+    expect(find.text('rice terrace'), findsNothing);
+    expect(find.text('temple'), findsNothing);
+    expect(find.text('walk'), findsNothing);
+    expect(find.byKey(const Key('explore-heading')), findsOneWidget);
+    expect(find.text('Explore with HELM'), findsOneWidget);
+    expect(find.byKey(const Key('explore-section-heading')), findsOneWidget);
+    expect(find.text('Where we take you'), findsOneWidget);
+    expect(find.text("Through HELM's eyes."), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
 
-    final harborSize = tester.widget<Text>(find.text('Harbor')).style?.fontSize;
-    final ridgeSize = tester.widget<Text>(find.text('Ridge')).style?.fontSize;
-    final coveSize = tester.widget<Text>(find.text('Cove')).style?.fontSize;
-    expect(ridgeSize, greaterThan(harborSize!));
-    expect(coveSize, harborSize);
+    double nameSize(String slug, String name) {
+      return tester
+          .widget<Text>(
+            find.descendant(
+              of: find.byKey(Key('discover-item-$slug'), skipOffstage: false),
+              matching: find.text(name, skipOffstage: false),
+            ),
+          )
+          .style!
+          .fontSize!;
+    }
+
+    expect(nameSize('ridge', 'Ridge'), nameSize('harbor', 'Harbor'));
+    expect(nameSize('cove', 'Cove'), nameSize('harbor', 'Harbor'));
 
     expect(
-      tester.widget<Text>(find.text('ميناء')).textDirection,
+      tester
+          .widget<Text>(
+            find.descendant(
+              of: find.byKey(const Key('discover-item-harbor'), skipOffstage: false),
+              matching: find.text('ميناء', skipOffstage: false),
+            ),
+          )
+          .textDirection,
       TextDirection.rtl,
     );
-    expect(find.byKey(const Key('discover-browse')), findsOneWidget);
-    expect(
-      tester.getSize(find.byKey(const Key('discover-browse'))).height,
-      greaterThanOrEqualTo(44),
-    );
   });
 
-  testWidgets('Browse destinations scrolls a later card into view',
+  testWidgets('Explore layout places search above destinations section',
       (tester) async {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(400, 420);
-    addTearDown(tester.view.reset);
-
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       return _jsonOk({
         'items': [
-          for (var i = 0; i < 8; i++)
-            {
-              'id': '00000000-0000-0000-0000-${i.toString().padLeft(12, '0')}',
-              'slug': 'place-$i',
-              'nameEn': 'Place $i',
-              'summaryEn': 'A published destination summary that fills the card. '
-                  'More lines keep later places below the first screen.',
-              'countryCode': 'ID',
-              'status': 'published',
-            },
+          {
+            'id': '11111111-1111-1111-1111-111111111111',
+            'slug': 'ubud',
+            'nameEn': 'Ubud',
+            'summaryEn': 'Cultural heart of Bali',
+            'countryCode': 'ID',
+            'status': 'published',
+          },
         ],
-        'total': 8,
+        'total': 1,
         'limit': 20,
         'offset': 0,
       });
@@ -293,68 +337,26 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    final laterBefore = tester.getTopLeft(find.text('Place 1')).dy;
-    expect(laterBefore, greaterThan(420));
-
-    await tester.tap(find.byKey(const Key('discover-browse')));
-    await tester.pumpAndSettle();
-
+    final headingTop =
+        tester.getTopLeft(find.byKey(const Key('explore-heading'))).dy;
+    final searchTop =
+        tester.getTopLeft(find.byKey(const Key('discover-search-field'))).dy;
+    final sectionTop =
+        tester.getTopLeft(find.byKey(const Key('explore-section-heading'))).dy;
+    expect(headingTop, lessThan(searchTop));
+    expect(searchTop, lessThan(sectionTop));
     expect(
-      PrimaryScrollController.of(
-        tester.element(find.byKey(const Key('discover-list'))),
-      ).offset,
-      greaterThan(0),
+      tester
+          .widget<TextField>(find.byKey(const Key('discover-search-field')))
+          .decoration
+          ?.hintText,
+      'Find your next destination',
     );
-    expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
-  });
-
-  testWidgets('Browse destinations jumps when motion is reduced',
-      (tester) async {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(400, 420);
-    addTearDown(tester.view.reset);
-    tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
-    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-
-    final mock = MockClient((request) async {
-      return _jsonOk({
-        'items': [
-          for (var i = 0; i < 8; i++)
-            {
-              'id': '00000000-0000-0000-0000-${i.toString().padLeft(12, '0')}',
-              'slug': 'place-$i',
-              'nameEn': 'Place $i',
-              'summaryEn': 'A published destination summary that fills the card. '
-                  'More lines keep later places below the first screen.',
-              'countryCode': 'ID',
-              'status': 'published',
-            },
-        ],
-        'total': 8,
-        'limit': 20,
-        'offset': 0,
-      });
-    });
-
-    await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
-    await tester.pumpAndSettle();
-    expect(tester.getTopLeft(find.text('Place 1')).dy, greaterThan(420));
-
-    await tester.tap(find.byKey(const Key('discover-browse')));
-    await tester.pump();
-
-    expect(
-      PrimaryScrollController.of(
-        tester.element(find.byKey(const Key('discover-list'))),
-      ).offset,
-      greaterThan(0),
-    );
-    expect(tester.getTopLeft(find.text('Place 1')).dy, lessThan(420));
   });
 
   testWidgets('Tapping a destination card opens the overview', (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       final path = request.url.path;
       if (path == '/v1/destinations/ubud') {
         return _jsonOk({
@@ -405,6 +407,7 @@ void main() {
     addTearDown(tester.view.reset);
 
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       return _jsonOk({
         'items': [
           {
@@ -437,6 +440,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: HelmTheme.light(),
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
@@ -450,19 +454,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final discover = find.byWidgetPredicate(
+    final explore = find.byWidgetPredicate(
       (widget) =>
           widget is Text &&
-          (widget.data ?? '').replaceAll('\u200B', '') == 'Discover',
+          (widget.data ?? '').replaceAll('\u200B', '') == 'Explore with HELM',
     );
-    expect(discover, findsOneWidget);
-    final discoverRect = tester.getRect(discover);
-    expect(discoverRect.left, greaterThanOrEqualTo(0));
-    expect(discoverRect.right, lessThanOrEqualTo(402));
-    expect(discoverRect.height, greaterThan(0));
-    final discoverText = tester.widget<Text>(discover);
-    if ((discoverText.data ?? '').contains('\u200B')) {
-      expect(discoverRect.height, greaterThan(40 * 3.12));
+    expect(explore, findsOneWidget);
+    final exploreRect = tester.getRect(explore);
+    expect(exploreRect.left, greaterThanOrEqualTo(0));
+    expect(exploreRect.right, lessThanOrEqualTo(402));
+    expect(exploreRect.height, greaterThan(0));
+    final exploreText = tester.widget<Text>(explore);
+    if ((exploreText.data ?? '').contains('\u200B')) {
+      expect(exploreRect.height, greaterThan(40 * 3.12));
     }
 
     await tester.drag(
@@ -502,15 +506,17 @@ void main() {
     final ridge = tester.widget<Material>(
       find.byKey(const Key('discover-item-ridge')),
     );
-    expect(ridge.color, const Color(0xFF0C1B2A));
+    expect(ridge.color, HelmTheme.lightScheme.surfaceContainer);
     final harbor = tester.widget<Material>(
       find.byKey(const Key('discover-item-harbor')),
     );
-    expect(harbor.color, const Color(0xFFFFFFFF));
+    expect(harbor.color, HelmTheme.lightScheme.surfaceContainer);
   });
 
-  testWidgets('dark featured card stays Deep Ocean', (tester) async {
+  testWidgets('dark destination rows use theme surface containers',
+      (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       return _jsonOk({
         'items': [
           {
@@ -531,7 +537,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: ThemeData(brightness: Brightness.dark, useMaterial3: true),
+        theme: HelmTheme.dark(),
         home: Scaffold(body: DiscoverTab(apiClient: _client(mock))),
       ),
     );
@@ -539,10 +545,10 @@ void main() {
 
     expect(
       tester.widget<Material>(find.byKey(const Key('discover-item-ridge'))).color,
-      const Color(0xFF163747),
+      HelmTheme.darkScheme.surfaceContainer,
     );
     expect(find.text('XX'), findsOneWidget);
-    expect(find.text('Featured'), findsOneWidget);
+    expect(find.text('Featured'), findsNothing);
   });
 
   testWidgets('Discover search keeps field mounted while results load',
@@ -550,6 +556,7 @@ void main() {
     final gate = Completer<void>();
     var calls = 0;
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       calls += 1;
       if (calls == 1) {
         return _jsonOk({
@@ -618,6 +625,7 @@ void main() {
       (tester) async {
     final queries = <String?>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       expect(request.url.path, '/v1/destinations');
       queries.add(request.url.queryParameters['q']);
       final q = request.url.queryParameters['q'];
@@ -692,6 +700,7 @@ void main() {
   testWidgets('Discover search clear restores the full list', (tester) async {
     final queries = <String?>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       queries.add(request.url.queryParameters['q']);
       final q = request.url.queryParameters['q'];
       if (q == 'Ridge') {
@@ -763,6 +772,7 @@ void main() {
   testWidgets('Discover search empty results keep search and explain the miss',
       (tester) async {
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       final q = request.url.queryParameters['q'];
       if (q == 'zzzznofit') {
         return _jsonOk({'items': [], 'total': 0, 'limit': 20, 'offset': 0});
@@ -858,8 +868,9 @@ void main() {
     return [for (var i = start; i < start + count; i++) destinationJson(i)];
   }
 
-  /// Globe pages use limit=100; Discover list pages use 12.
+  /// Globe pages use destinations limit=100; Explore list pages use 12.
   bool isGlobeCatalogRequest(http.BaseRequest request) =>
+      request.url.path.contains('/destinations') &&
       request.url.queryParameters['limit'] == '100';
 
   http.Response emptyGlobeCatalog() => _jsonOk({
@@ -891,13 +902,44 @@ void main() {
     }
   }
 
-  Future<void> revealAndTap(WidgetTester tester, Key key) async {
+  Future<void> revealAndTap(
+    WidgetTester tester,
+    Key key, {
+    bool settle = true,
+  }) async {
     await jumpToBottom(tester);
     final finder = find.byKey(key);
     expect(finder, findsOneWidget);
     final button = tester.widget<ButtonStyleButton>(finder);
     expect(button.onPressed, isNotNull);
     button.onPressed!();
+    if (!settle) {
+      await tester.pump();
+      return;
+    }
+    await tester.pumpAndSettle();
+    // ListView builds lazily; return to the bottom so appended rows mount.
+    await jumpToBottom(tester);
+  }
+
+  Finder placeItem(int index) =>
+      find.byKey(Key('discover-item-place-$index'), skipOffstage: false);
+
+  Finder searchField() =>
+      find.byKey(const Key('discover-search-field'), skipOffstage: false);
+
+  Finder searchSubmit() =>
+      find.byKey(const Key('discover-search-submit'), skipOffstage: false);
+
+  Future<void> submitSearchQuery(WidgetTester tester, String query) async {
+    await jumpToTop(tester);
+    final field = tester.widget<TextField>(searchField());
+    field.controller!.value = TextEditingValue(
+      text: query,
+      selection: TextSelection.collapsed(offset: query.length),
+    );
+    await tester.pump();
+    tester.widget<IconButton>(searchSubmit()).onPressed!();
   }
 
   testWidgets('Discover pagination loads first page of 12 from 25',
@@ -908,6 +950,7 @@ void main() {
 
     final offsets = <String?>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       expect(request.url.queryParameters['limit'], '12');
       offsets.add(request.url.queryParameters['offset']);
@@ -924,10 +967,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(offsets, ['0']);
-    expect(find.text('Place 0'), findsOneWidget);
-    expect(find.text('Place 12'), findsNothing);
+    expect(find.text('Place 0', skipOffstage: false), findsOneWidget);
+    expect(find.text('Place 12', skipOffstage: false), findsNothing);
     expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
-    expect(find.byKey(const Key('discover-browse')), findsOneWidget);
+    expect(find.byKey(const Key('explore-heading')), findsOneWidget);
+    expect(find.byKey(const Key('discover-browse')), findsNothing);
 
     await jumpToBottom(tester);
     expect(find.byKey(const Key('discover-load-more')), findsOneWidget);
@@ -942,6 +986,7 @@ void main() {
 
     final requests = <Map<String, String>>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       requests.add(Map<String, String>.from(request.url.queryParameters));
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
@@ -959,13 +1004,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
-    expect(find.text('Place 12'), findsWidgets);
-    expect(find.text('Place 23'), findsWidgets);
+    expect(placeItem(23), findsOneWidget);
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
-    expect(find.text('Place 24'), findsWidgets);
+    expect(placeItem(24), findsOneWidget);
     expect(find.byKey(const Key('discover-load-more')), findsNothing);
 
     expect(
@@ -983,6 +1025,7 @@ void main() {
 
     final requests = <Map<String, String>>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       final params = Map<String, String>.from(request.url.queryParameters);
       requests.add(params);
@@ -1019,21 +1062,13 @@ void main() {
     await tester.pumpAndSettle();
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
-    expect(find.text('Place 12'), findsWidgets);
+    expect(placeItem(23), findsOneWidget);
 
-    await jumpToTop(tester);
-    await tester.enterText(
-      find.byKey(const Key('discover-search-field')),
-      'Ridge',
-    );
-    tester
-        .widget<ButtonStyleButton>(find.byKey(const Key('discover-search-submit')))
-        .onPressed!();
+    await submitSearchQuery(tester, 'Ridge');
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
-    expect(find.text('Place 0'), findsNothing);
+    expect(placeItem(0), findsNothing);
     expect(find.byKey(const Key('discover-load-more')), findsNothing);
     expect(requests.last['q'], 'Ridge');
     expect(requests.last['limit'], '12');
@@ -1050,6 +1085,7 @@ void main() {
 
     final offsets = <String?>[];
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       offsets.add(request.url.queryParameters['offset']);
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
@@ -1085,14 +1121,12 @@ void main() {
     await tester.pumpAndSettle();
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
-    expect(find.text('Place 12'), findsWidgets);
-    expect(find.text('Place 17'), findsWidgets);
+    expect(placeItem(17), findsOneWidget);
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
-    expect(find.text('Place 24'), findsWidgets);
+    // After dedupe, page 3 starts at offset 24; confirm the request trail.
     expect(offsets, ['0', '12', '24']);
+    expect(placeItem(24), findsOneWidget);
   });
 
   testWidgets('Discover pagination shows page error and retries',
@@ -1103,6 +1137,7 @@ void main() {
 
     var listCalls = 0;
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       listCalls += 1;
       final offset = int.parse(request.url.queryParameters['offset'] ?? '0');
@@ -1129,18 +1164,17 @@ void main() {
     await tester.pumpAndSettle();
 
     await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('discover-page-error')), findsOneWidget);
     expect(find.byKey(const Key('discover-page-retry')), findsOneWidget);
-    expect(find.text('Place 0'), findsWidgets);
 
     tester
         .widget<ButtonStyleButton>(find.byKey(const Key('discover-page-retry')))
         .onPressed!();
     await tester.pumpAndSettle();
+    await jumpToBottom(tester);
 
-    expect(find.text('Place 12'), findsWidgets);
+    expect(placeItem(23), findsOneWidget);
     expect(find.byKey(const Key('discover-page-error')), findsNothing);
     expect(listCalls, 3);
   });
@@ -1154,6 +1188,7 @@ void main() {
     final pageGate = Completer<void>();
     var listCalls = 0;
     final mock = MockClient((request) async {
+      if (_isGeoCountries(request)) return _emptyCountries();
       if (isGlobeCatalogRequest(request)) return emptyGlobeCatalog();
       listCalls += 1;
       final q = request.url.queryParameters['q'];
@@ -1195,28 +1230,19 @@ void main() {
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));
     await tester.pumpAndSettle();
 
-    await revealAndTap(tester, const Key('discover-load-more'));
-    await tester.pump();
+    await revealAndTap(tester, const Key('discover-load-more'), settle: false);
     expect(find.byKey(const Key('discover-page-loading')), findsOneWidget);
 
-    await jumpToTop(tester, settle: false);
-    expect(find.byKey(const Key('discover-search-field')), findsOneWidget);
-    await tester.enterText(
-      find.byKey(const Key('discover-search-field')),
-      'Ridge',
-    );
-    tester
-        .widget<ButtonStyleButton>(find.byKey(const Key('discover-search-submit')))
-        .onPressed!();
+    await submitSearchQuery(tester, 'Ridge');
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
-    expect(find.text('Place 12'), findsNothing);
+    expect(placeItem(12), findsNothing);
 
     pageGate.complete();
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('discover-item-ridge')), findsOneWidget);
-    expect(find.text('Place 12'), findsNothing);
+    expect(find.text('Place 12', skipOffstage: false), findsNothing);
   });
 }

@@ -10,11 +10,13 @@ import '../discover/destination_overview_screen.dart';
 import '../discover/discover_globe.dart';
 import '../discover/discover_hero.dart';
 import '../discover/discover_search.dart';
+import '../geo/country_names.dart';
 import '../theme/helm_colors.dart';
 import '../theme/helm_tokens.dart';
 import '../theme/helm_typography.dart';
+import '../theme/helm_wrapping_text.dart';
 
-/// Discover tab — published destination list with overview navigation.
+/// Explore tab — published destination list with overview navigation.
 class DiscoverTab extends StatefulWidget {
   const DiscoverTab({super.key, this.apiClient, this.onBuildTrip});
 
@@ -33,7 +35,6 @@ class DiscoverTab extends StatefulWidget {
 enum _DiscoverLoadState { loading, empty, failure, success }
 
 class _DiscoverTabState extends State<DiscoverTab> {
-  final GlobalKey _destinationListKey = GlobalKey();
   final TextEditingController _searchController = TextEditingController();
 
   /// True when this tab created the [http.Client] (not when [apiClient] injected).
@@ -60,6 +61,9 @@ class _DiscoverTabState extends State<DiscoverTab> {
   int _requestGeneration = 0;
   bool _listInFlight = false;
 
+  /// Cached English country names from one `listGeoCountries` pass.
+  Map<String, String> _countryNames = const {};
+
   @override
   void initState() {
     super.initState();
@@ -76,6 +80,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
       );
     }
     _load();
+    _loadCountryNames();
   }
 
   @override
@@ -87,23 +92,10 @@ class _DiscoverTabState extends State<DiscoverTab> {
     super.dispose();
   }
 
-  void _scrollToDestinations() {
-    final target = _destinationListKey.currentContext;
-    if (target == null) return;
-    final reduceMotion = MediaQuery.disableAnimationsOf(target);
-    Scrollable.ensureVisible(
-      target,
-      alignment: 0,
-      duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 350),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  String? get _editorialSlug {
-    for (final item in _items) {
-      if (item.isFeatured) return item.slug;
-    }
-    return null;
+  Future<void> _loadCountryNames() async {
+    final names = await loadCountryNameCache(_client);
+    if (!mounted || names.isEmpty) return;
+    setState(() => _countryNames = names);
   }
 
   bool get _canLoadMore =>
@@ -263,6 +255,42 @@ class _DiscoverTabState extends State<DiscoverTab> {
     );
   }
 
+  Widget _sectionHeader() {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: HelmSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HelmWrappingText(
+            'Where we take you',
+            key: const Key('explore-section-heading'),
+            style: TextStyle(
+              color: scheme.onSurface,
+              fontFamily: HelmFonts.fraunces,
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+              height: 1.25,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: HelmSpacing.sm),
+          Text(
+            "Through HELM's eyes.",
+            key: const Key('explore-section-subtitle'),
+            style: TextStyle(
+              color: scheme.onSurfaceVariant,
+              fontFamily: HelmFonts.outfit,
+              fontSize: 16,
+              fontStyle: FontStyle.italic,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _resultsLoading() {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 48),
@@ -337,6 +365,20 @@ class _DiscoverTabState extends State<DiscoverTab> {
     );
   }
 
+  List<Widget> _chromeLeading({required bool includeGlobe}) {
+    return [
+      const DiscoverHero(),
+      _searchSlot(),
+      if (includeGlobe)
+        DiscoverGlobe(
+          apiClient: _client,
+          seedItems: _items,
+          catalogComplete: _reachedEnd,
+          onExplore: _openDestination,
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (_state) {
@@ -351,7 +393,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
-            _searchSlot(),
+            ..._chromeLeading(includeGlobe: false),
             _resultsLoading(),
           ],
         );
@@ -359,7 +401,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
-            _searchSlot(),
+            ..._chromeLeading(includeGlobe: false),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
@@ -411,36 +453,22 @@ class _DiscoverTabState extends State<DiscoverTab> {
           ),
         );
       case _DiscoverLoadState.success:
-        final editorialSlug = _editorialSlug;
         final showGlobe = _activeQuery.isEmpty;
         return ListView(
           key: const Key('discover-list'),
           primary: true,
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
-            if (showGlobe)
-              DiscoverGlobe(
-                apiClient: _client,
-                seedItems: _items,
-                catalogComplete: _reachedEnd,
-                onExplore: _openDestination,
+            ..._chromeLeading(includeGlobe: showGlobe),
+            _sectionHeader(),
+            for (final item in _items) ...[
+              if (item != _items.first) const SizedBox(height: 12),
+              DestinationCard(
+                item: item,
+                countryNames: _countryNames,
+                onTap: () => _openDestination(item),
               ),
-            DiscoverHero(onBrowse: _scrollToDestinations),
-            _searchSlot(),
-            Column(
-              key: _destinationListKey,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final item in _items) ...[
-                  if (item != _items.first) const SizedBox(height: 12),
-                  DestinationCard(
-                    item: item,
-                    editorial: item.slug == editorialSlug,
-                    onTap: () => _openDestination(item),
-                  ),
-                ],
-              ],
-            ),
+            ],
             _loadMoreFooter(),
           ],
         );

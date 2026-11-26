@@ -16,16 +16,21 @@ Widget _wrap(Widget child) {
 HelmApiClient _client(MockClient mock) =>
     HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
 
-void main() {
-  test('DestinationListItem parses plottable coordinates', () {
-    final item = DestinationListItem.fromJson({
+DestinationListItem _ubud() => DestinationListItem.fromJson({
       'id': '11111111-1111-1111-1111-111111111111',
       'slug': 'ubud',
       'nameEn': 'Ubud',
+      'summaryEn': 'Cultural heart of Bali',
+      'countryCode': 'ID',
       'latitude': -8.5069,
       'longitude': 115.2625,
+      'tags': ['culture', 'nature', 'food', 'extra'],
       'status': 'published',
     });
+
+void main() {
+  test('DestinationListItem parses plottable coordinates', () {
+    final item = _ubud();
     expect(item.hasPlottableCoordinates, isTrue);
     expect(withPlottableCoordinates([item]), hasLength(1));
   });
@@ -50,10 +55,8 @@ void main() {
     expect(withPlottableCoordinates([missing, bad]), isEmpty);
   });
 
-  testWidgets(
-      'DiscoverGlobe picker focuses without navigating or showing preview',
+  testWidgets('DiscoverGlobe has no standalone destination dropdown',
       (tester) async {
-    // flutter_globe keeps a ticker alive; disable animations and avoid settle.
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
@@ -61,26 +64,45 @@ void main() {
     final mock = MockClient((request) async {
       fail('Should not fetch when catalogComplete seed is provided');
     });
-    final seed = [
-      DestinationListItem.fromJson({
-        'id': '11111111-1111-1111-1111-111111111111',
-        'slug': 'ubud',
-        'nameEn': 'Ubud',
-        'summaryEn': 'Cultural heart of Bali',
-        'countryCode': 'ID',
-        'latitude': -8.5069,
-        'longitude': 115.2625,
-        'tags': ['culture', 'nature', 'food', 'extra'],
-        'status': 'published',
-      }),
-    ];
 
-    var exploreCalls = 0;
     await tester.pumpWidget(
       _wrap(
         DiscoverGlobe(
           apiClient: _client(mock),
-          seedItems: seed,
+          seedItems: [_ubud()],
+          catalogComplete: true,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(find.byKey(DiscoverGlobe.canvasKey), findsOneWidget);
+    expect(find.byKey(const Key('discover-globe-picker')), findsNothing);
+    expect(find.byKey(DiscoverGlobe.previewKey), findsNothing);
+  });
+
+  testWidgets(
+      'DiscoverGlobe compact preview Explore CTA hands off without navigating itself',
+      (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
+    final mock = MockClient((request) async {
+      fail('Should not fetch when catalogComplete seed is provided');
+    });
+
+    final globeKey = GlobalKey<DiscoverGlobeState>();
+    var exploreCalls = 0;
+    final seed = _ubud();
+
+    await tester.pumpWidget(
+      _wrap(
+        DiscoverGlobe(
+          key: globeKey,
+          apiClient: _client(mock),
+          seedItems: [seed],
           catalogComplete: true,
           onExplore: (_) => exploreCalls++,
         ),
@@ -89,22 +111,20 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.byKey(DiscoverGlobe.canvasKey), findsOneWidget);
-    expect(find.byKey(const Key('discover-globe-picker')), findsOneWidget);
-
-    await tester.tap(find.byKey(const Key('discover-globe-picker')));
+    globeKey.currentState!.focusDestinationForTest(seed);
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    await tester.tap(find.text('Ubud').last);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
 
-    expect(exploreCalls, 0);
-    expect(find.text('Expand'), findsNothing);
-    expect(find.text('Explore'), findsNothing);
-    expect(find.text('Close'), findsNothing);
-    expect(find.text('Cultural heart of Bali'), findsNothing);
-    expect(find.byKey(DiscoverGlobe.canvasKey), findsOneWidget);
+    expect(find.byKey(DiscoverGlobe.previewKey), findsOneWidget);
+    expect(find.text('Cultural heart of Bali'), findsOneWidget);
+    expect(find.byKey(const Key('discover-globe-picker')), findsNothing);
+
+    await tester.tap(find.byKey(DiscoverGlobe.exploreKey));
+    await tester.pump();
+    expect(exploreCalls, 1);
+
+    await tester.tap(find.byKey(DiscoverGlobe.dismissKey));
+    await tester.pump();
+    expect(find.byKey(DiscoverGlobe.previewKey), findsNothing);
   });
 
   testWidgets('DiscoverGlobe stays fail-soft when catalog fetch fails',
