@@ -73,7 +73,7 @@ async function httpJson(
   return { status: res.status, json };
 }
 
-test('trip drafts: owner CRUD, cross-owner 404, denied PATCH unchanged, 401 without token', async (t) => {
+test('trip drafts: owner CRUD, idempotent create, and current owner-scoped quotes', async (t) => {
   if (!databaseUrl) {
     t.skip('DATABASE_URL not set');
     return;
@@ -277,6 +277,99 @@ test('trip drafts: owner CRUD, cross-owner 404, denied PATCH unchanged, 401 with
     });
     assert.equal(bKeyed.status, 201, JSON.stringify(bKeyed.json));
     assert.notEqual(bKeyed.json.id, keyedId);
+
+    const quoteConstraints = {
+      kind: 'ubud_trip_preview',
+      version: 1,
+      answers: { destination: 'ubud', travelerCount: 2, nights: 2 },
+      selections: {
+        flightId: 'economy-example',
+        hotelSlug: 'ubud-komaneka-bisma',
+        includedActivitySlugs: ['ubud-tirta-empul'],
+      },
+      itinerary: {
+        days: [
+          { dayNumber: 1, stopSlugs: ['ubud-tirta-empul'] },
+          { dayNumber: 2, stopSlugs: [] },
+        ],
+      },
+      totalEgp: 1,
+    };
+    const quoteDraft = await httpJson(baseUrl, 'POST', '/v1/trips/drafts', tokenA, {
+      constraints: quoteConstraints,
+    });
+    assert.equal(quoteDraft.status, 201, JSON.stringify(quoteDraft.json));
+    const quoteDraftPath = `/v1/trips/drafts/${quoteDraft.json.id}`;
+    const quotePath = `${quoteDraftPath}/quote`;
+    assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+    const { status, json: quote } = await httpJson(baseUrl, 'POST', quotePath, tokenA);
+    assert.equal(status, 201, JSON.stringify(quote));
+    assert.equal(quote.draftId, quoteDraft.json.id);
+    assert.equal(quote.currency, 'EGP');
+    assert.equal(quote.source, 'demo');
+    assert.equal(quote.flightTotalEgp, 37000);
+    assert.equal(quote.lodgingTotalEgp, 19600);
+    assert.equal(quote.activitiesTotalEgp, 800);
+    assert.equal(quote.totalEgp, 57400);
+    assert.equal(Date.parse(String(quote.expiresAt)) - Date.parse(String(quote.createdAt)), 30 * 60 * 1000);
+    assert.deepEqual(await httpJson(baseUrl, 'GET', quotePath, tokenA), { status: 200, json: quote });
+    assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenB)).status, 404);
+    assert.equal((await httpJson(baseUrl, 'POST', quotePath, tokenB)).status, 404);
+    assert.equal((await httpJson(baseUrl, 'POST', quotePath)).status, 401);
+
+    const update = await httpJson(baseUrl, 'PATCH', quoteDraftPath, tokenA, {
+      constraints: {
+        ...quoteConstraints,
+        answers: { ...quoteConstraints.answers, travelerCount: 3 },
+      },
+    });
+    assert.equal(update.status, 200);
+    assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+    const mismatched = await httpJson(baseUrl, 'POST', quotePath, tokenA, {
+      expectedConstraints: quoteConstraints,
+    });
+    assert.equal(mismatched.status, 409);
+    assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+    const repriced = await httpJson(baseUrl, 'POST', quotePath, tokenA);
+    assert.equal(repriced.status, 201, JSON.stringify(repriced.json));
+    assert.notEqual(repriced.json.id, quote.id);
+    assert.equal(repriced.json.totalEgp, 76300);
+
+    await fixtureSql.unsafe(
+      `update trips.trip_draft_quotes
+       set created_at = now() - interval '31 minutes', expires_at = now() - interval '1 minute'
+       where draft_id = $1::uuid`,
+      [String(quoteDraft.json.id)],
+    );
+    assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+
+    const invalidUpdate = await httpJson(baseUrl, 'PATCH', quoteDraftPath, tokenA, {
+      constraints: {
+        ...quoteConstraints,
+        selections: {
+          ...quoteConstraints.selections,
+          includedActivitySlugs: ['ubud-balinese-cooking-class'],
+        },
+      },
+    });
+    assert.equal(invalidUpdate.status, 200);
+    assert.equal((await httpJson(baseUrl, 'POST', quotePath, tokenA)).status, 400);
+
+    const race = await Promise.all([
+      httpJson(baseUrl, 'PATCH', quoteDraftPath, tokenA, { constraints: quoteConstraints }),
+      httpJson(baseUrl, 'POST', quotePath, tokenA),
+    ]);
+    assert.equal(race[0]?.status, 200);
+    if (race[1]?.status === 201) {
+      assert.equal(race[1].json.totalEgp, 57400);
+      assert.deepEqual(await httpJson(baseUrl, 'GET', quotePath, tokenA), {
+        status: 200,
+        json: race[1].json,
+      });
+    } else {
+      assert.equal(race[1]?.status, 400);
+      assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+    }
   } catch (err) {
     primaryError = err;
   } finally {

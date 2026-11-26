@@ -6,14 +6,35 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
 import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
+import 'package:helm_mobile/build/trip_gen/trip_demo_checkout_screen.dart';
 import 'package:helm_mobile/build/trip_gen/trip_planner.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
+import 'package:helm_mobile/main.dart' show HelmShell;
 import 'package:helm_mobile/tabs/build_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 const _draftId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const _userId = 'user-a';
+
+Map<String, dynamic> _quoteJson({String id = 'quote-a'}) {
+  final now = DateTime.now().toUtc();
+  return {
+    'id': id,
+    'draftId': _draftId,
+    'currency': 'EGP',
+    'source': 'demo',
+    'rateVersion': 'ubud-demo-v1',
+    'travelerCount': 3,
+    'nights': 2,
+    'flightTotalEgp': 79500,
+    'lodgingTotalEgp': 9000,
+    'activitiesTotalEgp': 6500,
+    'totalEgp': 95000,
+    'createdAt': now.toIso8601String(),
+    'expiresAt': now.add(const Duration(minutes: 30)).toIso8601String(),
+  };
+}
 
 http.Response _json(Object body, {int status = 200}) => http.Response(
       jsonEncode(body),
@@ -92,15 +113,49 @@ TripPreviewPlan _samplePlan() {
 
 void main() {
   testWidgets(
+      'demo booking skips activity confirmation when activities cost nothing',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: TripDemoCheckoutScreen(
+        tripLabel: 'Ubud trip',
+        quote: TripDraftQuote.fromJson({
+          ..._quoteJson(),
+          'activitiesTotalEgp': 0,
+          'totalEgp': 88500,
+        }),
+        destinationName: 'Ubud',
+        days: _samplePlan().days,
+        validateQuote: () async => true,
+      ),
+    ));
+    await tester.tap(find.text('Simulate payment'));
+    await tester.pumpAndSettle();
+    expect(find.text('0 of 2 services confirmed'), findsOneWidget);
+    expect(find.byKey(const Key('trip-demo-confirm-activities')), findsNothing);
+  });
+
+  testWidgets(
     'save and reopen restores edited day order, activities, and estimate',
     (tester) async {
       Map<String, dynamic>? storedConstraints;
       var createCalls = 0;
       var listPhase = 0;
+      var quoteReadCalls = 0;
+      var quoteWrites = 0;
+      var quote = _quoteJson();
 
       final mock = MockClient((request) async {
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
+        }
+        if (request.url.path.endsWith('/drafts/$_draftId/quote')) {
+          if (request.method == 'POST') {
+            quote = _quoteJson(id: 'quote-${++quoteWrites}');
+            return _json(quote, status: 201);
+          }
+          quoteReadCalls++;
+          return _json(
+              quoteReadCalls == 1 ? {...quote, 'id': 'other-quote'} : quote);
         }
         if (request.url.path.endsWith('/drafts') && request.method == 'GET') {
           listPhase += 1;
@@ -125,6 +180,12 @@ void main() {
             status: 201,
           );
         }
+        if (request.method == 'PATCH' &&
+            request.url.path.endsWith('/drafts/$_draftId')) {
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          storedConstraints = body['constraints'] as Map<String, dynamic>;
+          return _json(_draftJson(constraints: storedConstraints!));
+        }
         return http.Response('unexpected ${request.method}', 500);
       });
 
@@ -136,11 +197,14 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: BuildTab(auth: auth, apiClient: client),
-          ),
+          home: HelmShell(auth: auth, apiClient: client),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
+      await tester.tap(find.text('Build'));
       await tester.pumpAndSettle();
       await _fillAndOpenPreview(tester);
 
@@ -223,20 +287,56 @@ void main() {
           reviewText('Sacred Monkey Forest Sanctuary (excluded from estimate)'),
           findsOneWidget);
       expect(reviewText('Balinese Cooking Class & Market Tour'), findsNothing);
-      await _tapPreviewKey(tester, const Key('trip-demo-checkout'));
+      const checkoutKey = Key('trip-demo-checkout');
+      expect(tester.widget<FilledButton>(find.byKey(checkoutKey)).onPressed,
+          isNull);
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
+      await _tapPreviewKey(tester, checkoutKey);
       expect(find.text('Demo checkout'), findsOneWidget);
       expect(
         tester
             .widget<Text>(find.byKey(const Key('trip-demo-checkout-total')))
             .data,
-        editedTotal,
+        '95000 EGP',
       );
       expect(find.byType(TextField), findsNothing);
       await tester.tap(find.text('Simulate payment'));
       await tester.pumpAndSettle();
+      expect(
+          find.byKey(const Key('trip-checkout-quote-error')), findsOneWidget);
+      expect(find.text('Demo payment complete'), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(find.byKey(checkoutKey)).onPressed,
+          isNull);
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
+      await _tapPreviewKey(tester, checkoutKey);
+      await tester.tap(find.text('Simulate payment'));
+      await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
-      expect(createCalls, 0);
-      await tester.tap(find.text('Preview Trip Mode'));
+      expect(quoteReadCalls, 2);
+      expect(createCalls, 1);
+      final openTripMode =
+          find.widgetWithText(FilledButton, 'Preview Trip Mode');
+      expect(find.text('0 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+
+      Future<void> confirmService(String service) async {
+        final button = find.byKey(Key('trip-demo-confirm-$service'));
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(tester.widget<TextButton>(button).onPressed, isNull);
+      }
+
+      await confirmService('flights');
+      expect(find.text('1 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+      await confirmService('stay');
+      await confirmService('activities');
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(openTripMode);
+      await tester.tap(openTripMode);
       await tester.pumpAndSettle();
       expect(find.text('Demo Trip Mode'), findsOneWidget);
       expect(find.text('Day 1 of 2'), findsOneWidget);
@@ -260,6 +360,8 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(find.text('Back to trip'));
       await tester.tap(find.text('Back to trip'));
       await tester.pumpAndSettle();
       expect(_estimateTotal(tester), editedTotal);
@@ -268,7 +370,6 @@ void main() {
       await tester.tap(reviewTitle);
       await tester.pumpAndSettle();
 
-      await _tapPreviewKey(tester, const Key('trip-preview-save'));
       expect(
           find.byKey(const Key('trip-preview-save-success')), findsOneWidget);
       expect(createCalls, 1);
@@ -346,6 +447,26 @@ void main() {
           find.byKey(Key('trip-stop-${originalTarget.last.place.slug}'));
       expect(tester.getTopLeft(addedStop).dy,
           lessThan(tester.getTopLeft(lastStop).dy));
+
+      Navigator.of(tester.element(find.byKey(const Key('trip-preview')))).pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      final confirmedTrip = find.byKey(const Key('trips-confirmed-demo'));
+      expect(confirmedTrip, findsOneWidget);
+      await tester.tap(confirmedTrip);
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsOneWidget);
+      await tester.tap(find.text('Next day'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ayung River White-Water Rafting'), findsOneWidget);
+
+      auth.setSession(
+          const TravelerSession(userId: 'user-b', accessToken: 'token-b'));
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsNothing);
+      expect(confirmedTrip, findsNothing);
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
 
       auth.dispose();
     },
@@ -574,6 +695,14 @@ void main() {
             'updatedAt': '2026-01-01T12:00:00.000Z',
           });
         }
+        if (request.method == 'PATCH' &&
+            request.url.path.endsWith('/drafts/$_draftId')) {
+          return _json(_draftJson(constraints: previewConstraints));
+        }
+        if (request.method == 'POST' &&
+            request.url.path.endsWith('/drafts/$_draftId/quote')) {
+          return _json(_quoteJson(), status: 201);
+        }
         return http.Response('unexpected ${request.url}', 500);
       });
 
@@ -601,6 +730,7 @@ void main() {
       expect(find.byKey(const Key('trip-preview')), findsOneWidget);
 
       await _tapPreviewKey(tester, const Key('trip-review'));
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
       await _tapPreviewKey(tester, const Key('trip-demo-checkout'));
       expect(find.text('Demo checkout'), findsOneWidget);
       auth.setSession(
