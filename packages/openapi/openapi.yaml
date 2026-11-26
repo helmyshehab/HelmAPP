@@ -443,7 +443,8 @@ paths:
       summary: List published Build-compatible packages
       description: |
         Returns only packages with `publish_status=published` and validated
-        `ubud_trip_preview` v1 content. Legacy metadata-only rows are omitted.
+        `trip_preview` v1 or legacy `ubud_trip_preview` v1 content. Legacy
+        metadata-only rows are omitted.
       tags: [packages]
       security: []
       responses:
@@ -597,10 +598,11 @@ paths:
   /v1/admin/packages/{id}/publish:
     post:
       operationId: adminPublishPackage
-      summary: Publish a Build-compatible Ubud package
+      summary: Publish a Build-compatible package
       description: |
-        Validates ubud_trip_preview v1 content, Build selections, itinerary
-        consistency, and that hotel/stops are published Ubud places.
+        Validates `trip_preview` v1 or legacy `ubud_trip_preview` v1 content,
+        Build selections, itinerary consistency, and that hotel/stops are
+        published places for the package destination (Ubud or Istanbul).
       tags: [packages-admin]
       security:
         - bearerAuth: []
@@ -2937,7 +2939,7 @@ components:
         content:
           type: object
           additionalProperties: true
-          description: Validated ubud_trip_preview v1 JSON for Customize in Build
+          description: Validated trip_preview v1 or legacy ubud_trip_preview v1 JSON for Customize in Build
     PackagePublicListResponse:
       type: object
       required: [items]
@@ -3041,7 +3043,7 @@ components:
           type: object
           additionalProperties: true
           nullable: true
-          description: Optional ubud_trip_preview v1 JSON; nights derive durationDays
+          description: Optional trip_preview v1 or legacy ubud_trip_preview v1 JSON; nights derive durationDays
     UpdatePackageRequest:
       type: object
       additionalProperties: false

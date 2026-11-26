@@ -28,11 +28,11 @@ export const defaultUbudPackageContent = {
 } as const;
 
 export type EditablePackageContent = {
-  kind: "ubud_trip_preview";
+  kind: "ubud_trip_preview" | "trip_preview";
   version: 1;
   answers: {
     budgetEgp: number;
-    destination: "ubud" | "surprise";
+    destination: "ubud" | "surprise" | "istanbul";
     travelerCount: number;
     lifestyle: "culture" | "adventure" | "food" | "relaxed";
     nights: number;
@@ -51,7 +51,12 @@ export type EditablePackageContent = {
 export function parseEditableContent(raw: unknown): EditablePackageContent | null {
   if (!raw || typeof raw !== "object") return null;
   const value = raw as EditablePackageContent;
-  if (value.kind !== "ubud_trip_preview" || value.version !== 1) return null;
+  if (
+    (value.kind !== "ubud_trip_preview" && value.kind !== "trip_preview") ||
+    value.version !== 1
+  ) {
+    return null;
+  }
   if (!value.answers || !value.selections || !value.itinerary) return null;
   return value;
 }

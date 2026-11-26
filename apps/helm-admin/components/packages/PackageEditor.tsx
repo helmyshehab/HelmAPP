@@ -10,12 +10,16 @@ import {
 } from "../../app/actions/packages";
 import {
   amenityOptions,
-  hotelOptions,
+  hotelOptions as ubudHotelOptions,
   parseEditableContent,
   syncDaysToNights,
   type EditablePackageContent,
   defaultUbudPackageContent,
 } from "../../lib/packages/ubud-content";
+import {
+  defaultIstanbulPackageContent,
+  istanbulHotelOptions,
+} from "../../lib/packages/istanbul-content";
 import styles from "../destinations/destinations.module.css";
 
 type PlaceOption = { slug: string; nameEn: string; category: string };
@@ -25,6 +29,17 @@ type PackageEditorProps = {
   places: PlaceOption[];
 };
 
+function defaultContentForPackage(pkg: PackageAdmin): EditablePackageContent {
+  const parsed = parseEditableContent(pkg.content);
+  if (parsed) return parsed;
+  if (pkg.destinationSlug === "istanbul") {
+    return JSON.parse(
+      JSON.stringify(defaultIstanbulPackageContent),
+    ) as EditablePackageContent;
+  }
+  return JSON.parse(JSON.stringify(defaultUbudPackageContent)) as EditablePackageContent;
+}
+
 export function PackageEditor({ pkg, places }: PackageEditorProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -33,12 +48,14 @@ export function PackageEditor({ pkg, places }: PackageEditorProps) {
   const [titleAr, setTitleAr] = useState(pkg.titleAr);
   const [summaryEn, setSummaryEn] = useState(pkg.summaryEn ?? "");
   const [summaryAr, setSummaryAr] = useState(pkg.summaryAr ?? "");
-  const [content, setContent] = useState<EditablePackageContent>(
-    () =>
-      parseEditableContent(pkg.content) ??
-      (JSON.parse(JSON.stringify(defaultUbudPackageContent)) as EditablePackageContent),
+  const [content, setContent] = useState<EditablePackageContent>(() =>
+    defaultContentForPackage(pkg),
   );
   const published = pkg.publishStatus === "published";
+  const hotelChoices =
+    pkg.destinationSlug === "istanbul"
+      ? [...istanbulHotelOptions]
+      : [...ubudHotelOptions];
   const stopChoices = useMemo(
     () => places.filter((place) => place.category !== "accommodation"),
     [places],
@@ -247,7 +264,7 @@ export function PackageEditor({ pkg, places }: PackageEditorProps) {
                 })
               }
             >
-              {hotelOptions.map((slug) => (
+              {hotelChoices.map((slug) => (
                 <option key={slug} value={slug}>
                   {slug}
                 </option>
@@ -285,7 +302,7 @@ export function PackageEditor({ pkg, places }: PackageEditorProps) {
       <section>
         <h2 className={styles.title}>2. Days</h2>
         <p className={styles.subtitle}>
-          Choose ordered published Ubud places per day. Included activities must appear in the
+          Choose ordered published places for this destination per day. Included activities must appear in the
           itinerary before publish.
         </p>
         {content.itinerary.days.map((day, dayIndex) => (

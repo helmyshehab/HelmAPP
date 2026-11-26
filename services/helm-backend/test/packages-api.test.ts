@@ -1,5 +1,6 @@
 /**
- * Packages API — public list hides unpublished/legacy; publish validates Ubud places.
+ * Packages API — public list hides unpublished/legacy; publish validates destination places.
+ * Covers legacy ubud_trip_preview and shared trip_preview (Istanbul).
  */
 import 'reflect-metadata';
 import assert from 'node:assert/strict';
@@ -45,6 +46,45 @@ const packageContent = {
     ],
   },
 };
+
+const istanbulPackageContent = {
+  kind: 'trip_preview',
+  version: 1,
+  answers: {
+    budgetEgp: 90000,
+    destination: 'istanbul',
+    travelerCount: 2,
+    lifestyle: 'culture',
+    nights: 3,
+    amenities: ['Breakfast included'],
+  },
+  selections: {
+    flightId: 'economy-example',
+    hotelSlug: 'istanbul-ajia-hotel',
+    includedActivitySlugs: ['hagia-sophia-exterior'],
+  },
+  itinerary: {
+    days: [
+      { dayNumber: 1, stopSlugs: ['hagia-sophia-exterior', 'istanbul-grand-bazaar'] },
+      { dayNumber: 2, stopSlugs: ['istanbul-galata-tower'] },
+      { dayNumber: 3, stopSlugs: ['hagia-sophia-exterior'] },
+    ],
+  },
+};
+
+async function promotePlaceToPublished(
+  db: { execute: (query: ReturnType<typeof sql>) => Promise<unknown> },
+  placeId: string,
+) {
+  for (const step of [
+    sql`update catalog.places set lifecycle_status = 'pending_verification' where id = ${placeId}::uuid`,
+    sql`update catalog.places set lifecycle_status = 'verified', verified_at = now() where id = ${placeId}::uuid`,
+    sql`update catalog.places set lifecycle_status = 'approved', approved_at = now() where id = ${placeId}::uuid`,
+    sql`update catalog.places set lifecycle_status = 'published', published_at = now() where id = ${placeId}::uuid`,
+  ]) {
+    await db.execute(step);
+  }
+}
 
 async function applyMigrationsAndSeed(targetUrl: string) {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -196,14 +236,28 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
           ${`test:ubud:${place[0]}`}
         )
       `);
-      for (const step of [
-        sql`update catalog.places set lifecycle_status = 'pending_verification' where id = ${placeId}::uuid`,
-        sql`update catalog.places set lifecycle_status = 'verified', verified_at = now() where id = ${placeId}::uuid`,
-        sql`update catalog.places set lifecycle_status = 'approved', approved_at = now() where id = ${placeId}::uuid`,
-        sql`update catalog.places set lifecycle_status = 'published', published_at = now() where id = ${placeId}::uuid`,
-      ]) {
-        await db.execute(step);
-      }
+      await promotePlaceToPublished(db, placeId);
+    }
+
+    // Seed already published Hagia Sophia; add hotel + stops for Istanbul Customize.
+    const istanbulDestinationId = '11111111-1111-1111-1111-111111111111';
+    for (const place of [
+      ['istanbul-ajia-hotel', 'Ajia Hotel', 'accommodation'],
+      ['istanbul-grand-bazaar', 'Grand Bazaar', 'attraction'],
+      ['istanbul-galata-tower', 'Galata Tower', 'attraction'],
+    ] as const) {
+      const placeId = randomUUID();
+      await db.execute(sql`
+        insert into catalog.places (
+          id, destination_id, slug, name_en, name_ar, category,
+          lifecycle_status, external_key
+        ) values (
+          ${placeId}::uuid, ${istanbulDestinationId}::uuid, ${place[0]}, ${place[1]}, ${place[1]},
+          ${place[2]}::catalog.place_category, 'draft',
+          ${`test:istanbul:${place[0]}`}
+        )
+      `);
+      await promotePlaceToPublished(db, placeId);
     }
 
     const publicBefore = await httpJson(baseUrl, 'GET', '/v1/packages');
@@ -297,6 +351,62 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
       ((latest.json.content as Json).answers as Json).budgetEgp,
       90000,
     );
+
+    // Istanbul trip_preview package (new slug; legacy null-content row stays hidden).
+    const istanbulCreated = await httpJson(baseUrl, 'POST', '/v1/admin/packages', adminToken, {
+      destinationId: istanbulDestinationId,
+      slug: 'istanbul-bosphorus-escape',
+      titleEn: 'Istanbul Bosphorus escape',
+      titleAr: 'إسطنبول — رحلة البوسفور',
+      summaryEn: 'Three nights with Hagia Sophia and the Grand Bazaar.',
+      content: istanbulPackageContent,
+    });
+    assert.equal(istanbulCreated.status, 201, JSON.stringify(istanbulCreated.json));
+    const istanbulPackageId = String(istanbulCreated.json.id);
+    assert.equal(istanbulCreated.json.publishStatus, 'unpublished');
+    assert.equal(istanbulCreated.json.durationDays, 3);
+
+    const istanbulPublishBlockedWrongPlace = await httpJson(
+      baseUrl,
+      'POST',
+      `/v1/admin/packages/${istanbulPackageId}/publish`,
+      adminToken,
+    );
+    // Places exist — should succeed.
+    assert.equal(
+      istanbulPublishBlockedWrongPlace.status,
+      200,
+      JSON.stringify(istanbulPublishBlockedWrongPlace.json),
+    );
+
+    const publicWithIstanbul = await httpJson(baseUrl, 'GET', '/v1/packages');
+    assert.equal(publicWithIstanbul.status, 200, JSON.stringify(publicWithIstanbul.json));
+    const publicSlugs = (publicWithIstanbul.json.items as Json[]).map((item) => item.slug);
+    assert.ok(publicSlugs.includes('ubud-culture-escape'));
+    assert.ok(publicSlugs.includes('istanbul-bosphorus-escape'));
+    assert.ok(!publicSlugs.includes('istanbul-5d-private-stay'));
+
+    const istanbulGet = await httpJson(baseUrl, 'GET', '/v1/packages/istanbul-bosphorus-escape');
+    assert.equal(istanbulGet.status, 200, JSON.stringify(istanbulGet.json));
+    assert.equal((istanbulGet.json.content as Json).kind, 'trip_preview');
+    assert.equal(((istanbulGet.json.content as Json).answers as Json).destination, 'istanbul');
+
+    // Reject publish when content destination does not match package destination.
+    const mismatched = await httpJson(baseUrl, 'POST', '/v1/admin/packages', adminToken, {
+      destinationId: istanbulDestinationId,
+      slug: 'istanbul-wrong-content',
+      titleEn: 'Mismatch',
+      titleAr: 'Mismatch',
+      content: packageContent,
+    });
+    assert.equal(mismatched.status, 201, JSON.stringify(mismatched.json));
+    const mismatchPublish = await httpJson(
+      baseUrl,
+      'POST',
+      `/v1/admin/packages/${String(mismatched.json.id)}/publish`,
+      adminToken,
+    );
+    assert.equal(mismatchPublish.status, 400, JSON.stringify(mismatchPublish.json));
   } catch (err) {
     primaryError = err;
   } finally {

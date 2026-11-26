@@ -277,7 +277,8 @@ export interface paths {
         /**
          * List published Build-compatible packages
          * @description Returns only packages with `publish_status=published` and validated
-         *     `ubud_trip_preview` v1 content. Legacy metadata-only rows are omitted.
+         *     `trip_preview` v1 or legacy `ubud_trip_preview` v1 content. Legacy
+         *     metadata-only rows are omitted.
          */
         get: operations["listPackages"];
         put?: never;
@@ -371,9 +372,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Publish a Build-compatible Ubud package
-         * @description Validates ubud_trip_preview v1 content, Build selections, itinerary
-         *     consistency, and that hotel/stops are published Ubud places.
+         * Publish a Build-compatible package
+         * @description Validates `trip_preview` v1 or legacy `ubud_trip_preview` v1 content,
+         *     Build selections, itinerary consistency, and that hotel/stops are
+         *     published places for the package destination (Ubud or Istanbul).
          */
         post: operations["adminPublishPackage"];
         delete?: never;
@@ -1521,7 +1523,7 @@ export interface components {
             summaryAr: string | null;
             durationDays: number;
             destinationSlug: string;
-            /** @description Validated ubud_trip_preview v1 JSON for Customize in Build */
+            /** @description Validated trip_preview v1 or legacy ubud_trip_preview v1 JSON for Customize in Build */
             content: {
                 [key: string]: unknown;
             };
@@ -1563,7 +1565,7 @@ export interface components {
             summaryEn?: string | null;
             summaryAr?: string | null;
             marketCode?: string;
-            /** @description Optional ubud_trip_preview v1 JSON; nights derive durationDays */
+            /** @description Optional trip_preview v1 or legacy ubud_trip_preview v1 JSON; nights derive durationDays */
             content?: {
                 [key: string]: unknown;
             } | null;

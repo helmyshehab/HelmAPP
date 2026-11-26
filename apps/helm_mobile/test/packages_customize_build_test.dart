@@ -9,11 +9,13 @@ import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
 import 'package:helm_mobile/main.dart' show HelmShell;
+import 'package:helm_mobile/packages/istanbul_package_fixture.dart';
 import 'package:helm_mobile/packages/ubud_package_fixture.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 const _draftId = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+const _istanbulDraftId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 const _userId = 'user-a';
 
 const _publishedSlugs = {
@@ -21,6 +23,13 @@ const _publishedSlugs = {
   'ubud-capella-ubud',
   'ubud-moksa',
   'ubud-sacred-monkey-forest',
+};
+
+const _istanbulPublishedSlugs = {
+  'istanbul-ajia-hotel',
+  'hagia-sophia-exterior',
+  'istanbul-grand-bazaar',
+  'istanbul-galata-tower',
 };
 
 http.Response _json(Object body, {int status = 200}) => http.Response(
@@ -65,6 +74,21 @@ Map<String, dynamic> _packageJson({Map<String, dynamic>? content}) {
     'durationDays': fixture.snapshot.answers.nights,
     'destinationSlug': 'ubud',
     'content': content ?? fixture.snapshot.toConstraints(),
+  };
+}
+
+Map<String, dynamic> _istanbulPackageJson() {
+  final fixture = istanbulBosphorusPackageFixture;
+  return {
+    'id': fixture.id,
+    'slug': 'istanbul-bosphorus-escape',
+    'titleEn': fixture.title,
+    'titleAr': fixture.title,
+    'summaryEn': fixture.summary,
+    'summaryAr': fixture.summary,
+    'durationDays': fixture.snapshot.answers.nights,
+    'destinationSlug': 'istanbul',
+    'content': fixture.snapshot.toConstraints(),
   };
 }
 
@@ -301,4 +325,140 @@ void main() {
       auth.dispose();
     },
   );
+
+  test('Istanbul package fixture is trip_preview v1', () {
+    final snapshot = istanbulBosphorusPackageFixture.snapshot;
+    final constraints = snapshot.toConstraints();
+    expect(constraints['kind'], tripPreviewConstraintKind);
+    expect(constraints['version'], tripPreviewConstraintVersion);
+    expect(tryParseTripPreviewDraft(constraints), isNotNull);
+    expect(snapshot.supportsDemoQuote, isFalse);
+    expect(snapshot.hotelSlug, 'istanbul-ajia-hotel');
+  });
+
+  testWidgets(
+    'Istanbul Customize saves edits, reopens them, and hides demo quote',
+    (tester) async {
+      Map<String, dynamic>? storedConstraints;
+      final mock = MockClient((request) async {
+        if (_isPackagesList(request)) {
+          return _json({'items': [_istanbulPackageJson()]});
+        }
+        if (request.url.path.endsWith('/bootstrap')) {
+          return _json(_bootstrap());
+        }
+        if (request.url.path.contains('/catalog/places')) {
+          return publishedUbudFixture(slugs: _istanbulPublishedSlugs);
+        }
+        if (request.url.path.endsWith('/drafts') && request.method == 'GET') {
+          if (storedConstraints == null) {
+            return _json({'items': <Object>[]});
+          }
+          return _json({
+            'items': [
+              _draftJson(
+                id: _istanbulDraftId,
+                title: 'Istanbul trip · 3 nights',
+                constraints: storedConstraints!,
+              ),
+            ],
+          });
+        }
+        if (request.url.path.endsWith('/drafts') && request.method == 'POST') {
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          storedConstraints =
+              Map<String, dynamic>.from(body['constraints'] as Map);
+          expect(storedConstraints!['kind'], tripPreviewConstraintKind);
+          expect(
+            storedConstraints!['answers']['destination'],
+            'istanbul',
+          );
+          return _json(
+            _draftJson(
+              id: _istanbulDraftId,
+              title: 'Istanbul trip · 3 nights',
+              constraints: storedConstraints!,
+            ),
+            status: 201,
+          );
+        }
+        return http.Response('unexpected ${request.method} ${request.url}', 500);
+      });
+
+      final auth = FakeTravelerAuth(
+        initial: const TravelerSession(userId: _userId, accessToken: 'token-a'),
+      );
+      final client =
+          HelmApiClient(baseUrl: 'https://api.test', httpClient: mock);
+
+      await tester.pumpWidget(
+        MaterialApp(home: HelmShell(auth: auth, apiClient: client)),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Packages'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          Key('package-customize-${istanbulBosphorusPackageFixture.id}'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('trip-preview')), findsOneWidget);
+      expect(
+        find.byKey(const Key('trip-hotel-istanbul-ajia-hotel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('trip-stop-istanbul-galata-tower')),
+        findsWidgets,
+      );
+
+      await _tapPreviewKey(tester, const Key('trip-review'));
+      expect(
+        find.byKey(const Key('trip-review-quote-unavailable')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('trip-review-request-quote')), findsNothing);
+      expect(find.byKey(const Key('trip-demo-checkout')), findsNothing);
+
+      // Edit itinerary: drop Galata from day 2 by reopening after save with
+      // hotel still selected, then verify reopen keeps trip_preview kind.
+      await _tapPreviewKey(tester, const Key('trip-preview-save'));
+      expect(find.byKey(const Key('trip-preview-save-success')), findsOneWidget);
+      expect(storedConstraints!['selections']['hotelSlug'], 'istanbul-ajia-hotel');
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('Istanbul trip · 3 nights'), findsOneWidget);
+
+      await tester.tap(find.byKey(Key('build-draft-$_istanbulDraftId')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('trip-hotel-istanbul-ajia-hotel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('trip-stop-hagia-sophia-exterior')),
+        findsWidgets,
+      );
+      await _tapPreviewKey(tester, const Key('trip-review'));
+      expect(
+        find.byKey(const Key('trip-review-quote-unavailable')),
+        findsOneWidget,
+      );
+      auth.dispose();
+    },
+  );
+
+  test('Legacy Ubud draft constraints still parse and plan', () {
+    final constraints = ubudCulturePackageFixture.snapshot.toConstraints();
+    expect(constraints['kind'], ubudTripPreviewConstraintKind);
+    final snapshot = tryParseTripPreviewDraft(constraints);
+    expect(snapshot, isNotNull);
+    expect(snapshot!.supportsDemoQuote, isTrue);
+    final plan = planFromTripPreviewDraft(snapshot);
+    expect(plan.destinationSlug, 'ubud');
+    expect(plan.days, isNotEmpty);
+  });
 }

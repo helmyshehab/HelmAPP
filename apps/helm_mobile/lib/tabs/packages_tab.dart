@@ -166,7 +166,7 @@ class _PackageIdea {
   final TripPreviewDraftSnapshot snapshot;
 
   static _PackageIdea? tryParse(Map<String, dynamic> json) {
-    final snapshot = tryParseUbudTripPreviewDraft(
+    final snapshot = tryParseTripPreviewDraft(
       Map<String, dynamic>.from(json['content'] as Map? ?? const {}),
     );
     if (snapshot == null) return null;

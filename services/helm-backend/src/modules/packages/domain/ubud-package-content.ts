@@ -95,16 +95,12 @@ export function parseUbudPackageContent(raw: unknown): UbudPackageContent {
   return parsed.data;
 }
 
-export function isBuildCompatiblePackageContent(raw: unknown): boolean {
+/** @deprecated Prefer isBuildCompatiblePackageContent from trip-preview-content (dual-read). */
+export function isUbudPackageContent(raw: unknown): boolean {
   try {
     parseUbudPackageContent(raw);
     return true;
   } catch {
     return false;
   }
-}
-
-export function requiredPublishedSlugs(content: UbudPackageContent): string[] {
-  const stops = content.itinerary.days.flatMap((day) => day.stopSlugs);
-  return [...new Set([content.selections.hotelSlug, ...stops])];
 }

@@ -24,8 +24,8 @@ export default async function PackagesPage() {
           <p className={styles.kicker}>Catalog</p>
           <h1 className={styles.title}>Packages</h1>
           <p className={styles.subtitle}>
-            Author Ubud trip ideas as versioned Build content. Unpublish before editing a live
-            package, then preview and publish.
+            Author Ubud or Istanbul trip ideas as versioned Build content. Unpublish before
+            editing a live package, then preview and publish.
           </p>
         </div>
         <Link className={styles.primaryLink} href="/packages/new">
