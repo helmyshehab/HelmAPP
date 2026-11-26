@@ -16,6 +16,21 @@ import 'package:http/testing.dart';
 
 const _draftId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const _userId = 'user-a';
+const _bookingId = 'demo-booking-a';
+
+Map<String, dynamic> _bookingJson({
+  required Map<String, dynamic> quote,
+  required Map<String, dynamic> constraints,
+}) =>
+    {
+      'id': _bookingId,
+      'draftId': _draftId,
+      'title': 'Ubud trip · 2 nights',
+      'status': 'pending_confirmation',
+      'quote': quote,
+      'constraints': constraints,
+      'createdAt': '2026-01-01T00:00:00Z',
+    };
 
 Map<String, dynamic> _quoteJson({String id = 'quote-a'}) {
   final now = DateTime.now().toUtc();
@@ -115,17 +130,16 @@ void main() {
   testWidgets(
       'demo booking skips activity confirmation when activities cost nothing',
       (tester) async {
+    final quote = {..._quoteJson(), 'activitiesTotalEgp': 0, 'totalEgp': 88500};
     await tester.pumpWidget(MaterialApp(
       home: TripDemoCheckoutScreen(
         tripLabel: 'Ubud trip',
-        quote: TripDraftQuote.fromJson({
-          ..._quoteJson(),
-          'activitiesTotalEgp': 0,
-          'totalEgp': 88500,
-        }),
+        quote: TripDraftQuote.fromJson(quote),
         destinationName: 'Ubud',
         days: _samplePlan().days,
-        validateQuote: () async => true,
+        createBooking: () async => DemoTripBooking.fromJson(
+          _bookingJson(quote: quote, constraints: {}),
+        ),
       ),
     ));
     await tester.tap(find.text('Simulate payment'));
@@ -140,22 +154,36 @@ void main() {
       Map<String, dynamic>? storedConstraints;
       var createCalls = 0;
       var listPhase = 0;
-      var quoteReadCalls = 0;
+      var checkoutAttempts = 0;
       var quoteWrites = 0;
       var quote = _quoteJson();
+      Map<String, dynamic>? booking;
 
       final mock = MockClient((request) async {
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
+        }
+        if (request.url.path == '/v1/trips/demo-bookings') {
+          if (request.method == 'GET') {
+            return _json({
+              'items': [
+                if (booking != null &&
+                    request.headers['authorization'] == 'Bearer token-a')
+                  booking,
+              ]
+            });
+          }
+          final body = jsonDecode(request.body);
+          expect(body, {'draftId': _draftId, 'quoteId': quote['id']});
+          if (checkoutAttempts++ == 0) return _json({}, status: 409);
+          booking = _bookingJson(quote: quote, constraints: storedConstraints!);
+          return _json(booking!, status: 201);
         }
         if (request.url.path.endsWith('/drafts/$_draftId/quote')) {
           if (request.method == 'POST') {
             quote = _quoteJson(id: 'quote-${++quoteWrites}');
             return _json(quote, status: 201);
           }
-          quoteReadCalls++;
-          return _json(
-              quoteReadCalls == 1 ? {...quote, 'id': 'other-quote'} : quote);
         }
         if (request.url.path.endsWith('/drafts') && request.method == 'GET') {
           listPhase += 1;
@@ -314,7 +342,7 @@ void main() {
       await tester.tap(find.text('Simulate payment'));
       await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
-      expect(quoteReadCalls, 2);
+      expect(checkoutAttempts, 2);
       expect(createCalls, 1);
       final openTripMode =
           find.widgetWithText(FilledButton, 'Preview Trip Mode');
@@ -467,6 +495,23 @@ void main() {
       expect(find.text('Demo Trip Mode'), findsNothing);
       expect(confirmedTrip, findsNothing);
       expect(find.text('No confirmed trips yet'), findsOneWidget);
+
+      // A new shell has no in-memory confirmation state, but the booking still
+      // comes back from the signed-in traveler's booking API.
+      await tester.pumpWidget(const SizedBox());
+      final restarted = FakeTravelerAuth(
+        initial: const TravelerSession(userId: _userId, accessToken: 'token-a'),
+      );
+      await tester.pumpWidget(
+          MaterialApp(home: HelmShell(auth: restarted, apiClient: client)));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('trips-demo-booking-$_bookingId')),
+          findsOneWidget);
+      expect(find.textContaining('Awaiting confirmation'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      restarted.dispose();
 
       auth.dispose();
     },

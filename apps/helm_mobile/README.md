@@ -20,8 +20,8 @@ flutter run -d chrome --target tool/demo_main.dart
 ```
 
 Open **Ubud → Build my trip**. Use `demo@example.com` and `demo1234` on the
-demo sign-in screen. The demo uses a local catalog and in-memory drafts, so
-reloading clears your drafts. Checkout is simulated. It needs no Supabase
+demo sign-in screen. The demo uses a local catalog and keeps drafts and demo
+bookings in memory until reload. Checkout is simulated. It needs no Supabase
 project or API credentials. For Android, replace `-d chrome` with your device
 ID from `flutter devices`.
 

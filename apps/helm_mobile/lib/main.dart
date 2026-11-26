@@ -121,7 +121,12 @@ class _HelmShellState extends State<HelmShell> {
             setState(() => _confirmedDemoTrip = trip),
       ),
       const PackagesTab(),
-      TripsTab(trip: _confirmedDemoTrip, onOpenTrip: _openTripMode),
+      TripsTab(
+        auth: widget.auth,
+        apiClient: widget.apiClient,
+        trip: _confirmedDemoTrip,
+        onOpenTrip: _openTripMode,
+      ),
       const ProfileTab(),
     ];
 

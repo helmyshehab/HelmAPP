@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
+import { DemoTripBookingsController } from './demo-trip-bookings.controller';
+import { DemoTripBookingsService } from './demo-trip-bookings.service';
 
-/**
- * BookingsModule — domain boundary stub (Step 2).
- * No product feature implementation yet.
- */
 @Module({
-  providers: [],
-  exports: [],
+  controllers: [DemoTripBookingsController],
+  providers: [DemoTripBookingsService],
 })
 export class BookingsModule {}

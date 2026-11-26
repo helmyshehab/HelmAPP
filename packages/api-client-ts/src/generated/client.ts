@@ -14,6 +14,9 @@ export type BootstrapCustomerProfileResponse =
   components["schemas"]["BootstrapCustomerProfileResponse"];
 export type TripDraft = components["schemas"]["TripDraft"];
 export type TripDraftQuote = components["schemas"]["TripDraftQuote"];
+export type DemoTripBooking = components["schemas"]["DemoTripBooking"];
+export type DemoTripBookingList = components["schemas"]["DemoTripBookingList"];
+export type CreateDemoTripBookingRequest = components["schemas"]["CreateDemoTripBookingRequest"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
 export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
 export type UpdateTripDraftRequest = components["schemas"]["UpdateTripDraftRequest"];
@@ -166,6 +169,29 @@ export function createHelmClient(options: HelmClientOptions) {
       );
       if (!res.ok) throw new Error(`getTripDraftItinerary failed: ${res.status}`);
       return (await res.json()) as TripDraftItineraryResponse;
+    },
+    async listDemoTripBookings(accessToken?: string): Promise<DemoTripBookingList> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("listDemoTripBookings requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/demo-bookings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`listDemoTripBookings failed: ${res.status}`);
+      return (await res.json()) as DemoTripBookingList;
+    },
+    async createDemoTripBooking(
+      body: CreateDemoTripBookingRequest,
+      accessToken?: string,
+    ): Promise<DemoTripBooking> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("createDemoTripBooking requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/demo-bookings`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`createDemoTripBooking failed: ${res.status}`);
+      return (await res.json()) as DemoTripBooking;
     },
     async createTripDraftQuote(
       id: string,
