@@ -28,6 +28,9 @@ class DiscoverTab extends StatefulWidget {
 
   static const int pageSize = 12;
 
+  /// Shared Explore content column width; heading, search, globe, and rows align.
+  static const double contentMaxWidth = 720;
+
   @override
   State<DiscoverTab> createState() => _DiscoverTabState();
 }
@@ -379,6 +382,34 @@ class _DiscoverTabState extends State<DiscoverTab> {
     ];
   }
 
+  /// Centers Explore chrome and rows within [DiscoverTab.contentMaxWidth].
+  Widget _exploreList({
+    Key? key,
+    required List<Widget> children,
+  }) {
+    return ListView(
+      key: key,
+      primary: true,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: DiscoverTab.contentMaxWidth,
+            ),
+            child: Column(
+              key: const Key('explore-content-column'),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: children,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (_state) {
@@ -390,16 +421,14 @@ class _DiscoverTabState extends State<DiscoverTab> {
             ),
           );
         }
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        return _exploreList(
           children: [
             ..._chromeLeading(includeGlobe: false),
             _resultsLoading(),
           ],
         );
       case _DiscoverLoadState.empty:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        return _exploreList(
           children: [
             ..._chromeLeading(includeGlobe: false),
             Padding(
@@ -454,10 +483,8 @@ class _DiscoverTabState extends State<DiscoverTab> {
         );
       case _DiscoverLoadState.success:
         final showGlobe = _activeQuery.isEmpty;
-        return ListView(
+        return _exploreList(
           key: const Key('discover-list'),
-          primary: true,
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
           children: [
             ..._chromeLeading(includeGlobe: showGlobe),
             _sectionHeader(),
