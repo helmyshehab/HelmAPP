@@ -22,7 +22,7 @@ HelmApiClient _emptyClient() {
 }
 
 void main() {
-  testWidgets('HelmShell renders wordmark, Discover, and five-tab navigation',
+  testWidgets('HelmShell renders wordmark, Explore, and five-tab navigation',
       (tester) async {
     final auth = FakeTravelerAuth();
     addTearDown(auth.dispose);
@@ -37,7 +37,7 @@ void main() {
     expect(find.byType(HelmWordmark), findsOneWidget);
     expect(find.byType(DiscoverTab), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('Discover'), findsWidgets);
+    expect(find.text('Explore'), findsWidgets);
     expect(find.text('Build'), findsOneWidget);
     expect(find.text('Packages'), findsOneWidget);
     expect(find.text('Trips'), findsOneWidget);

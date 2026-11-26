@@ -241,20 +241,31 @@ void main() {
           'offset': 0,
         });
       }
+      if (request.url.path == '/v1/geo/countries') {
+        return _jsonOk({
+          'items': [],
+          'total': 0,
+          'limit': 100,
+          'offset': 0,
+        });
+      }
       if (request.url.path == '/v1/catalog/places') {
         return emptyPlaces();
       }
-      detailCalls += 1;
-      if (detailCalls == 1) {
-        return http.Response('boom', 500);
+      if (request.url.path == '/v1/destinations/ubud') {
+        detailCalls += 1;
+        if (detailCalls == 1) {
+          return http.Response('boom', 500);
+        }
+        return _jsonOk(
+          _detailPayload(
+            slug: 'ubud',
+            nameEn: 'Ubud',
+            summaryEn: 'Cultural heart of Bali',
+          ),
+        );
       }
-      return _jsonOk(
-        _detailPayload(
-          slug: 'ubud',
-          nameEn: 'Ubud',
-          summaryEn: 'Cultural heart of Bali',
-        ),
-      );
+      return emptyPlaces();
     });
 
     await tester.pumpWidget(_wrap(DiscoverTab(apiClient: _client(mock))));

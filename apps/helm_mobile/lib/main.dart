@@ -179,7 +179,7 @@ class _HelmShellState extends State<HelmShell> {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),
-            label: 'Discover',
+            label: 'Explore',
           ),
           NavigationDestination(
             icon: Icon(Icons.auto_awesome_outlined),

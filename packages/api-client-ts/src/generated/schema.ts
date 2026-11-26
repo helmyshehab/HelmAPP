@@ -631,6 +631,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/catalog/destinations/{id}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload or replace a destination cover image
+         * @description Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+         *     optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+         *     before an atomic DB cover replacement. Does not change lifecycle or published_at.
+         *     Concurrent uploads are serialized per destination; conflicts return 409.
+         */
+        post: operations["adminUploadDestinationCover"];
+        /**
+         * Remove the active destination cover
+         * @description Administrator / super-administrator only. Deactivates the active cover link.
+         *     Storage objects are removed only when the media asset has no remaining active
+         *     references. Does not change lifecycle or published_at.
+         */
+        delete: operations["adminDeleteDestinationCover"];
+        options?: never;
+        head?: never;
+        /**
+         * Update destination cover alt text
+         * @description Administrator / super-administrator only. Updates EN/AR alt text on the active
+         *     cover media asset. Does not change lifecycle or published_at.
+         */
+        patch: operations["adminUpdateDestinationCoverAlt"];
+        trace?: never;
+    };
     "/v1/admin/audit-events": {
         parameters: {
             query?: never;
@@ -962,6 +996,20 @@ export interface components {
         LifecycleStatus: "draft" | "pending_verification" | "verified" | "approved" | "published" | "rejected" | "archived";
         /** @enum {string} */
         PlaceCategory: "accommodation" | "restaurant" | "cafe" | "bar" | "beach_club" | "attraction" | "activity" | "nightlife" | "transport";
+        /**
+         * @description Traveler-facing destination cover. URL is server-resolved for a public
+         *     catalog-media object. Never includes storage bucket/path or credentials.
+         */
+        DestinationCoverPublic: {
+            /** Format: uri */
+            url: string;
+            altTextEn?: string;
+            altTextAr?: string;
+        };
+        UpdateDestinationCoverAltRequest: {
+            altTextEn: string;
+            altTextAr?: string | null;
+        };
         DestinationPublic: {
             /** Format: uuid */
             id: string;
@@ -978,6 +1026,8 @@ export interface components {
             longitude?: number;
             isFeatured?: boolean;
             tags?: string[];
+            /** @description Present only when an active public cover exists */
+            cover?: components["schemas"]["DestinationCoverPublic"];
             /** @enum {string} */
             status: "published";
             /** Format: date-time */
@@ -2648,6 +2698,100 @@ export interface operations {
         };
         responses: {
             /** @description Destination with replaced tags */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUploadDestinationCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                     */
+                    file: string;
+                    altTextEn: string;
+                    altTextAr?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Destination with updated cover media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminDeleteDestinationCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Destination after cover removal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DestinationAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdateDestinationCoverAlt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["DestinationId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDestinationCoverAltRequest"];
+            };
+        };
+        responses: {
+            /** @description Destination with updated cover alt text */
             200: {
                 headers: {
                     [name: string]: unknown;

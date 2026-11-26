@@ -29,6 +29,9 @@ export type TripDraftItineraryDay = components["schemas"]["TripDraftItineraryDay
 export type TripDraftItineraryItem = components["schemas"]["TripDraftItineraryItem"];
 export type DestinationListResponse = components["schemas"]["DestinationListResponse"];
 export type DestinationPublic = components["schemas"]["DestinationPublic"];
+export type DestinationCoverPublic = components["schemas"]["DestinationCoverPublic"];
+export type UpdateDestinationCoverAltRequest =
+  components["schemas"]["UpdateDestinationCoverAltRequest"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
 export type PlacePublic = components["schemas"]["PlacePublic"];
 export type CategoryListResponse = components["schemas"]["CategoryListResponse"];
@@ -497,6 +500,53 @@ export function createHelmClient(options: HelmClientOptions) {
         `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/tags`,
         { method: "PUT", body: JSON.stringify(body) },
       );
+    },
+    async adminUploadDestinationCover(
+      id: string,
+      input: {
+        file: Blob;
+        altTextEn: string;
+        altTextAr?: string;
+        fileName?: string;
+      },
+    ): Promise<DestinationAdmin> {
+      const form = new FormData();
+      form.append("file", input.file, input.fileName ?? "cover");
+      form.append("altTextEn", input.altTextEn);
+      if (input.altTextAr !== undefined) {
+        form.append("altTextAr", input.altTextAr);
+      }
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, {
+        method: "POST",
+        headers,
+        body: form,
+      });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+      return (await res.json()) as DestinationAdmin;
+    },
+    async adminUpdateDestinationCoverAlt(
+      id: string,
+      body: UpdateDestinationCoverAltRequest,
+    ): Promise<DestinationAdmin> {
+      return sendJson<DestinationAdmin>(
+        `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/cover`,
+        { method: "PATCH", body: JSON.stringify(body) },
+      );
+    },
+    async adminDeleteDestinationCover(id: string): Promise<DestinationAdmin> {
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/catalog/destinations/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, { method: "DELETE", headers });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+      return (await res.json()) as DestinationAdmin;
     },
     async adminListAuditEvents(params: {
       entityType: string;

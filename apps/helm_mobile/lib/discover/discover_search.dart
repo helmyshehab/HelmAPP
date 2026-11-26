@@ -7,7 +7,10 @@ import '../theme/helm_typography.dart';
 
 final RegExp _arabicScript = RegExp(r'[\u0600-\u06FF]');
 
-/// Submit-to-filter Discover search. Does not request while typing.
+/// Submit-to-filter Explore search as one integrated bar.
+///
+/// Does not request while typing. Keyboard submit and the trailing action
+/// both call [onSubmit]. Clear appears when the field or active query is set.
 class DiscoverSearch extends StatefulWidget {
   const DiscoverSearch({
     super.key,
@@ -58,145 +61,108 @@ class _DiscoverSearchState extends State<DiscoverSearch> {
 
   bool get _rtlInput => _arabicScript.hasMatch(widget.controller.text);
 
+  bool get _showClear =>
+      widget.activeQuery.isNotEmpty || widget.controller.text.isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final fieldFill = isDark ? HelmColors.deepOcean : HelmColors.white;
-    final borderColor =
-        isDark ? HelmColors.ivoryDivider : HelmColors.midnightDivider;
-    final hasActiveQuery = widget.activeQuery.isNotEmpty;
+    final fieldFill = scheme.surfaceContainer;
+    final borderColor = scheme.outlineVariant;
+    final muted = scheme.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: HelmSpacing.lg),
       child: Semantics(
         container: true,
         label: 'Search',
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Search',
-              style: TextStyle(
-                color: scheme.onSurface,
-                fontFamily: HelmFonts.outfit,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 1.4,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: HelmSpacing.sm),
-            TextField(
-              key: DiscoverSearch.fieldKey,
-              controller: widget.controller,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => widget.onSubmit(),
-              textDirection:
-                  _rtlInput ? TextDirection.rtl : TextDirection.ltr,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: scheme.onSurface,
-                fontFamily: HelmFonts.outfit,
-                fontFamilyFallback: HelmFonts.arabicFallback,
-                fontSize: 16,
-                height: 1.4,
-              ),
-              cursorColor: HelmColors.teal,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(120),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Destination name or slug',
-                labelStyle: TextStyle(
-                  color: isDark
-                      ? HelmColors.ivoryMuted
-                      : HelmColors.midnightMuted,
-                  fontFamily: HelmFonts.outfit,
-                  fontSize: 14,
-                ),
-                filled: true,
-                fillColor: fieldFill,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(HelmRadius.md),
-                  borderSide: BorderSide(color: borderColor),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(HelmRadius.md),
-                  borderSide: BorderSide(color: borderColor),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(HelmRadius.md),
-                  borderSide: const BorderSide(color: HelmColors.teal, width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: HelmSpacing.md),
-            Wrap(
-              spacing: HelmSpacing.md,
-              runSpacing: HelmSpacing.sm,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                FilledButton(
-                  key: DiscoverSearch.submitKey,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: HelmColors.teal,
-                    foregroundColor: HelmColors.white,
-                    minimumSize: const Size(0, 44),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 12,
-                    ),
-                    tapTargetSize: MaterialTapTargetSize.padded,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(HelmRadius.md),
-                      ),
-                    ),
-                    textStyle: const TextStyle(
-                      fontFamily: HelmFonts.outfit,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
-                  ),
-                  onPressed: widget.onSubmit,
-                  child: const Text('Search'),
-                ),
-                if (hasActiveQuery)
-                  OutlinedButton(
-                    key: DiscoverSearch.clearKey,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: scheme.onSurface,
-                      minimumSize: const Size(0, 44),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
-                      ),
-                      side: BorderSide(color: borderColor),
-                      tapTargetSize: MaterialTapTargetSize.padded,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(HelmRadius.md),
-                        ),
-                      ),
-                      textStyle: const TextStyle(
-                        fontFamily: HelmFonts.outfit,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                      ),
-                    ),
-                    onPressed: widget.onClear,
-                    child: const Text('Clear'),
-                  ),
-              ],
-            ),
+        textField: true,
+        child: TextField(
+          key: DiscoverSearch.fieldKey,
+          controller: widget.controller,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => widget.onSubmit(),
+          textDirection: _rtlInput ? TextDirection.rtl : TextDirection.ltr,
+          textAlign: TextAlign.start,
+          style: TextStyle(
+            color: scheme.onSurface,
+            fontFamily: HelmFonts.outfit,
+            fontFamilyFallback: HelmFonts.arabicFallback,
+            fontSize: 16,
+            height: 1.4,
+          ),
+          cursorColor: HelmColors.teal,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(120),
           ],
+          decoration: InputDecoration(
+            hintText: 'Find your next destination',
+            hintStyle: TextStyle(
+              color: muted,
+              fontFamily: HelmFonts.outfit,
+              fontSize: 16,
+              height: 1.4,
+            ),
+            filled: true,
+            fillColor: fieldFill,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              color: muted,
+              size: 22,
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
+            ),
+            suffixIcon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_showClear)
+                  IconButton(
+                    key: DiscoverSearch.clearKey,
+                    tooltip: 'Clear search',
+                    onPressed: widget.onClear,
+                    style: IconButton.styleFrom(
+                      minimumSize: const Size(44, 44),
+                      tapTargetSize: MaterialTapTargetSize.padded,
+                    ),
+                    icon: Icon(Icons.close, color: muted, size: 20),
+                  ),
+                IconButton(
+                  key: DiscoverSearch.submitKey,
+                  tooltip: 'Search',
+                  onPressed: widget.onSubmit,
+                  style: IconButton.styleFrom(
+                    foregroundColor: HelmColors.white,
+                    backgroundColor: HelmColors.teal,
+                    minimumSize: const Size(44, 44),
+                    tapTargetSize: MaterialTapTargetSize.padded,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(HelmRadius.sm),
+                    ),
+                  ),
+                  icon: const Icon(Icons.arrow_forward, size: 20),
+                ),
+                const SizedBox(width: HelmSpacing.sm),
+              ],
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(HelmRadius.md),
+              borderSide: BorderSide(color: borderColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(HelmRadius.md),
+              borderSide: BorderSide(color: borderColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(HelmRadius.md),
+              borderSide: const BorderSide(color: HelmColors.teal, width: 2),
+            ),
+          ),
         ),
       ),
     );

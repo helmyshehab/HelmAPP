@@ -7,10 +7,18 @@ import type {
   GeoCityListResponse,
   GeoCountryListResponse,
   LifecycleStatus,
+  UpdateDestinationCoverAltRequest,
   UpdateDestinationRequest,
 } from "@helm/api-client-ts";
 import { createAuthedHelmClient } from "../../lib/api/helm-client";
 import { requireStaff } from "../../lib/auth/require-staff";
+import { isAdminPrincipal } from "../../lib/auth/staff";
+import {
+  COVER_MAX_BYTES,
+  validateAltTextAr,
+  validateAltTextEn,
+  validateCoverFile,
+} from "../../lib/destinations/cover";
 import { parseApiError } from "../../lib/destinations/errors";
 
 type GeoCity = GeoCityListResponse["items"][number];
@@ -32,6 +40,25 @@ async function staffClient() {
   return createAuthedHelmClient(accessToken);
 }
 
+async function requireAdminClient() {
+  const { accessToken, me } = await requireStaff();
+  if (!isAdminPrincipal(me)) {
+    return {
+      ok: false as const,
+      failure: {
+        ok: false as const,
+        message: "Administrator authorization is required to manage covers.",
+        status: 403,
+        kind: "forbidden",
+      } satisfies DestinationActionFailure,
+    };
+  }
+  return {
+    ok: true as const,
+    client: createAuthedHelmClient(accessToken),
+  };
+}
+
 function fail(error: unknown): DestinationActionFailure {
   const parsed = parseApiError(error);
   return {
@@ -40,6 +67,11 @@ function fail(error: unknown): DestinationActionFailure {
     status: parsed.status,
     kind: parsed.kind,
   };
+}
+
+function revalidateDestination(id: string) {
+  revalidatePath("/destinations");
+  revalidatePath(`/destinations/${id}`);
 }
 
 export async function createDestinationAction(
@@ -177,6 +209,137 @@ export async function listTagOptionsAction(): Promise<
           nameAr: tag.nameAr,
         })),
     };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function uploadDestinationCoverAction(
+  destinationId: string,
+  formData: FormData,
+): Promise<DestinationActionResult> {
+  const gated = await requireAdminClient();
+  if (!gated.ok) return gated.failure;
+
+  const fileValue = formData.get("file");
+  const file =
+    fileValue instanceof File
+      ? fileValue
+      : null;
+  const fileError = validateCoverFile(file);
+  if (fileError || !file) {
+    return {
+      ok: false,
+      message: fileError ?? "Cover image file is required.",
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+  if (file.size > COVER_MAX_BYTES) {
+    return {
+      ok: false,
+      message: "Cover image must be at most 5 MiB.",
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+
+  const altTextEn = String(formData.get("altTextEn") ?? "");
+  const altEnError = validateAltTextEn(altTextEn);
+  if (altEnError) {
+    return {
+      ok: false,
+      message: altEnError,
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+  const altTextArRaw = formData.get("altTextAr");
+  const altTextAr =
+    typeof altTextArRaw === "string" ? altTextArRaw : "";
+  const altArError = validateAltTextAr(altTextAr);
+  if (altArError) {
+    return {
+      ok: false,
+      message: altArError,
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+
+  try {
+    const updated = await gated.client.adminUploadDestinationCover(
+      destinationId,
+      {
+        file,
+        altTextEn: altTextEn.trim(),
+        ...(altTextAr.trim() ? { altTextAr: altTextAr.trim() } : {}),
+        fileName: file.name || "cover",
+      },
+    );
+    revalidateDestination(destinationId);
+    return { ok: true, id: updated.id };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function updateDestinationCoverAltAction(
+  destinationId: string,
+  body: UpdateDestinationCoverAltRequest,
+): Promise<DestinationActionResult> {
+  const gated = await requireAdminClient();
+  if (!gated.ok) return gated.failure;
+
+  const altEnError = validateAltTextEn(body.altTextEn ?? "");
+  if (altEnError) {
+    return {
+      ok: false,
+      message: altEnError,
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+  const altAr =
+    body.altTextAr === null || body.altTextAr === undefined
+      ? ""
+      : String(body.altTextAr);
+  const altArError = validateAltTextAr(altAr);
+  if (altArError) {
+    return {
+      ok: false,
+      message: altArError,
+      status: 400,
+      kind: "bad_request",
+    };
+  }
+
+  try {
+    const updated = await gated.client.adminUpdateDestinationCoverAlt(
+      destinationId,
+      {
+        altTextEn: body.altTextEn.trim(),
+        altTextAr: altAr.trim() ? altAr.trim() : null,
+      },
+    );
+    revalidateDestination(destinationId);
+    return { ok: true, id: updated.id };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function deleteDestinationCoverAction(
+  destinationId: string,
+): Promise<DestinationActionResult> {
+  const gated = await requireAdminClient();
+  if (!gated.ok) return gated.failure;
+
+  try {
+    const updated =
+      await gated.client.adminDeleteDestinationCover(destinationId);
+    revalidateDestination(destinationId);
+    return { ok: true, id: updated.id };
   } catch (error) {
     return fail(error);
   }

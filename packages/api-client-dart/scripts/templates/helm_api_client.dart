@@ -723,6 +723,62 @@ class HelmApiClient {
       _sendJson('/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/tags',
           method: 'PUT', accessToken: accessToken, body: body);
 
+  Future<Map<String, dynamic>> adminUploadDestinationCover({
+    required String accessToken,
+    required String id,
+    required List<int> fileBytes,
+    required String altTextEn,
+    String? altTextAr,
+    String fileName = 'cover.jpg',
+  }) async {
+    final path =
+        '/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/cover';
+    final request = http.MultipartRequest('POST', _u(path));
+    request.headers['Authorization'] = 'Bearer $accessToken';
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      fileBytes,
+      filename: fileName,
+    ));
+    request.fields['altTextEn'] = altTextEn;
+    if (altTextAr != null) {
+      request.fields['altTextAr'] = altTextAr;
+    }
+    final streamed = await _http.send(request);
+    final res = await http.Response.fromStream(streamed);
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw Exception('$path failed: ${res.statusCode}');
+    }
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> adminUpdateDestinationCoverAlt({
+    required String accessToken,
+    required String id,
+    required Map<String, dynamic> body,
+  }) =>
+      _sendJson(
+          '/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/cover',
+          method: 'PATCH',
+          accessToken: accessToken,
+          body: body);
+
+  Future<Map<String, dynamic>> adminDeleteDestinationCover({
+    required String accessToken,
+    required String id,
+  }) async {
+    final path =
+        '/v1/admin/catalog/destinations/${Uri.encodeComponent(id)}/cover';
+    final res = await _http.delete(
+      _u(path),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw Exception('$path failed: ${res.statusCode}');
+    }
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> adminListAuditEvents({
     required String accessToken,
     required String entityType,

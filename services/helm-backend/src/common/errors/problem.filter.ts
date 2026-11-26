@@ -58,6 +58,23 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       return { ...body, request_id: requestId };
     }
 
+    // Multer LIMIT_FILE_SIZE (and siblings) arrive as plain errors with a code.
+    if (
+      exception &&
+      typeof exception === 'object' &&
+      'code' in exception &&
+      (exception as { code?: string }).code === 'LIMIT_FILE_SIZE'
+    ) {
+      return {
+        type: 'https://helm.app/errors/validation-failed',
+        title: 'Validation failed',
+        status: HttpStatus.BAD_REQUEST,
+        detail: 'Cover image exceeds the maximum allowed size (5 MiB)',
+        code: 'VALIDATION_FAILED',
+        request_id: requestId,
+      };
+    }
+
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const response = exception.getResponse();

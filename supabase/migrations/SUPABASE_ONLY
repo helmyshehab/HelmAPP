@@ -1,0 +1,7 @@
+# Migrations that require real Supabase Storage (storage.buckets / storage.objects).
+# One basename per line. Comments (#) and blank lines are ignored.
+# apply-migrations.sh:
+#   MIGRATION_MODE=plain-postgres — may SKIP these when Storage schema is absent
+#   MIGRATION_MODE=supabase (default) — must APPLY; fails if Storage is absent
+# Never stub storage.* tables on plain Postgres.
+20261126160000_catalog_media_storage_bucket.sql

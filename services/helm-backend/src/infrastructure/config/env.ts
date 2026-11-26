@@ -24,6 +24,13 @@ const envSchema = z.object({
   PAYMENT_PROVIDER: z.enum(['mock']).default('mock'),
   FLIGHT_PROVIDER: z.enum(['mock']).default('mock'),
   NOTIFY_PROVIDER: z.enum(['console', 'mock']).default('console'),
+
+  /**
+   * Object storage for catalog covers.
+   * `mock` — in-memory (tests / unpaid local MVP).
+   * `supabase` — thin Storage REST via service role (never anon).
+   */
+  STORAGE_PROVIDER: z.enum(['mock', 'supabase']).default('mock'),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;
@@ -59,6 +66,14 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): AppEnv {
 
   if (env.NODE_ENV === 'production' && !env.DATABASE_URL) {
     throw new Error('DATABASE_URL is required when NODE_ENV=production');
+  }
+
+  if (env.STORAGE_PROVIDER === 'supabase') {
+    if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error(
+        'STORAGE_PROVIDER=supabase requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (backend-only)',
+      );
+    }
   }
 
   return env;

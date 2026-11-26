@@ -289,7 +289,7 @@ void main() {
       _expectPaintedWithinBounds(tester, scale: scale);
       expect(find.byType(DiscoverTab), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
-      expect(find.text('Discover'), findsWidgets);
+      expect(find.text('Explore'), findsWidgets);
       expect(find.text('Build'), findsOneWidget);
       expect(find.text('Packages'), findsOneWidget);
       expect(find.text('Trips'), findsOneWidget);
