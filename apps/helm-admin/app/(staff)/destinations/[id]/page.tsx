@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DestinationCoverPanel } from "../../../../components/destinations/DestinationCoverPanel";
 import { DestinationForm } from "../../../../components/destinations/DestinationForm";
 import { LifecycleActions } from "../../../../components/destinations/LifecycleActions";
 import { LifecycleBadge } from "../../../../components/destinations/LifecycleBadge";
@@ -8,7 +9,9 @@ import styles from "../../../../components/destinations/destinations.module.css"
 import { createAuthedHelmClient } from "../../../../lib/api/helm-client";
 import { isAdminPrincipal } from "../../../../lib/auth/staff";
 import { requireStaff } from "../../../../lib/auth/require-staff";
+import { coverViewFromMedia } from "../../../../lib/destinations/cover";
 import { parseApiError } from "../../../../lib/destinations/errors";
+import { getPublicAdminEnv } from "../../../../lib/env";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -34,6 +37,7 @@ export default async function DestinationDetailPage({
   const { me, accessToken } = await requireStaff();
   const client = createAuthedHelmClient(accessToken);
   const isAdmin = isAdminPrincipal(me);
+  const { supabaseUrl } = getPublicAdminEnv();
 
   let loadError: string | null = null;
   let destination: Awaited<
@@ -140,6 +144,13 @@ export default async function DestinationDetailPage({
               tagOptions={tagOptions}
               initialCities={cities}
               initialParents={parents}
+            />
+          </section>
+          <section className={styles.panel}>
+            <DestinationCoverPanel
+              destinationId={destination.id}
+              isAdmin={isAdmin}
+              initialCover={coverViewFromMedia(destination.media, supabaseUrl)}
             />
           </section>
           <section className={styles.panel}>

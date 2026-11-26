@@ -298,6 +298,23 @@
   margin-top: 0.5rem;
 }
 
+.coverPreview {
+  display: block;
+  width: min(100%, 22rem);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.55rem;
+  border: 1px solid var(--helm-border);
+  background: rgba(10, 22, 40, 0.04);
+}
+
+.coverActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
 .tagList {
   display: flex;
   flex-wrap: wrap;
