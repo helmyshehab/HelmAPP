@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -8,6 +9,8 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { z } from 'zod';
 import { CurrentUser } from '../../../common/auth/current-user.decorator';
@@ -16,6 +19,7 @@ import { ZodValidationPipe } from '../../../common/http/zod-validation.pipe';
 import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
 import { LIFECYCLE_STATUSES } from '../domain/lifecycle';
 import { CatalogAdminService } from '../application/catalog-admin.service';
+import { CatalogCoverUploadInterceptor } from './catalog-cover-upload.interceptor';
 
 const createPlaceBody = z.object({
   destinationId: z.string().uuid(),
@@ -129,6 +133,19 @@ const replaceTagsBody = z
   })
   .strict();
 
+const updateCoverAltBody = z
+  .object({
+    altTextEn: z.string().min(1).max(500),
+    altTextAr: z.string().max(500).nullable().optional(),
+  })
+  .strict();
+
+type UploadedCoverFile = {
+  buffer?: Buffer;
+  mimetype?: string;
+  size?: number;
+};
+
 @Controller('admin/catalog')
 export class CatalogAdminController {
   constructor(@Inject(CatalogAdminService) private readonly admin: CatalogAdminService) {}
@@ -187,6 +204,46 @@ export class CatalogAdminController {
     @Body(new ZodValidationPipe(replaceTagsBody)) body: z.infer<typeof replaceTagsBody>,
   ) {
     return this.admin.replaceDestinationTags(user, id, body.tagSlugs);
+  }
+
+  @Post('destinations/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  @UseInterceptors(CatalogCoverUploadInterceptor('file'))
+  uploadDestinationCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @UploadedFile() file: UploadedCoverFile | undefined,
+    @Body() body: { altTextEn?: string; altTextAr?: string },
+  ) {
+    return this.admin.uploadDestinationCover(
+      user,
+      id,
+      file?.buffer
+        ? { buffer: file.buffer, mimetype: file.mimetype, size: file.size }
+        : undefined,
+      body?.altTextEn,
+      body?.altTextAr,
+    );
+  }
+
+  @Patch('destinations/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  updateDestinationCoverAlt(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateCoverAltBody))
+    body: z.infer<typeof updateCoverAltBody>,
+  ) {
+    return this.admin.updateDestinationCoverAlt(user, id, body);
+  }
+
+  @Delete('destinations/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  deleteDestinationCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+  ) {
+    return this.admin.deleteDestinationCover(user, id);
   }
 
   @Get('places')

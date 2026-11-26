@@ -824,6 +824,113 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/destinations/{id}/cover:
+    post:
+      operationId: adminUploadDestinationCover
+      summary: Upload or replace a destination cover image
+      description: |
+        Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+        optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+        before an atomic DB cover replacement. Does not change lifecycle or published_at.
+        Concurrent uploads are serialized per destination; conflicts return 409.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, altTextEn]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                altTextEn:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                altTextAr:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Destination with updated cover media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    patch:
+      operationId: adminUpdateDestinationCoverAlt
+      summary: Update destination cover alt text
+      description: |
+        Administrator / super-administrator only. Updates EN/AR alt text on the active
+        cover media asset. Does not change lifecycle or published_at.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDestinationCoverAltRequest"
+      responses:
+        "200":
+          description: Destination with updated cover alt text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: adminDeleteDestinationCover
+      summary: Remove the active destination cover
+      description: |
+        Administrator / super-administrator only. Deactivates the active cover link.
+        Storage objects are removed only when the media asset has no remaining active
+        references. Does not change lifecycle or published_at.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DestinationId"
+      responses:
+        "200":
+          description: Destination after cover removal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DestinationAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/admin/audit-events:
     get:
       operationId: adminListAuditEvents
@@ -1473,6 +1580,33 @@ components:
         - activity
         - nightlife
         - transport
+    DestinationCoverPublic:
+      type: object
+      required: [url]
+      description: |
+        Traveler-facing destination cover. URL is server-resolved for a public
+        catalog-media object. Never includes storage bucket/path or credentials.
+      properties:
+        url:
+          type: string
+          format: uri
+        altTextEn:
+          type: string
+        altTextAr:
+          type: string
+    UpdateDestinationCoverAltRequest:
+      type: object
+      required: [altTextEn]
+      additionalProperties: false
+      properties:
+        altTextEn:
+          type: string
+          minLength: 1
+          maxLength: 500
+        altTextAr:
+          type: string
+          nullable: true
+          maxLength: 500
     DestinationPublic:
       type: object
       required: [id, slug, nameEn, nameAr, countryCode, status]
@@ -1507,6 +1641,9 @@ components:
           type: array
           items:
             type: string
+        cover:
+          $ref: "#/components/schemas/DestinationCoverPublic"
+          description: Present only when an active public cover exists
         status:
           type: string
           enum: [published]

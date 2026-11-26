@@ -1,7 +1,18 @@
+import { randomUUID } from 'node:crypto';
 import { Inject, Injectable, Optional } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
+import { StructuredLogger } from '../../../common/logging/structured-logger';
 import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
+import {
+  CATALOG_MEDIA_BUCKET,
+  STORAGE_PORT,
+  type StoragePort,
+} from '../../../infrastructure/ports/storage.port';
 import { DRIZZLE, type DrizzleClient } from '../../../infrastructure/adapters/drizzle/drizzle.client';
+import {
+  buildDestinationCoverObjectPath,
+  validateCatalogCoverImage,
+} from '../../../infrastructure/storage/catalog-media';
 import { AuditService } from '../../audit/audit.service';
 import {
   ADMIN_ONLY_TARGETS,
@@ -22,13 +33,28 @@ import {
 import { CatalogRepository } from '../infrastructure/catalog.repository';
 import { CatalogImportWriter } from '../infrastructure/catalog-import.writer';
 
+export type DestinationCoverUploadFile = {
+  buffer: Buffer | Uint8Array;
+  mimetype?: string;
+  size?: number;
+};
+
 @Injectable()
 export class CatalogAdminService {
   constructor(
     @Inject(CatalogRepository) private readonly repo: CatalogRepository,
     @Inject(AuditService) private readonly audit: AuditService,
     @Optional() @Inject(DRIZZLE) private readonly db?: DrizzleClient | null,
+    @Optional() @Inject(STORAGE_PORT) private readonly storage?: StoragePort | null,
+    @Optional() @Inject(StructuredLogger) private readonly logger?: StructuredLogger,
   ) {}
+
+  private requireStorage(): StoragePort {
+    if (!this.storage) {
+      throw AppException.validation('Object storage is not configured');
+    }
+    return this.storage;
+  }
 
   private importWriter(): CatalogImportWriter {
     if (!this.db) {
@@ -176,6 +202,205 @@ export class CatalogAdminService {
 
   async getStaffDestination(id: string) {
     return this.hydrateDestination(id);
+  }
+
+  /**
+   * Upload or replace the destination cover.
+   * Storage object is written first; DB replacement is atomic; failures compensate.
+   * Does not change lifecycle_status or published_at.
+   */
+  async uploadDestinationCover(
+    actor: AuthPrincipal,
+    destinationId: string,
+    file: DestinationCoverUploadFile | undefined,
+    altTextEn: string | undefined,
+    altTextAr?: string | null,
+  ) {
+    this.assertAdmin(actor);
+    const destination = await this.repo.getDestinationById(destinationId);
+    if (!destination) throw AppException.notFound('Destination not found');
+
+    const altEn = altTextEn?.trim() ?? '';
+    if (!altEn) {
+      throw AppException.validation('altTextEn is required');
+    }
+    if (altEn.length > 500) {
+      throw AppException.validation('altTextEn must be at most 500 characters');
+    }
+    const altArRaw = altTextAr?.trim() ?? '';
+    if (altArRaw.length > 500) {
+      throw AppException.validation('altTextAr must be at most 500 characters');
+    }
+    const altAr = altArRaw.length > 0 ? altArRaw : null;
+
+    if (!file?.buffer || file.buffer.byteLength === 0) {
+      throw AppException.validation('Cover image file is required');
+    }
+    const body =
+      file.buffer instanceof Uint8Array
+        ? file.buffer
+        : Uint8Array.from(file.buffer);
+    const validated = validateCatalogCoverImage(body, file.mimetype);
+
+    const mediaId = randomUUID();
+    const storagePath = buildDestinationCoverObjectPath({
+      destinationId,
+      objectId: mediaId,
+      extension: validated.extension,
+    });
+    const storage = this.requireStorage();
+
+    await storage.uploadPublicObject({
+      bucket: CATALOG_MEDIA_BUCKET,
+      path: storagePath,
+      body: validated.body,
+      contentType: validated.mimeType,
+      upsert: false,
+    });
+
+    let replaced: Array<{
+      mediaId: string;
+      storageBucket: string;
+      storagePath: string;
+    }> = [];
+    try {
+      const result = await this.repo.replaceDestinationCover({
+        destinationId,
+        mediaId,
+        storageBucket: CATALOG_MEDIA_BUCKET,
+        storagePath,
+        mimeType: validated.mimeType,
+        byteSize: validated.byteSize,
+        altTextEn: altEn,
+        altTextAr: altAr,
+      });
+      replaced = result.replaced;
+    } catch (err) {
+      await this.safeRemoveStorageObject(
+        CATALOG_MEDIA_BUCKET,
+        storagePath,
+        'compensating_cleanup_after_db_failure',
+      );
+      throw err;
+    }
+
+    for (const old of replaced) {
+      await this.retireUnreferencedMediaAsset(old);
+    }
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.cover.upload',
+      entityType: 'destination',
+      entityId: destinationId,
+      after: {
+        mediaId,
+        storagePath,
+        replacedMediaIds: replaced.map((r) => r.mediaId),
+      },
+    });
+
+    return this.hydrateDestination(destinationId);
+  }
+
+  async updateDestinationCoverAlt(
+    actor: AuthPrincipal,
+    destinationId: string,
+    input: { altTextEn: string; altTextAr?: string | null },
+  ) {
+    this.assertAdmin(actor);
+    const destination = await this.repo.getDestinationById(destinationId);
+    if (!destination) throw AppException.notFound('Destination not found');
+
+    const altEn = input.altTextEn?.trim() ?? '';
+    if (!altEn) {
+      throw AppException.validation('altTextEn is required');
+    }
+    if (altEn.length > 500) {
+      throw AppException.validation('altTextEn must be at most 500 characters');
+    }
+    const altArRaw = input.altTextAr?.trim() ?? '';
+    if (altArRaw.length > 500) {
+      throw AppException.validation('altTextAr must be at most 500 characters');
+    }
+    const altAr = altArRaw.length > 0 ? altArRaw : null;
+
+    const updated = await this.repo.updateDestinationCoverAltTexts(destinationId, {
+      altTextEn: altEn,
+      altTextAr: altAr,
+    });
+    if (!updated) {
+      throw AppException.notFound('Destination cover not found');
+    }
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.cover.alt_update',
+      entityType: 'destination',
+      entityId: destinationId,
+      after: { mediaId: updated.mediaId },
+    });
+
+    return this.hydrateDestination(destinationId);
+  }
+
+  async deleteDestinationCover(actor: AuthPrincipal, destinationId: string) {
+    this.assertAdmin(actor);
+    const destination = await this.repo.getDestinationById(destinationId);
+    if (!destination) throw AppException.notFound('Destination not found');
+
+    const deactivated = await this.repo.deactivateDestinationCover(destinationId);
+    if (!deactivated) {
+      throw AppException.notFound('Destination cover not found');
+    }
+
+    await this.retireUnreferencedMediaAsset(deactivated);
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.destination.cover.delete',
+      entityType: 'destination',
+      entityId: destinationId,
+      after: { mediaId: deactivated.mediaId },
+    });
+
+    return this.hydrateDestination(destinationId);
+  }
+
+  private async retireUnreferencedMediaAsset(asset: {
+    mediaId: string;
+    storageBucket: string;
+    storagePath: string;
+  }) {
+    const refs = await this.repo.countActiveMediaReferences(asset.mediaId);
+    if (refs > 0) return;
+    await this.repo.deactivateMediaAsset(asset.mediaId);
+    await this.safeRemoveStorageObject(
+      asset.storageBucket,
+      asset.storagePath,
+      'retire_unreferenced_cover_asset',
+    );
+  }
+
+  private async safeRemoveStorageObject(
+    bucket: string,
+    path: string,
+    reason: string,
+  ) {
+    try {
+      await this.requireStorage().removeObject(bucket, path);
+    } catch (err) {
+      this.logger?.warn(
+        {
+          msg: 'storage_cleanup_failed',
+          reason,
+          bucket,
+          path,
+          detail: err instanceof Error ? err.message : String(err),
+        },
+        'CatalogAdminService',
+      );
+    }
   }
 
   async createDestination(

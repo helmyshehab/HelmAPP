@@ -11,6 +11,7 @@ import { MockNotifyAdapter } from './adapters/mock/mock-notify.adapter';
 import { MockPaymentAdapter } from './adapters/mock/mock-payment.adapter';
 import { MockStorageAdapter } from './adapters/mock/mock-storage.adapter';
 import { SupabaseJwtAuthAdapter } from './adapters/supabase/supabase-jwt-auth.adapter';
+import { SupabaseStorageAdapter } from './adapters/supabase/supabase-storage.adapter';
 import { SystemClockAdapter } from './adapters/system/system-clock.adapter';
 import {
   AI_PORT,
@@ -27,6 +28,7 @@ import { ROLES_PORT } from './ports/roles.port';
  * Wires infrastructure adapters. Domain modules depend on ports only.
  * Mock auth is registered only when AUTH_PROVIDER=mock (never in production — loadEnv forbids it).
  * RolesPort prefers Drizzle/Postgres when DATABASE_URL is set.
+ * StoragePort uses mock by default; STORAGE_PROVIDER=supabase selects the REST adapter.
  */
 @Global()
 @Module({})
@@ -35,6 +37,7 @@ export class InfrastructureModule {
     const env = loadEnv(source);
     const useMockAuth = env.AUTH_PROVIDER === 'mock';
     const useDbRoles = Boolean(env.DATABASE_URL);
+    const useSupabaseStorage = env.STORAGE_PROVIDER === 'supabase';
 
     const authProviders = useMockAuth
       ? [
@@ -61,6 +64,16 @@ export class InfrastructureModule {
           { provide: ROLES_PORT, useExisting: MemoryRolesAdapter },
         ];
 
+    const storageProviders = useSupabaseStorage
+      ? [
+          SupabaseStorageAdapter,
+          { provide: STORAGE_PORT, useExisting: SupabaseStorageAdapter },
+        ]
+      : [
+          MockStorageAdapter,
+          { provide: STORAGE_PORT, useExisting: MockStorageAdapter },
+        ];
+
     return {
       module: InfrastructureModule,
       imports: [ConfigModule],
@@ -71,14 +84,13 @@ export class InfrastructureModule {
         },
         ...authProviders,
         ...rolesProviders,
+        ...storageProviders,
         SystemClockAdapter,
-        MockStorageAdapter,
         MockPaymentAdapter,
         MockAiAdapter,
         MockFlightAdapter,
         MockNotifyAdapter,
         { provide: CLOCK_PORT, useExisting: SystemClockAdapter },
-        { provide: STORAGE_PORT, useExisting: MockStorageAdapter },
         { provide: PAYMENT_PORT, useExisting: MockPaymentAdapter },
         { provide: AI_PORT, useExisting: MockAiAdapter },
         { provide: FLIGHT_PORT, useExisting: MockFlightAdapter },

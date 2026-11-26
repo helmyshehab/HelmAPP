@@ -1353,6 +1353,303 @@ export class CatalogRepository {
     const total = Number((countRes as unknown as { c: number }[])[0]?.c ?? 0);
     return { items: rows as unknown as Record<string, unknown>[], total, limit, offset };
   }
+
+  /**
+   * Batch-load active public covers for many destinations (avoids N+1).
+   */
+  async listPublicDestinationCovers(destinationIds: string[]) {
+    const ids = [...new Set(destinationIds.map((id) => id.trim()).filter(Boolean))];
+    if (ids.length === 0) {
+      return new Map<
+        string,
+        {
+          destinationId: string;
+          storageBucket: string;
+          storagePath: string;
+          altTextEn: string | null;
+          altTextAr: string | null;
+        }
+      >();
+    }
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        dm.destination_id as "destinationId",
+        m.storage_bucket as "storageBucket",
+        m.storage_path as "storagePath",
+        m.alt_text_en as "altTextEn",
+        m.alt_text_ar as "altTextAr"
+      from catalog.destination_media dm
+      join catalog.media_assets m on m.id = dm.media_id
+      where dm.destination_id in (${sql.join(
+        ids.map((id) => sql`${id}::uuid`),
+        sql`, `,
+      )})
+        and dm.is_active = true
+        and dm.is_cover = true
+        and m.is_active = true
+        and m.is_public = true
+    `);
+    const map = new Map<
+      string,
+      {
+        destinationId: string;
+        storageBucket: string;
+        storagePath: string;
+        altTextEn: string | null;
+        altTextAr: string | null;
+      }
+    >();
+    for (const row of rows as unknown as {
+      destinationId: string;
+      storageBucket: string;
+      storagePath: string;
+      altTextEn: string | null;
+      altTextAr: string | null;
+    }[]) {
+      map.set(String(row.destinationId), row);
+    }
+    return map;
+  }
+
+  async getActiveDestinationCover(destinationId: string) {
+    const map = await this.listPublicDestinationCovers([destinationId]);
+    return map.get(destinationId) ?? null;
+  }
+
+  async getMediaAssetById(mediaId: string) {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        id,
+        storage_bucket as "storageBucket",
+        storage_path as "storagePath",
+        mime_type as "mimeType",
+        byte_size as "byteSize",
+        alt_text_en as "altTextEn",
+        alt_text_ar as "altTextAr",
+        is_public as "isPublic",
+        is_active as "isActive"
+      from catalog.media_assets
+      where id = ${mediaId}::uuid
+      limit 1
+    `);
+    return (rows as unknown as Record<string, unknown>[])[0] ?? null;
+  }
+
+  /** Active destination_media + place_media references for a media asset. */
+  async countActiveMediaReferences(mediaId: string): Promise<number> {
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select (
+        (select count(*)::int from catalog.destination_media
+          where media_id = ${mediaId}::uuid and is_active = true)
+        +
+        (select count(*)::int from catalog.place_media
+          where media_id = ${mediaId}::uuid and is_active = true)
+      ) as c
+    `);
+    return Number((rows as unknown as { c: number }[])[0]?.c ?? 0);
+  }
+
+  async deactivateMediaAsset(mediaId: string): Promise<void> {
+    const db = this.requireDb();
+    await db.execute(sql`
+      update catalog.media_assets
+      set is_active = false, is_public = false, updated_at = now()
+      where id = ${mediaId}::uuid
+    `);
+  }
+
+  /**
+   * Atomically replace the active cover for a destination.
+   * Locks the destination row to serialize concurrent uploads.
+   * Does not mutate destinations.lifecycle_status or published_at.
+   */
+  async replaceDestinationCover(input: {
+    destinationId: string;
+    mediaId: string;
+    storageBucket: string;
+    storagePath: string;
+    mimeType: string;
+    byteSize: number;
+    altTextEn: string;
+    altTextAr: string | null;
+  }): Promise<{
+    mediaId: string;
+    replaced: Array<{
+      mediaId: string;
+      storageBucket: string;
+      storagePath: string;
+    }>;
+  }> {
+    const db = this.requireDb();
+    try {
+      return await db.transaction(async (tx) => {
+        const locked = await tx.execute(sql`
+          select id
+          from catalog.destinations
+          where id = ${input.destinationId}::uuid
+          for update
+        `);
+        if ((locked as unknown as unknown[]).length === 0) {
+          throw AppException.notFound('Destination not found');
+        }
+
+        await tx.execute(sql`
+          insert into catalog.media_assets (
+            id, storage_bucket, storage_path, mime_type, byte_size,
+            alt_text_en, alt_text_ar, is_public, is_active
+          ) values (
+            ${input.mediaId}::uuid,
+            ${input.storageBucket},
+            ${input.storagePath},
+            ${input.mimeType},
+            ${input.byteSize},
+            ${input.altTextEn},
+            ${input.altTextAr},
+            true,
+            true
+          )
+        `);
+
+        const deactivated = await tx.execute(sql`
+          update catalog.destination_media dm
+          set is_active = false, is_cover = false
+          where dm.destination_id = ${input.destinationId}::uuid
+            and dm.is_active = true
+            and dm.is_cover = true
+          returning dm.media_id as "mediaId"
+        `);
+
+        const replacedIds = (deactivated as unknown as { mediaId: string }[]).map((r) =>
+          String(r.mediaId),
+        );
+
+        await tx.execute(sql`
+          insert into catalog.destination_media (
+            destination_id, media_id, sort_order, is_cover, is_active
+          ) values (
+            ${input.destinationId}::uuid,
+            ${input.mediaId}::uuid,
+            0,
+            true,
+            true
+          )
+        `);
+
+        const replaced: Array<{
+          mediaId: string;
+          storageBucket: string;
+          storagePath: string;
+        }> = [];
+        for (const mediaId of replacedIds) {
+          if (mediaId === input.mediaId) continue;
+          const assetRows = await tx.execute(sql`
+            select
+              id as "mediaId",
+              storage_bucket as "storageBucket",
+              storage_path as "storagePath"
+            from catalog.media_assets
+            where id = ${mediaId}::uuid
+            limit 1
+          `);
+          const asset = (assetRows as unknown as {
+            mediaId: string;
+            storageBucket: string;
+            storagePath: string;
+          }[])[0];
+          if (asset) replaced.push(asset);
+        }
+
+        return { mediaId: input.mediaId, replaced };
+      });
+    } catch (err) {
+      if (err instanceof AppException) throw err;
+      const code = collectErrorCode(err);
+      const blob = collectErrorText(err);
+      if (code === '23505' || /uq_destination_media_cover|unique/i.test(blob)) {
+        throw AppException.conflict(
+          'Another cover update is in progress; retry the upload',
+        );
+      }
+      throw err instanceof Error ? err : new Error(blob);
+    }
+  }
+
+  async updateDestinationCoverAltTexts(
+    destinationId: string,
+    input: { altTextEn: string; altTextAr: string | null },
+  ): Promise<{ mediaId: string } | null> {
+    const db = this.requireDb();
+    return db.transaction(async (tx) => {
+      const rows = await tx.execute(sql`
+        select dm.media_id as "mediaId"
+        from catalog.destination_media dm
+        join catalog.media_assets m on m.id = dm.media_id
+        where dm.destination_id = ${destinationId}::uuid
+          and dm.is_active = true
+          and dm.is_cover = true
+          and m.is_active = true
+        for update of dm
+        limit 1
+      `);
+      const current = (rows as unknown as { mediaId: string }[])[0];
+      if (!current) return null;
+
+      await tx.execute(sql`
+        update catalog.media_assets
+        set
+          alt_text_en = ${input.altTextEn},
+          alt_text_ar = ${input.altTextAr},
+          updated_at = now()
+        where id = ${current.mediaId}::uuid
+      `);
+      return { mediaId: String(current.mediaId) };
+    });
+  }
+
+  async deactivateDestinationCover(destinationId: string): Promise<{
+    mediaId: string;
+    storageBucket: string;
+    storagePath: string;
+  } | null> {
+    const db = this.requireDb();
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`
+        select id from catalog.destinations
+        where id = ${destinationId}::uuid
+        for update
+      `);
+
+      const rows = await tx.execute(sql`
+        update catalog.destination_media dm
+        set is_active = false, is_cover = false
+        where dm.destination_id = ${destinationId}::uuid
+          and dm.is_active = true
+          and dm.is_cover = true
+        returning dm.media_id as "mediaId"
+      `);
+      const deactivated = (rows as unknown as { mediaId: string }[])[0];
+      if (!deactivated) return null;
+
+      const assetRows = await tx.execute(sql`
+        select
+          id as "mediaId",
+          storage_bucket as "storageBucket",
+          storage_path as "storagePath"
+        from catalog.media_assets
+        where id = ${deactivated.mediaId}::uuid
+        limit 1
+      `);
+      const asset = (assetRows as unknown as {
+        mediaId: string;
+        storageBucket: string;
+        storagePath: string;
+      }[])[0];
+      return asset ?? null;
+    });
+  }
 }
 
 function collectErrorText(err: unknown): string {

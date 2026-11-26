@@ -1,7 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
+import {
+  STORAGE_PORT,
+  type StoragePort,
+} from '../../../infrastructure/ports/storage.port';
 import { CATEGORY_GROUPS, isPlaceCategory } from '../domain/categories';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
+import { toPublicDestinationCover } from './destination-cover.mapper';
 import {
   assertNoInternalLeak,
   toPublicDestination,
@@ -10,7 +15,10 @@ import {
 
 @Injectable()
 export class CatalogQueryService {
-  constructor(@Inject(CatalogRepository) private readonly repo: CatalogRepository) {}
+  constructor(
+    @Inject(CatalogRepository) private readonly repo: CatalogRepository,
+    @Optional() @Inject(STORAGE_PORT) private readonly storage?: StoragePort | null,
+  ) {}
 
   async listPublicDestinations(query: {
     country?: string;
@@ -27,16 +35,30 @@ export class CatalogQueryService {
       offset: query.offset ?? 0,
       publicOnly: true,
     });
-    const items = result.items.map((row) => toPublicDestination(row));
-    const body = { ...result, items };
-    assertNoInternalLeak(body);
-    return body;
+    const coverById = await this.repo.listPublicDestinationCovers(
+      result.items.map((row) => String(row.id)),
+    );
+    const items = result.items.map((row) => {
+      const body = toPublicDestination(row) as Record<string, unknown>;
+      const coverRow = coverById.get(String(row.id));
+      if (coverRow && this.storage) {
+        body.cover = toPublicDestinationCover(coverRow, this.storage);
+      }
+      return body;
+    });
+    const response = { ...result, items };
+    assertNoInternalLeak(response);
+    return response;
   }
 
   async getPublicDestination(slug: string) {
     const row = await this.repo.getDestinationBySlug(slug, true);
     if (!row) throw AppException.notFound(`Destination not found: ${slug}`);
-    const body = toPublicDestination(row);
+    const body = toPublicDestination(row) as Record<string, unknown>;
+    const coverRow = await this.repo.getActiveDestinationCover(String(row.id));
+    if (coverRow && this.storage) {
+      body.cover = toPublicDestinationCover(coverRow, this.storage);
+    }
     assertNoInternalLeak(body);
     return body;
   }
@@ -138,10 +160,8 @@ export class CatalogQueryService {
     limit?: number;
     offset?: number;
   }) {
-    // Default to active-only when clients omit the filter (picker UX).
-    const active = query.active === undefined ? true : query.active;
     return this.repo.listCountries({
-      active,
+      active: query.active,
       q: query.q,
       limit: query.limit ?? 20,
       offset: query.offset ?? 0,
@@ -154,9 +174,6 @@ export class CatalogQueryService {
     limit?: number;
     offset?: number;
   }) {
-    if (query.country && !/^[A-Za-z]{2}$/.test(query.country)) {
-      throw AppException.validation('country must be ISO-3166 alpha-2');
-    }
     return this.repo.listCities({
       country: query.country,
       q: query.q,
