@@ -263,3 +263,70 @@ jobs:
           grep -E '^# pass 1$' "$out"
           grep -E '^# fail 0$' "$out"
           grep -E '^# skipped 0$' "$out"
+
+  # Single shared Flutter web preview → staging API + Supabase anon.
+  # Runs only after green CI on main. Hosting: GitHub Pages ($0).
+  deploy-flutter-web-preview:
+    name: Deploy Flutter web staging preview
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - openapi-clients
+      - migrations-present
+      - backend-typecheck
+      - web-typecheck
+      - mobile-flutter
+      - migrations-apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    env:
+      FLUTTER_VERSION: "3.27.4"
+    defaults:
+      run:
+        working-directory: apps/helm_mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require staging Supabase secrets
+        env:
+          HELM_SUPABASE_URL: ${{ secrets.HELM_SUPABASE_URL }}
+          HELM_SUPABASE_ANON_KEY: ${{ secrets.HELM_SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HELM_SUPABASE_URL}" ] || [ -z "${HELM_SUPABASE_ANON_KEY}" ]; then
+            echo "::error::Set repo secrets HELM_SUPABASE_URL and HELM_SUPABASE_ANON_KEY (anon/publishable only)."
+            exit 1
+          fi
+      - name: Set up Flutter
+        run: |
+          git clone --quiet --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
+      - run: flutter pub get
+      - name: Build web against staging
+        env:
+          HELM_SUPABASE_URL: ${{ secrets.HELM_SUPABASE_URL }}
+          HELM_SUPABASE_ANON_KEY: ${{ secrets.HELM_SUPABASE_ANON_KEY }}
+        run: |
+          set -euo pipefail
+          flutter build web --release --target lib/main.dart \
+            --base-href=/HelmAPP/ \
+            --dart-define=HELM_API_BASE_URL=https://helm-staging-api-ujqa.onrender.com \
+            --dart-define=HELM_SUPABASE_URL="$HELM_SUPABASE_URL" \
+            --dart-define=HELM_SUPABASE_ANON_KEY="$HELM_SUPABASE_ANON_KEY" \
+            --dart-define=HELM_GIT_SHA="${GITHUB_SHA}"
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/helm_mobile/build/web
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

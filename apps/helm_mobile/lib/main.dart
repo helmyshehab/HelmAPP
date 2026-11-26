@@ -7,6 +7,7 @@ import 'auth/traveler_session.dart';
 import 'build/trip_gen/trip_answers.dart';
 import 'build/trip_gen/trip_demo_mode_screen.dart';
 import 'build/trip_gen/trip_preview_draft.dart';
+import 'config/build_info.dart';
 import 'tabs/build_tab.dart';
 import 'tabs/discover_tab.dart';
 import 'tabs/packages_tab.dart';
@@ -152,18 +153,34 @@ class _HelmShellState extends State<HelmShell> {
     final titleSlot =
         HelmWordmark.titleSlotWidth(MediaQuery.sizeOf(context).width);
 
+    final previewLabel = BuildInfo.previewLabel;
+    final previewBarHeight = previewLabel.isEmpty ? 0.0 : 22.0;
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: HelmWordmark.toolbarHeight(
-          maxWidth: titleSlot,
-          fontSize: fontSize,
-          textScaler: scaler,
-        ),
+              maxWidth: titleSlot,
+              fontSize: fontSize,
+              textScaler: scaler,
+            ) +
+            previewBarHeight,
         // The app bar clamps title scaling at 1.34. Restore the system
         // scaler so large text still reaches the lockup.
         title: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: scaler),
-          child: const HelmWordmark(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const HelmWordmark(),
+              if (previewLabel.isNotEmpty)
+                Text(
+                  previewLabel,
+                  key: const Key('helm-preview-commit'),
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+            ],
+          ),
         ),
       ),
       body: tabs[index],
