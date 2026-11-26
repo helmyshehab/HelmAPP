@@ -129,6 +129,27 @@ try {
   `);
   assert.equal(Number(accountCount[0]?.c ?? 0), 1);
   assert.equal(Number(profileCount[0]?.c ?? 0), 1);
+  assert.equal([a, b].filter(({ json }) => json.accountCreated).length, 1);
+  assert.equal([a, b].filter(({ json }) => json.profileCreated).length, 1);
+
+  const sharedEmail = `shared.${randomUUID()}@helm.local`;
+  const subjects = [randomUUID(), randomUUID()];
+  const sharedEmailTokens = await Promise.all(
+    subjects.map((userId) => auth.issueAccessToken({ userId, email: sharedEmail })),
+  );
+  const results = await Promise.all(
+    sharedEmailTokens.map((sharedEmailToken) =>
+      httpJson(baseUrl, 'POST', '/v1/customer/profile/bootstrap', sharedEmailToken),
+    ),
+  );
+  for (const [index, result] of results.entries()) {
+    assert.equal(result.status, 200, JSON.stringify(result.json));
+    assert.equal(result.json.userId, subjects[index]);
+    assert.equal(result.json.accountCreated, true);
+    assert.equal(result.json.profileCreated, true);
+  }
+  assert.equal(results.filter(({ json }) => json.email === sharedEmail).length, 1);
+  assert.equal(results.filter(({ json }) => json.email === null).length, 1);
 
   console.log('concurrent bootstrap ok');
 } catch (err) {
