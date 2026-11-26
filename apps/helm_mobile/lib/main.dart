@@ -4,9 +4,9 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'auth/fake_traveler_auth.dart';
 import 'auth/supabase_traveler_auth.dart';
 import 'auth/traveler_session.dart';
-import 'build/trip_gen/confirmed_demo_trip.dart';
 import 'build/trip_gen/trip_answers.dart';
 import 'build/trip_gen/trip_demo_mode_screen.dart';
+import 'build/trip_gen/trip_preview_draft.dart';
 import 'tabs/build_tab.dart';
 import 'tabs/discover_tab.dart';
 import 'tabs/packages_tab.dart';
@@ -44,10 +44,15 @@ class HelmApp extends StatelessWidget {
 }
 
 class HelmShell extends StatefulWidget {
-  const HelmShell({super.key, required this.auth, this.apiClient});
+  const HelmShell(
+      {super.key,
+      required this.auth,
+      this.apiClient,
+      this.allowDemoStaffConfirmation = false});
 
   final TravelerAuth auth;
   final HelmApiClient? apiClient;
+  final bool allowDemoStaffConfirmation;
 
   @override
   State<HelmShell> createState() => _HelmShellState();
@@ -56,7 +61,6 @@ class HelmShell extends StatefulWidget {
 class _HelmShellState extends State<HelmShell> {
   int index = 0;
   TripDestinationChoice? _buildDestination;
-  ConfirmedDemoTrip? _confirmedDemoTrip;
   Route<void>? _tripModeRoute;
   late int _authGeneration;
 
@@ -81,18 +85,15 @@ class _HelmShellState extends State<HelmShell> {
       Navigator.of(context).removeRoute(route);
     }
     _tripModeRoute = null;
-    if (_confirmedDemoTrip != null) {
-      setState(() => _confirmedDemoTrip = null);
-    }
   }
 
-  Future<void> _openTripMode() async {
-    final trip = _confirmedDemoTrip;
-    if (trip == null || _tripModeRoute != null) return;
+  Future<void> _openTripMode(TripPreviewDraftSnapshot snapshot) async {
+    if (widget.auth.session == null || _tripModeRoute != null) return;
+    final trip = planFromUbudTripPreviewDraft(snapshot);
     final route = MaterialPageRoute<void>(
       builder: (_) => TripDemoModeScreen(
         destinationName: trip.destinationName,
-        days: trip.days,
+        days: demoBookingDays(trip, snapshot.includedActivitySlugs),
       ),
     );
     _tripModeRoute = route;
@@ -117,14 +118,12 @@ class _HelmShellState extends State<HelmShell> {
         auth: widget.auth,
         apiClient: widget.apiClient,
         initialDestination: _buildDestination,
-        onDemoTripConfirmed: (trip) =>
-            setState(() => _confirmedDemoTrip = trip),
+        allowDemoStaffConfirmation: widget.allowDemoStaffConfirmation,
       ),
       const PackagesTab(),
       TripsTab(
         auth: widget.auth,
         apiClient: widget.apiClient,
-        trip: _confirmedDemoTrip,
         onOpenTrip: _openTripMode,
       ),
       const ProfileTab(),

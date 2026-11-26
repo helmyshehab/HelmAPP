@@ -183,6 +183,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/trips/demo-bookings/{id}/services/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Confirm a demo booking service as staff
+         * @description Requires a database-backed operator or administrator role. Repeating a confirmation preserves its original timestamp.
+         */
+        patch: operations["confirmDemoBookingService"];
+        trace?: never;
+    };
     "/v1/trips/demo-bookings": {
         parameters: {
             query?: never;
@@ -732,13 +752,20 @@ export interface components {
             draftId: string;
             title: string | null;
             /** @enum {string} */
-            status: "pending_confirmation";
+            status: "pending_confirmation" | "confirmed";
+            services: components["schemas"]["DemoBookingService"][];
             quote: components["schemas"]["TripDraftQuote"];
             constraints: {
                 [key: string]: unknown;
             };
             /** Format: date-time */
             createdAt: string;
+        };
+        DemoBookingService: {
+            /** @enum {string} */
+            kind: "flights" | "stay" | "activities";
+            /** Format: date-time */
+            confirmedAt: string | null;
         };
         DemoTripBookingList: {
             items: components["schemas"]["DemoTripBooking"][];
@@ -1660,6 +1687,33 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+        };
+    };
+    confirmDemoBookingService: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                kind: "flights" | "stay" | "activities";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Booking with updated service confirmations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoTripBooking"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     listDemoTripBookings: {

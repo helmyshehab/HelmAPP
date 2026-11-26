@@ -28,7 +28,8 @@ void main() {
               child: Center(child: SizedBox(width: 440, child: child)),
             )
         : null,
-    home: HelmShell(auth: auth, apiClient: api),
+    home:
+        HelmShell(auth: auth, apiClient: api, allowDemoStaffConfirmation: true),
   ));
 }
 
@@ -103,6 +104,28 @@ class _DemoApi {
     }
 
     final drafts = _draftsByOwner.putIfAbsent(session.userId, () => {});
+    final segments = request.url.pathSegments;
+    if (request.method == 'PATCH' &&
+        segments.length == 7 &&
+        path.startsWith('/v1/admin/trips/demo-bookings/') &&
+        segments[5] == 'services') {
+      final bookings = _bookingsByOwner[session.userId]?.values ??
+          const <Map<String, dynamic>>[];
+      for (final booking in bookings) {
+        if (booking['id'] != segments[4]) continue;
+        final services = booking['services'] as List<Map<String, dynamic>>;
+        for (final service in services) {
+          if (service['kind'] != segments[6]) continue;
+          service['confirmedAt'] ??= DateTime.now().toUtc().toIso8601String();
+          if (services.every((item) => item['confirmedAt'] != null)) {
+            booking['status'] = 'confirmed';
+          }
+          return _json(booking);
+        }
+      }
+      return _json({'title': 'Demo booking service not found'},
+          statusCode: 404);
+    }
     if (path == '/v1/trips/demo-bookings') {
       final bookings = _bookingsByOwner.putIfAbsent(session.userId, () => {});
       if (request.method == 'GET') {
@@ -131,6 +154,14 @@ class _DemoApi {
           'draftId': draft['id'],
           'title': draft['title'],
           'status': 'pending_confirmation',
+          'services': <Map<String, dynamic>>[
+            for (final kind in [
+              'flights',
+              'stay',
+              if ((quote['activitiesTotalEgp'] as int) > 0) 'activities'
+            ])
+              {'kind': kind, 'confirmedAt': null},
+          ],
           'quote': quote,
           'constraints': draft['constraints'],
           'createdAt': DateTime.now().toUtc().toIso8601String(),

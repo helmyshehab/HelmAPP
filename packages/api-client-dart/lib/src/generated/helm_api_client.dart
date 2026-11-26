@@ -247,12 +247,26 @@ class TripDraftQuote {
       );
 }
 
+class DemoBookingService {
+  const DemoBookingService({required this.kind, required this.confirmedAt});
+
+  final String kind;
+  final String? confirmedAt;
+
+  factory DemoBookingService.fromJson(Map<String, dynamic> json) =>
+      DemoBookingService(
+        kind: json['kind'] as String,
+        confirmedAt: json['confirmedAt'] as String?,
+      );
+}
+
 class DemoTripBooking {
   const DemoTripBooking({
     required this.id,
     required this.draftId,
     required this.title,
     required this.status,
+    required this.services,
     required this.quote,
     required this.constraints,
     required this.createdAt,
@@ -262,6 +276,7 @@ class DemoTripBooking {
   final String draftId;
   final String? title;
   final String status;
+  final List<DemoBookingService> services;
   final TripDraftQuote quote;
   final Map<String, dynamic> constraints;
   final String createdAt;
@@ -271,6 +286,9 @@ class DemoTripBooking {
         draftId: json['draftId'] as String,
         title: json['title'] as String?,
         status: json['status'] as String,
+        services: (json['services'] as List<dynamic>)
+            .map((item) => DemoBookingService.fromJson(item as Map<String, dynamic>))
+            .toList(),
         quote: TripDraftQuote.fromJson(json['quote'] as Map<String, dynamic>),
         constraints: json['constraints'] as Map<String, dynamic>,
         createdAt: json['createdAt'] as String,
@@ -419,6 +437,23 @@ class HelmApiClient {
     return TripDraftItineraryResponse.fromJson(
       jsonDecode(res.body) as Map<String, dynamic>,
     );
+  }
+
+  Future<DemoTripBooking> confirmDemoBookingService({
+    required String accessToken,
+    required String bookingId,
+    required String kind,
+  }) async {
+    final id = Uri.encodeComponent(bookingId);
+    final service = Uri.encodeComponent(kind);
+    final res = await _http.patch(
+      _u('/v1/admin/trips/demo-bookings/$id/services/$service'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('confirmDemoBookingService failed: ${res.statusCode}');
+    }
+    return DemoTripBooking.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<List<DemoTripBooking>> listDemoTripBookings({

@@ -1,8 +1,27 @@
 import 'package:helm_api_client/helm_api_client.dart';
 
 import 'trip_answers.dart';
+import 'trip_demo_pricing.dart';
 import 'trip_planner.dart';
 import 'ubud_demo_catalog.dart';
+
+List<TripPreviewDay> demoBookingDays(
+  TripPreviewPlan plan,
+  Set<String> includedActivitySlugs,
+) =>
+    [
+      for (final day in plan.days)
+        TripPreviewDay(
+          dayNumber: day.dayNumber,
+          title: day.title,
+          stops: [
+            for (final stop in day.stops)
+              if (!isPricedDemoActivity(stop.place) ||
+                  includedActivitySlugs.contains(stop.place.slug))
+                stop,
+          ],
+        ),
+    ];
 
 /// Marker stored in `TripDraft.constraints` for the local Ubud preview flow.
 const ubudTripPreviewConstraintKind = 'ubud_trip_preview';

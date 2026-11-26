@@ -15,6 +15,7 @@ export type BootstrapCustomerProfileResponse =
 export type TripDraft = components["schemas"]["TripDraft"];
 export type TripDraftQuote = components["schemas"]["TripDraftQuote"];
 export type DemoTripBooking = components["schemas"]["DemoTripBooking"];
+export type DemoBookingService = components["schemas"]["DemoBookingService"];
 export type DemoTripBookingList = components["schemas"]["DemoTripBookingList"];
 export type CreateDemoTripBookingRequest = components["schemas"]["CreateDemoTripBookingRequest"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
@@ -169,6 +170,21 @@ export function createHelmClient(options: HelmClientOptions) {
       );
       if (!res.ok) throw new Error(`getTripDraftItinerary failed: ${res.status}`);
       return (await res.json()) as TripDraftItineraryResponse;
+    },
+    async confirmDemoBookingService(
+      id: string,
+      kind: DemoBookingService["kind"],
+      accessToken?: string,
+    ): Promise<DemoTripBooking> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("confirmDemoBookingService requires an access token");
+      const path = `/v1/admin/trips/demo-bookings/${encodeURIComponent(id)}/services/${encodeURIComponent(kind)}`;
+      const res = await fetchImpl(`${base}${path}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`confirmDemoBookingService failed: ${res.status}`);
+      return (await res.json()) as DemoTripBooking;
     },
     async listDemoTripBookings(accessToken?: string): Promise<DemoTripBookingList> {
       const token = accessToken ?? options.accessToken;

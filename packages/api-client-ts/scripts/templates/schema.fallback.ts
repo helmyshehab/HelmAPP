@@ -120,6 +120,9 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/admin/trips/demo-bookings/{id}/services/{kind}": {
+        patch: operations["confirmDemoBookingService"];
+    };
     "/v1/trips/demo-bookings": {
         get: operations["listDemoTripBookings"];
         post: operations["createDemoTripBooking"];
@@ -257,11 +260,13 @@ export interface components {
             id: string;
             draftId: string;
             title: string | null;
-            status: "pending_confirmation";
+            status: "pending_confirmation" | "confirmed";
+            services: components["schemas"]["DemoBookingService"][];
             quote: components["schemas"]["TripDraftQuote"];
             constraints: Record<string, unknown>;
             createdAt: string;
         };
+        DemoBookingService: { kind: "flights" | "stay" | "activities"; confirmedAt: string | null };
         DemoTripBookingList: { items: components["schemas"]["DemoTripBooking"][] };
         TripDraftQuote: {
             id: string;
@@ -550,6 +555,9 @@ export interface operations {
                 };
             };
         };
+    };
+    confirmDemoBookingService: {
+        responses: { 200: { content: { "application/json": components["schemas"]["DemoTripBooking"] } } };
     };
     listDemoTripBookings: {
         responses: { 200: { content: { "application/json": components["schemas"]["DemoTripBookingList"] } } };
