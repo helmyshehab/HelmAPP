@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -64,6 +65,11 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   bool _saving = false;
   String? _saveError;
   String? _saveMessage;
+  TripDraftQuote? _quote;
+  String? _quoteConstraints;
+  String? _quoteError;
+  Timer? _quoteExpiration;
+  bool _requestingQuote = false;
   bool _cleared = false;
   int? _activityPickerDay;
   Route<void>? _checkoutRoute;
@@ -92,6 +98,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
 
   @override
   void dispose() {
+    _quoteExpiration?.cancel();
     widget.auth.sessionListenable.removeListener(_onAuthChanged);
     super.dispose();
   }
@@ -105,9 +112,13 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     final identityChanged = session?.userId != _boundUserId;
     if (!identityChanged && !generationChanged) return;
     if (!mounted) return;
+    _quoteExpiration?.cancel();
     setState(() {
       _cleared = true;
       _saving = false;
+      _requestingQuote = false;
+      _quote = null;
+      _quoteError = null;
       _saveError = null;
       _saveMessage = null;
     });
@@ -383,31 +394,38 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     widget.onAnswersChanged?.call(updated);
   }
 
-  Future<void> _saveDraft() async {
+  Map<String, dynamic> _snapshotConstraints() =>
+      TripPreviewDraftSnapshot.fromPlan(
+        plan: _plan,
+        flightId: _flightId,
+        hotelSlug: _hotelSlug,
+        includedActivitySlugs: _includedActivitySlugs,
+      ).toConstraints();
+
+  Future<void> _saveDraft({bool requestQuote = false}) async {
     if (!canStartMutation(_saving) || _cleared) return;
     final session = widget.auth.session;
     if (session == null || session.userId != _boundUserId) return;
     final generation = widget.auth.authGeneration;
 
+    _quoteExpiration?.cancel();
     setState(() {
       _saving = true;
+      _requestingQuote = requestQuote;
       _saveError = null;
       _saveMessage = null;
+      _quote = null;
+      _quoteError = null;
     });
 
-    final snapshot = TripPreviewDraftSnapshot.fromPlan(
-      plan: _plan,
-      flightId: _flightId,
-      hotelSlug: _hotelSlug,
-      includedActivitySlugs: _includedActivitySlugs,
-    );
-    final constraints = snapshot.toConstraints();
+    final constraints = _snapshotConstraints();
     final title = ubudTripPreviewDraftTitle(_plan.answers);
 
     try {
       await widget.apiClient.bootstrapCustomerProfile(
         accessToken: session.accessToken,
       );
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
 
       TripDraft saved;
       final existingId = _draftId;
@@ -424,6 +442,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
           constraints: _createReplayConstraints,
           clientRequestKey: _createClientRequestKey,
         );
+        if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
 
         // Traveler may have edited after a timed-out first attempt — patch.
         final newerThanReplay = title != _createReplayTitle ||
@@ -452,18 +471,69 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
       setState(() {
         _draftId = saved.id;
-        _saving = false;
         _saveMessage = 'Draft saved.';
       });
       widget.onDraftIdChanged?.call(saved.id);
+      if (requestQuote) await _requestQuote(saved.id, constraints, generation);
     } catch (e) {
       if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
       // Keep traveler edits; do not assign a draft id after a failed create.
       // Replay key + first payload stay set so a retry can recover safely.
       setState(() {
-        _saving = false;
         _saveError = e.toString();
       });
+    } finally {
+      if (mounted && _isAuthCurrent(generation) && !_cleared) {
+        setState(() {
+          _saving = false;
+          _requestingQuote = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _requestQuote(
+    String draftId,
+    Map<String, dynamic> constraints,
+    int generation,
+  ) async {
+    final session = widget.auth.session;
+    if (session == null || !_isAuthCurrent(generation)) return;
+    try {
+      final quote = await widget.apiClient.createTripDraftQuote(
+        accessToken: session.accessToken,
+        id: draftId,
+        expectedConstraints: constraints,
+      );
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
+      if (quote.draftId != draftId) {
+        throw StateError('Quote does not match the saved draft');
+      }
+      if (!_sameJsonMaps(constraints, _snapshotConstraints())) {
+        setState(() => _quoteError = 'Your trip changed. Request a new quote.');
+        return;
+      }
+      final remaining =
+          DateTime.parse(quote.expiresAt).difference(DateTime.now());
+      if (remaining <= Duration.zero) {
+        setState(() => _quoteError = 'The quote expired. Request a new quote.');
+        return;
+      }
+      setState(() {
+        _quote = quote;
+        _quoteConstraints = jsonEncode(constraints);
+      });
+      _quoteExpiration = Timer(remaining, () {
+        if (!mounted || _cleared) return;
+        setState(() {
+          _quote = null;
+          _quoteError = 'The quote expired. Request a new quote.';
+        });
+      });
+    } catch (_) {
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
+      setState(() => _quoteError =
+          'Could not get a quote. Your draft is saved. Try again.');
     }
   }
 
@@ -496,6 +566,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
 
     final theme = Theme.of(context);
     final estimate = _estimate;
+    final quote = _quote != null &&
+            _quoteConstraints == jsonEncode(_snapshotConstraints())
+        ? _quote
+        : null;
     final travelers = _plan.answers.travelerCount!;
     final nights = _plan.answers.nights!;
 
@@ -648,6 +722,11 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
               stay: ubudPlaceBySlug(_hotelSlug)!,
               includedActivitySlugs: _includedActivitySlugs,
               estimate: estimate,
+              quote: quote,
+              quoteError: _quoteError,
+              requestingQuote: _requestingQuote,
+              onRequestQuote:
+                  _saving ? null : () => _saveDraft(requestQuote: true),
               onCheckout: _saving ? null : _openDemoCheckout,
             ),
             if (_saveError != null) ...[
@@ -668,7 +747,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
             const SizedBox(height: 8),
             FilledButton(
               key: const Key('trip-preview-save'),
-              onPressed: _saving ? null : _saveDraft,
+              onPressed: _saving ? null : () => _saveDraft(),
               child: Text(_saving ? 'Saving…' : 'Save draft'),
             ),
             const SizedBox(height: 8),
@@ -699,6 +778,10 @@ class _TripReview extends StatelessWidget {
     required this.includedActivitySlugs,
     required this.estimate,
     required this.onCheckout,
+    required this.quote,
+    required this.quoteError,
+    required this.requestingQuote,
+    required this.onRequestQuote,
   });
 
   final TripPreviewPlan plan;
@@ -707,10 +790,15 @@ class _TripReview extends StatelessWidget {
   final Set<String> includedActivitySlugs;
   final TripDemoEstimate estimate;
   final VoidCallback? onCheckout;
+  final TripDraftQuote? quote;
+  final String? quoteError;
+  final bool requestingQuote;
+  final VoidCallback? onRequestQuote;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final currentQuote = quote;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ExpansionTile(
@@ -747,6 +835,23 @@ class _TripReview extends StatelessWidget {
               ),
           ],
           const SizedBox(height: 16),
+          if (currentQuote != null) ...[
+            Text('Saved demo quote', style: textTheme.labelLarge),
+            Text(
+              formatDemoEgp(currentQuote.totalEgp),
+              key: const Key('trip-review-server-quote-total'),
+              style: textTheme.headlineSmall,
+            ),
+            Text(_quoteExpiryLabel(context, currentQuote.expiresAt)),
+          ],
+          if (quoteError != null)
+            Text(quoteError!, key: const Key('trip-review-quote-error')),
+          OutlinedButton(
+            key: const Key('trip-review-request-quote'),
+            onPressed: onRequestQuote,
+            child: Text(
+                requestingQuote ? 'Getting quote…' : 'Save and get demo quote'),
+          ),
           FilledButton(
             key: const Key('trip-demo-checkout'),
             onPressed: onCheckout,
@@ -755,6 +860,14 @@ class _TripReview extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _quoteExpiryLabel(BuildContext context, String expiresAt) {
+    final local = DateTime.parse(expiresAt).toLocal();
+    final formats = MaterialLocalizations.of(context);
+    final date = formats.formatCompactDate(local);
+    final time = formats.formatTimeOfDay(TimeOfDay.fromDateTime(local));
+    return 'Expires $date at $time';
   }
 }
 

@@ -183,6 +183,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/trips/drafts/{id}/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Get the caller's current draft quote
+         * @description Returns 404 if the draft is inaccessible, the quote is missing or expired, the draft has changed, or the demo rate version has changed.
+         */
+        get: operations["getTripDraftQuote"];
+        put?: never;
+        /**
+         * Calculate and save a demo quote for the caller's saved Ubud draft
+         * @description Replaces the previous quote using server-side demo rates. The quote expires after 30 minutes.
+         */
+        post: operations["createTripDraftQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -671,6 +697,27 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+        };
+        TripDraftQuote: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            draftId: string;
+            /** @enum {string} */
+            currency: "EGP";
+            /** @enum {string} */
+            source: "demo";
+            rateVersion: string;
+            travelerCount: number;
+            nights: number;
+            flightTotalEgp: number;
+            lodgingTotalEgp: number;
+            activitiesTotalEgp: number;
+            totalEgp: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            expiresAt: string;
         };
         TripDraftItineraryItem: {
             /** Format: uuid */
@@ -1561,6 +1608,74 @@ export interface operations {
             404: components["responses"]["NotFound"];
             /** @description Database is not configured or unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getTripDraftQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current saved demo quote */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftQuote"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    createTripDraftQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["TripDraftId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description If specified, this snapshot must match the current saved draft before pricing. */
+                    expectedConstraints?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Saved demo quote in whole EGP */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripDraftQuote"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description Saved selections differ from the expected snapshot */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -35,6 +35,10 @@ const updateTripDraftBody = z
   })
   .strict();
 
+const createTripDraftQuoteBody = z.object({
+  expectedConstraints: jsonObject.optional(),
+}).strict().default({});
+
 @Controller('trips/drafts')
 export class TripDraftsController {
   constructor(
@@ -63,6 +67,24 @@ export class TripDraftsController {
   ) {
     assertUuid(id);
     return this.tripDrafts.getItinerary(requireUser(user), id);
+  }
+
+  @Post(':id/quote')
+  @HttpCode(HttpStatus.CREATED)
+  createQuote(
+    @CurrentUser() user: AuthPrincipal | undefined,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(createTripDraftQuoteBody))
+    body: z.infer<typeof createTripDraftQuoteBody>,
+  ) {
+    assertUuid(id);
+    return this.tripDrafts.createQuote(requireUser(user), id, body.expectedConstraints);
+  }
+
+  @Get(':id/quote')
+  getQuote(@CurrentUser() user: AuthPrincipal | undefined, @Param('id') id: string) {
+    assertUuid(id);
+    return this.tripDrafts.getQuote(requireUser(user), id);
   }
 
   @Get(':id')
