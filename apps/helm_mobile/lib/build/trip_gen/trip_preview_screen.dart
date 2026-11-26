@@ -77,7 +77,6 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   bool _submittingRequest = false;
   String? _requestError;
   String? _requestStatus;
-  String? _requestId;
   bool _cleared = false;
   Set<String>? _publishedSlugs;
   bool _catalogFailed = false;
@@ -119,10 +118,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
       for (final item in items) {
         if (item.draftId == draftId) {
-          setState(() {
-            _requestId = item.id;
-            _requestStatus = item.status;
-          });
+          setState(() => _requestStatus = item.status);
           return;
         }
       }
@@ -150,7 +146,6 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       );
       if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
       setState(() {
-        _requestId = request.id;
         _requestStatus = request.status;
         _saveMessage =
             'Trip requested. You can keep editing this private draft.';
