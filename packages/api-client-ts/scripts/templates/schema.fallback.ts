@@ -120,6 +120,9 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/admin/trips/demo-bookings": {
+        get: operations["listStaffDemoTripBookings"];
+    };
     "/v1/admin/trips/demo-bookings/{id}/services/{kind}": {
         patch: operations["confirmDemoBookingService"];
     };
@@ -268,6 +271,8 @@ export interface components {
         };
         DemoBookingService: { kind: "flights" | "stay" | "activities"; confirmedAt: string | null };
         DemoTripBookingList: { items: components["schemas"]["DemoTripBooking"][] };
+        StaffDemoTripBooking: Pick<components["schemas"]["DemoTripBooking"], "id" | "title" | "status" | "services" | "createdAt">;
+        StaffDemoTripBookingList: { items: components["schemas"]["StaffDemoTripBooking"][] };
         TripDraftQuote: {
             id: string;
             draftId: string;
@@ -558,6 +563,10 @@ export interface operations {
     };
     confirmDemoBookingService: {
         responses: { 200: { content: { "application/json": components["schemas"]["DemoTripBooking"] } } };
+    };
+    listStaffDemoTripBookings: {
+        parameters: { query?: { id?: string } };
+        responses: { 200: { content: { "application/json": components["schemas"]["StaffDemoTripBookingList"] } } };
     };
     listDemoTripBookings: {
         responses: { 200: { content: { "application/json": components["schemas"]["DemoTripBookingList"] } } };
