@@ -19,9 +19,11 @@ type DemoTripBooking = {
   createdAt: string;
 };
 
+type StaffDemoTripBooking = Pick<DemoTripBooking, 'id' | 'title' | 'status' | 'services' | 'createdAt'>;
+
 const hasPaidActivities = sql`(quote_json ->> 'activitiesTotalEgp')::integer > 0`;
-const bookingProjection = sql`
-  id::text as id, draft_id::text as "draftId", title,
+const staffBookingProjection = sql`
+  id::text as id, title,
   case when confirmations ?& array['flights', 'stay']
     and (not (${hasPaidActivities}) or confirmations ? 'activities')
     then 'confirmed' else 'pending_confirmation' end as status,
@@ -31,9 +33,11 @@ const bookingProjection = sql`
   ) || case when ${hasPaidActivities} then jsonb_build_array(
     jsonb_build_object('kind', 'activities', 'confirmedAt', confirmations -> 'activities' ->> 'confirmedAt')
   ) else '[]'::jsonb end as services,
-  quote_json as quote,
-  constraints_json as constraints,
   to_char(created_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as "createdAt"
+`;
+const bookingProjection = sql`
+  ${staffBookingProjection}, draft_id::text as "draftId", quote_json as quote,
+  constraints_json as constraints
 `;
 
 @Injectable()
@@ -51,6 +55,17 @@ export class DemoTripBookingsService {
       from bookings.demo_trip_bookings
       where user_id = ${userId}::uuid
       order by created_at desc, id desc
+    `);
+    return { items: [...rows] };
+  }
+
+  async listForStaff(id?: string): Promise<{ items: StaffDemoTripBooking[] }> {
+    const rows = await this.requireDb().execute<StaffDemoTripBooking>(sql`
+      select ${staffBookingProjection}
+      from bookings.demo_trip_bookings
+      ${id ? sql`where id = ${id}::uuid` : sql``}
+      order by created_at desc, id desc
+      limit 25
     `);
     return { items: [...rows] };
   }

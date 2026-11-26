@@ -272,6 +272,30 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/admin/trips/demo-bookings:
+    get:
+      operationId: listStaffDemoTripBookings
+      summary: List up to 25 recent demo bookings or find an exact booking ID
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          schema: {type: string, format: uuid}
+      responses:
+        "200":
+          description: Staff booking summaries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffDemoTripBookingList"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /v1/admin/trips/demo-bookings/{id}/services/{kind}:
     patch:
       operationId: confirmDemoBookingService
@@ -1472,6 +1496,26 @@ components:
           type: object
           additionalProperties: true
         createdAt: {type: string, format: date-time}
+    StaffDemoTripBooking:
+      type: object
+      required: [id, title, status, services, createdAt]
+      properties:
+        id: {type: string, format: uuid}
+        title: {type: string, nullable: true}
+        status: {type: string, enum: [pending_confirmation, confirmed]}
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoBookingService"
+        createdAt: {type: string, format: date-time}
+    StaffDemoTripBookingList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaffDemoTripBooking"
     DemoBookingService:
       type: object
       required: [kind, confirmedAt]

@@ -407,6 +407,9 @@ test('trip drafts: private CRUD, current quotes, and idempotent simulated bookin
     });
 
     const staffPath = `/v1/admin/trips/demo-bookings/${first.json.id}/services`;
+    const staffListPath = '/v1/admin/trips/demo-bookings';
+    assert.equal((await httpJson(baseUrl, 'GET', staffListPath)).status, 401);
+    assert.equal((await httpJson(baseUrl, 'GET', staffListPath, tokenA)).status, 403);
     assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`)).status, 401);
     assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenA)).status, 403);
     assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenB)).status, 403);
@@ -414,6 +417,20 @@ test('trip drafts: private CRUD, current quotes, and idempotent simulated bookin
       'insert into identity.user_roles (user_id, role) values ($1::uuid, $2::identity.app_role)',
       [userB, 'operator'],
     );
+    const staffBooking = {
+      id: first.json.id,
+      title: first.json.title,
+      status: first.json.status,
+      services: first.json.services,
+      createdAt: first.json.createdAt,
+    };
+    const recent = await httpJson(baseUrl, 'GET', staffListPath, tokenB);
+    assert.equal(recent.status, 200);
+    assert.ok((recent.json.items as Json[]).some((item) => item.id === staffBooking.id));
+    assert.deepEqual(await httpJson(baseUrl, 'GET', `${staffListPath}?id=${staffBooking.id}`, tokenB), {
+      status: 200, json: { items: [staffBooking] },
+    });
+    assert.equal((await httpJson(baseUrl, 'GET', `${staffListPath}?id=invalid`, tokenB)).status, 400);
     const flights = await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenB);
     assert.equal(flights.status, 200, JSON.stringify(flights.json));
     assert.equal(flights.json.status, 'pending_confirmation');

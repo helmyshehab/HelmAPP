@@ -17,6 +17,8 @@ export type TripDraftQuote = components["schemas"]["TripDraftQuote"];
 export type DemoTripBooking = components["schemas"]["DemoTripBooking"];
 export type DemoBookingService = components["schemas"]["DemoBookingService"];
 export type DemoTripBookingList = components["schemas"]["DemoTripBookingList"];
+export type StaffDemoTripBooking = components["schemas"]["StaffDemoTripBooking"];
+export type StaffDemoTripBookingList = components["schemas"]["StaffDemoTripBookingList"];
 export type CreateDemoTripBookingRequest = components["schemas"]["CreateDemoTripBookingRequest"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
 export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
@@ -173,6 +175,16 @@ export function createHelmClient(options: HelmClientOptions) {
       );
       if (!res.ok) throw new Error(`getTripDraftItinerary failed: ${res.status}`);
       return (await res.json()) as TripDraftItineraryResponse;
+    },
+    async listStaffDemoTripBookings(id?: string): Promise<StaffDemoTripBookingList> {
+      if (!options.accessToken) throw new Error("listStaffDemoTripBookings requires an access token");
+      const query = id ? `?id=${encodeURIComponent(id)}` : "";
+      const res = await fetchImpl(`${base}/v1/admin/trips/demo-bookings${query}`, {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${options.accessToken}` },
+      });
+      if (!res.ok) throw new Error(`listStaffDemoTripBookings failed: ${res.status}`);
+      return (await res.json()) as StaffDemoTripBookingList;
     },
     async confirmDemoBookingService(
       id: string,

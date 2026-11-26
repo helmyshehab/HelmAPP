@@ -260,6 +260,33 @@ class DemoBookingService {
       );
 }
 
+class StaffDemoTripBooking {
+  const StaffDemoTripBooking({
+    required this.id,
+    required this.title,
+    required this.status,
+    required this.services,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String? title;
+  final String status;
+  final List<DemoBookingService> services;
+  final String createdAt;
+
+  factory StaffDemoTripBooking.fromJson(Map<String, dynamic> json) =>
+      StaffDemoTripBooking(
+        id: json['id'] as String,
+        title: json['title'] as String?,
+        status: json['status'] as String,
+        services: (json['services'] as List<dynamic>)
+            .map((item) => DemoBookingService.fromJson(item as Map<String, dynamic>))
+            .toList(),
+        createdAt: json['createdAt'] as String,
+      );
+}
+
 class DemoTripBooking {
   const DemoTripBooking({
     required this.id,
@@ -437,6 +464,24 @@ class HelmApiClient {
     return TripDraftItineraryResponse.fromJson(
       jsonDecode(res.body) as Map<String, dynamic>,
     );
+  }
+
+  Future<List<StaffDemoTripBooking>> listStaffDemoTripBookings({
+    required String accessToken,
+    String? bookingId,
+  }) async {
+    final uri = _u('/v1/admin/trips/demo-bookings');
+    final res = await _http.get(
+      bookingId == null ? uri : uri.replace(queryParameters: {'id': bookingId}),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('listStaffDemoTripBookings failed: ${res.statusCode}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return (data['items'] as List<dynamic>)
+        .map((item) => StaffDemoTripBooking.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   Future<DemoTripBooking> confirmDemoBookingService({
