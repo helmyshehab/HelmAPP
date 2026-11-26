@@ -19,6 +19,7 @@ const jwtSecret =
 const ADMIN_ID = '77777777-7777-7777-7777-777777777777';
 
 type Json = Record<string, unknown>;
+type SqlClient = ReturnType<typeof postgres>;
 
 const packageContent = {
   kind: 'ubud_trip_preview',
@@ -57,7 +58,7 @@ async function applyMigrationsAndSeed(targetUrl: string) {
     }
     await client.unsafe(readFileSync(path.join(repoRoot, 'supabase/seed.sql'), 'utf8'));
   } finally {
-    await client.end({ timeout: 1 });
+    await client.end({ timeout: 5 });
   }
 }
 
@@ -89,6 +90,12 @@ async function httpJson(
   return { status: res.status, json };
 }
 
+function nestPostgresClient(db: unknown): SqlClient | undefined {
+  if (!db || typeof db !== 'object') return undefined;
+  const client = (db as { $client?: SqlClient }).$client;
+  return typeof client?.end === 'function' ? client : undefined;
+}
+
 test('packages: unpublished hidden; publish validates; edits require unpublish', async (t) => {
   if (!databaseUrl) {
     t.skip('DATABASE_URL not set');
@@ -98,9 +105,10 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
   const adminSql = postgres(databaseUrl, { max: 1 });
   const disposableDb = `helm_packages_${Date.now()}_${randomUUID().replace(/-/g, '').slice(0, 8)}`;
   let disposableUrl = '';
-  let app: { getUrl(): Promise<string>; close(): Promise<void>; get<T>(token: unknown): T } | undefined;
-  let fixtureSql: ReturnType<typeof postgres> | undefined;
-  let nestDrizzleClient: { end: (opts?: object) => Promise<void> } | undefined;
+  let app: { close(): Promise<void> } | undefined;
+  let fixtureSql: SqlClient | undefined;
+  let nestSql: SqlClient | undefined;
+  let primaryError: unknown;
 
   try {
     await adminSql.unsafe(`create database "${disposableDb}"`);
@@ -134,9 +142,7 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
     app = nestApp;
     const baseUrl = await nestApp.getUrl();
     const auth = nestApp.get(MockAuthAdapter);
-    nestDrizzleClient = nestApp.get(DRIZZLE) as unknown as {
-      end: (opts?: object) => Promise<void>;
-    };
+    nestSql = nestPostgresClient(nestApp.get(DRIZZLE));
     const adminToken = await auth.issueAccessToken({
       userId: ADMIN_ID,
       email: 'demo.admin@helm.local',
@@ -146,28 +152,58 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
     const db = drizzle(fixtureSql, { schema });
     const ubudId = randomUUID();
 
+    // Seed has TR/GE/EG only — Ubud needs Indonesia + IDR before destination insert.
+    await db.execute(sql`
+      insert into pricing.currencies (code, name_en, name_ar, minor_units)
+      values ('IDR', 'Indonesian Rupiah', 'روبية إندونيسية', 2)
+      on conflict (code) do nothing
+    `);
+    await db.execute(sql`
+      insert into geo.countries (code, name_en, name_ar, default_currency)
+      values ('ID', 'Indonesia', 'إندونيسيا', 'IDR')
+      on conflict (code) do nothing
+    `);
+
+    // Lifecycle trigger forbids creating destinations/places as published.
     await db.execute(sql`
       insert into catalog.destinations (
-        id, slug, name_en, name_ar, country_code, lifecycle_status, published_at, tags
+        id, slug, name_en, name_ar, country_code, lifecycle_status, tags
       ) values (
-        ${ubudId}::uuid, 'ubud', 'Ubud', 'أوبود', 'ID', 'published', now(), array['culture']
+        ${ubudId}::uuid, 'ubud', 'Ubud', 'أوبود', 'ID', 'draft', array['culture']
       )
     `);
+    for (const step of [
+      sql`update catalog.destinations set lifecycle_status = 'pending_verification' where id = ${ubudId}::uuid`,
+      sql`update catalog.destinations set lifecycle_status = 'verified', verified_at = now() where id = ${ubudId}::uuid`,
+      sql`update catalog.destinations set lifecycle_status = 'approved', approved_at = now() where id = ${ubudId}::uuid`,
+      sql`update catalog.destinations set lifecycle_status = 'published', published_at = now() where id = ${ubudId}::uuid`,
+    ]) {
+      await db.execute(step);
+    }
     for (const place of [
       ['ubud-village-hotel', 'Ubud Village Hotel', 'accommodation'],
       ['ubud-moksa', 'Moksa', 'restaurant'],
       ['ubud-sacred-monkey-forest', 'Sacred Monkey Forest', 'attraction'],
     ] as const) {
+      const placeId = randomUUID();
       await db.execute(sql`
         insert into catalog.places (
           id, destination_id, slug, name_en, name_ar, category,
-          lifecycle_status, published_at, external_key
+          lifecycle_status, external_key
         ) values (
-          ${randomUUID()}::uuid, ${ubudId}::uuid, ${place[0]}, ${place[1]}, ${place[1]},
-          ${place[2]}::catalog.place_category, 'published', now(),
+          ${placeId}::uuid, ${ubudId}::uuid, ${place[0]}, ${place[1]}, ${place[1]},
+          ${place[2]}::catalog.place_category, 'draft',
           ${`test:ubud:${place[0]}`}
         )
       `);
+      for (const step of [
+        sql`update catalog.places set lifecycle_status = 'pending_verification' where id = ${placeId}::uuid`,
+        sql`update catalog.places set lifecycle_status = 'verified', verified_at = now() where id = ${placeId}::uuid`,
+        sql`update catalog.places set lifecycle_status = 'approved', approved_at = now() where id = ${placeId}::uuid`,
+        sql`update catalog.places set lifecycle_status = 'published', published_at = now() where id = ${placeId}::uuid`,
+      ]) {
+        await db.execute(step);
+      }
     }
 
     const publicBefore = await httpJson(baseUrl, 'GET', '/v1/packages');
@@ -261,11 +297,55 @@ test('packages: unpublished hidden; publish validates; edits require unpublish',
       ((latest.json.content as Json).answers as Json).budgetEgp,
       90000,
     );
+  } catch (err) {
+    primaryError = err;
   } finally {
-    await app?.close();
-    await nestDrizzleClient?.end({ timeout: 1 }).catch(() => undefined);
-    await fixtureSql?.end({ timeout: 1 }).catch(() => undefined);
-    await adminSql.unsafe(`drop database if exists "${disposableDb}"`).catch(() => undefined);
-    await adminSql.end({ timeout: 1 }).catch(() => undefined);
+    const cleanupErrors: Error[] = [];
+    const runCleanup = async (label: string, fn: () => Promise<void>) => {
+      try {
+        await fn();
+      } catch (err) {
+        cleanupErrors.push(
+          err instanceof Error ? err : new Error(`${label}: ${String(err)}`),
+        );
+      }
+    };
+
+    await runCleanup('fixtureSql.end', async () => {
+      if (fixtureSql) await fixtureSql.end({ timeout: 5 });
+    });
+    await runCleanup('nestSql.end', async () => {
+      if (nestSql) await nestSql.end({ timeout: 5 });
+    });
+    await runCleanup('app.close', async () => {
+      if (app) await app.close();
+    });
+    await runCleanup('drop disposable database', async () => {
+      await adminSql.unsafe(
+        `select pg_terminate_backend(pid)
+         from pg_stat_activity
+         where datname = $1 and pid <> pg_backend_pid()`,
+        [disposableDb],
+      );
+      await adminSql.unsafe(`drop database if exists "${disposableDb}"`);
+    });
+    await runCleanup('adminSql.end', async () => {
+      await adminSql.end({ timeout: 5 });
+    });
+
+    if (primaryError && cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [primaryError, ...cleanupErrors],
+        `Test assertion failed and disposable database cleanup also failed (${cleanupErrors.length})`,
+      );
+    }
+    if (primaryError) throw primaryError;
+    if (cleanupErrors.length === 1) throw cleanupErrors[0];
+    if (cleanupErrors.length > 1) {
+      throw new AggregateError(
+        cleanupErrors,
+        `Disposable database cleanup failed (${cleanupErrors.length})`,
+      );
+    }
   }
 });

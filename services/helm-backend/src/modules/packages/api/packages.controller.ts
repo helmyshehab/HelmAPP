@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { Public } from '../../../common/auth/public.decorator';
 import { Roles } from '../../../common/auth/roles.decorator';
@@ -82,12 +92,14 @@ export class PackagesAdminController {
   }
 
   @Post(':id/unpublish')
+  @HttpCode(HttpStatus.OK)
   @Roles('administrator', 'super-administrator')
   unpublish(@Param('id') id: string) {
     return this.packages.unpublish(id);
   }
 
   @Post(':id/publish')
+  @HttpCode(HttpStatus.OK)
   @Roles('administrator', 'super-administrator')
   publish(@Param('id') id: string) {
     return this.packages.publish(id);
