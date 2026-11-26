@@ -2,7 +2,13 @@
  * Staff URL paths (route groups like (staff) do not appear in the URL).
  */
 
-const STAFF_PREFIXES = ["/destinations", "/places", "/import", "/demo-bookings"] as const;
+const STAFF_PREFIXES = [
+  "/destinations",
+  "/places",
+  "/packages",
+  "/import",
+  "/demo-bookings",
+] as const;
 
 export function isLoginPath(pathname: string): boolean {
   return pathname === "/login" || pathname.startsWith("/login/");

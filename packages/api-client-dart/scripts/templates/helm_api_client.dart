@@ -598,6 +598,11 @@ class HelmApiClient {
     return TripDraft.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
+  Future<Map<String, dynamic>> listPackages() => _getJson('/v1/packages');
+
+  Future<Map<String, dynamic>> getPackage(String slug) =>
+      _getJson('/v1/packages/${Uri.encodeComponent(slug)}');
+
   Future<Map<String, dynamic>> listDestinations({
     String? country,
     String? q,

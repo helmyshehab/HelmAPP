@@ -267,6 +267,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List published Build-compatible packages
+         * @description Returns only packages with `publish_status=published` and validated
+         *     `ubud_trip_preview` v1 content. Legacy metadata-only rows are omitted.
+         */
+        get: operations["listPackages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/packages/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a published Build-compatible package by slug */
+        get: operations["getPackage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all packages for staff */
+        get: operations["adminListPackages"];
+        put?: never;
+        /** Create an unpublished package */
+        post: operations["adminCreatePackage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/packages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a package for staff editing */
+        get: operations["adminGetPackage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update an unpublished package
+         * @description Published packages must be unpublished before content or titles can change.
+         */
+        patch: operations["adminUpdatePackage"];
+        trace?: never;
+    };
+    "/v1/admin/packages/{id}/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unpublish a package before editing */
+        post: operations["adminUnpublishPackage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/packages/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish a Build-compatible Ubud package
+         * @description Validates ubud_trip_preview v1 content, Build selections, itinerary
+         *     consistency, and that hotel/stops are published Ubud places.
+         */
+        post: operations["adminPublishPackage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -1344,6 +1459,74 @@ export interface components {
                 message?: string;
             }[];
         };
+        /** @enum {string} */
+        PackagePublishStatus: "unpublished" | "published";
+        PackagePublic: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            titleEn: string;
+            titleAr: string;
+            summaryEn: string | null;
+            summaryAr: string | null;
+            durationDays: number;
+            destinationSlug: string;
+            /** @description Validated ubud_trip_preview v1 JSON for Customize in Build */
+            content: {
+                [key: string]: unknown;
+            };
+        };
+        PackagePublicListResponse: {
+            items: components["schemas"]["PackagePublic"][];
+        };
+        PackageAdmin: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            destinationId: string;
+            destinationSlug: string;
+            slug: string;
+            titleEn: string;
+            titleAr: string;
+            summaryEn: string | null;
+            summaryAr: string | null;
+            durationDays: number;
+            publishStatus: components["schemas"]["PackagePublishStatus"];
+            marketCode: string;
+            content: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        PackageAdminListResponse: {
+            items: components["schemas"]["PackageAdmin"][];
+        };
+        CreatePackageRequest: {
+            /** Format: uuid */
+            destinationId: string;
+            slug: string;
+            titleEn: string;
+            titleAr: string;
+            summaryEn?: string | null;
+            summaryAr?: string | null;
+            marketCode?: string;
+            /** @description Optional ubud_trip_preview v1 JSON; nights derive durationDays */
+            content?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        UpdatePackageRequest: {
+            titleEn?: string;
+            titleAr?: string;
+            summaryEn?: string | null;
+            summaryAr?: string | null;
+            content?: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** @description RFC 7807 problem+json */
         Problem: {
             /** Format: uri */
@@ -1409,6 +1592,7 @@ export interface components {
         Slug: string;
         DestinationId: string;
         TripDraftId: string;
+        PackageId: string;
         CountryFilter: string;
         FeaturedFilter: "true" | "false";
         SearchQuery: string;
@@ -1894,6 +2078,208 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+        };
+    };
+    listPackages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Published packages travelers can customize in Build */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackagePublicListResponse"];
+                };
+            };
+        };
+    };
+    getPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: components["parameters"]["Slug"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Published package */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackagePublic"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminListPackages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff package list (includes unpublished and legacy rows) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdminListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    adminCreatePackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePackageRequest"];
+            };
+        };
+        responses: {
+            /** @description Created unpublished package */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminGetPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff package detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdatePackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePackageRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated unpublished package */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminUnpublishPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package is unpublished */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminPublishPackage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package is published */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
         };
     };
     listDestinations: {

@@ -8,6 +8,7 @@ import styles from "./StaffShell.module.css";
 const NAV = [
   { href: "/destinations", label: "Destinations" },
   { href: "/places", label: "Places" },
+  { href: "/packages", label: "Packages" },
   { href: "/import", label: "Import" },
   { href: "/demo-bookings", label: "Demo Bookings" },
 ] as const;

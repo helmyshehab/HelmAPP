@@ -130,6 +130,7 @@ class _HelmShellState extends State<HelmShell> {
         allowDemoStaffConfirmation: widget.allowDemoStaffConfirmation,
       ),
       PackagesTab(
+        apiClient: widget.apiClient,
         onCustomizeInBuild: (snapshot) => setState(() {
           _buildDestination = null;
           _buildPackageSnapshot = snapshot;
