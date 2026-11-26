@@ -6,6 +6,8 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
 import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
+import 'package:helm_mobile/build/trip_gen/trip_demo_checkout_screen.dart';
+import 'package:helm_mobile/build/trip_gen/trip_demo_pricing.dart';
 import 'package:helm_mobile/build/trip_gen/trip_planner.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
 import 'package:helm_mobile/tabs/build_tab.dart';
@@ -91,6 +93,29 @@ TripPreviewPlan _samplePlan() {
 }
 
 void main() {
+  testWidgets(
+      'demo booking skips activity confirmation when activities cost nothing',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: TripDemoCheckoutScreen(
+        tripLabel: 'Ubud trip',
+        estimate: const TripDemoEstimate(
+          flightTotalEgp: 37000,
+          lodgingTotalEgp: 9000,
+          activitiesTotalEgp: 0,
+          totalEgp: 46000,
+          budgetEgp: 85000,
+        ),
+        destinationName: 'Ubud',
+        days: _samplePlan().days,
+      ),
+    ));
+    await tester.tap(find.text('Simulate payment'));
+    await tester.pumpAndSettle();
+    expect(find.text('0 of 2 services confirmed'), findsOneWidget);
+    expect(find.byKey(const Key('trip-demo-confirm-activities')), findsNothing);
+  });
+
   testWidgets(
     'save and reopen restores edited day order, activities, and estimate',
     (tester) async {
@@ -236,7 +261,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
       expect(createCalls, 0);
-      await tester.tap(find.text('Preview Trip Mode'));
+      final openTripMode =
+          find.widgetWithText(FilledButton, 'Preview Trip Mode');
+      expect(find.text('0 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+
+      Future<void> confirmService(String service) async {
+        final button = find.byKey(Key('trip-demo-confirm-$service'));
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(tester.widget<TextButton>(button).onPressed, isNull);
+      }
+
+      await confirmService('flights');
+      expect(find.text('1 of 3 services confirmed'), findsOneWidget);
+      expect(tester.widget<FilledButton>(openTripMode).onPressed, isNull);
+      await confirmService('stay');
+      await confirmService('activities');
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(openTripMode);
+      await tester.tap(openTripMode);
       await tester.pumpAndSettle();
       expect(find.text('Demo Trip Mode'), findsOneWidget);
       expect(find.text('Day 1 of 2'), findsOneWidget);
@@ -260,6 +305,8 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
+      expect(find.text('3 of 3 services confirmed'), findsOneWidget);
+      await tester.ensureVisible(find.text('Back to trip'));
       await tester.tap(find.text('Back to trip'));
       await tester.pumpAndSettle();
       expect(_estimateTotal(tester), editedTotal);
