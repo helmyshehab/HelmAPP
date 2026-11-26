@@ -4,6 +4,7 @@ import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
 import {
   TripDraftsRepository,
   type TripDraftItinerary,
+  type TripDraftQuote,
   type TripDraftRow,
 } from '../infrastructure/trip-drafts.repository';
 
@@ -57,6 +58,22 @@ export class TripDraftsService {
     );
     if (!itinerary) throw AppException.notFound('Trip draft not found');
     return itinerary;
+  }
+
+  async createQuote(
+    principal: AuthPrincipal,
+    id: string,
+    expectedConstraints?: Record<string, unknown>,
+  ): Promise<TripDraftQuote> {
+    const quote = await this.drafts.createQuoteForOwner(principal.userId, id, expectedConstraints);
+    if (!quote) throw AppException.notFound('Trip draft not found');
+    return quote;
+  }
+
+  async getQuote(principal: AuthPrincipal, id: string): Promise<TripDraftQuote> {
+    const quote = await this.drafts.getQuoteForOwner(principal.userId, id);
+    if (!quote) throw AppException.notFound('Current trip draft quote not found');
+    return quote;
   }
 
   async update(

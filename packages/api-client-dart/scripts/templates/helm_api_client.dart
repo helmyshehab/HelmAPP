@@ -199,6 +199,54 @@ class TripDraftItineraryResponse {
       );
 }
 
+class TripDraftQuote {
+  const TripDraftQuote({
+    required this.id,
+    required this.draftId,
+    required this.currency,
+    required this.source,
+    required this.rateVersion,
+    required this.travelerCount,
+    required this.nights,
+    required this.flightTotalEgp,
+    required this.lodgingTotalEgp,
+    required this.activitiesTotalEgp,
+    required this.totalEgp,
+    required this.createdAt,
+    required this.expiresAt,
+  });
+
+  final String id;
+  final String draftId;
+  final String currency;
+  final String source;
+  final String rateVersion;
+  final int travelerCount;
+  final int nights;
+  final int flightTotalEgp;
+  final int lodgingTotalEgp;
+  final int activitiesTotalEgp;
+  final int totalEgp;
+  final String createdAt;
+  final String expiresAt;
+
+  factory TripDraftQuote.fromJson(Map<String, dynamic> json) => TripDraftQuote(
+        id: json['id'] as String,
+        draftId: json['draftId'] as String,
+        currency: json['currency'] as String,
+        source: json['source'] as String,
+        rateVersion: json['rateVersion'] as String,
+        travelerCount: json['travelerCount'] as int,
+        nights: json['nights'] as int,
+        flightTotalEgp: json['flightTotalEgp'] as int,
+        lodgingTotalEgp: json['lodgingTotalEgp'] as int,
+        activitiesTotalEgp: json['activitiesTotalEgp'] as int,
+        totalEgp: json['totalEgp'] as int,
+        createdAt: json['createdAt'] as String,
+        expiresAt: json['expiresAt'] as String,
+      );
+}
+
 const Object _omit = Object();
 
 /// Generated Helm حلم API client (meta/identity + catalog discovery + trip drafts).
@@ -341,6 +389,41 @@ class HelmApiClient {
     return TripDraftItineraryResponse.fromJson(
       jsonDecode(res.body) as Map<String, dynamic>,
     );
+  }
+
+  Future<TripDraftQuote> createTripDraftQuote({
+    required String accessToken,
+    required String id,
+    Map<String, dynamic>? expectedConstraints,
+  }) async {
+    final res = await _http.post(
+      _u('/v1/trips/drafts/${Uri.encodeComponent(id)}/quote'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        if (expectedConstraints != null) 'Content-Type': 'application/json',
+      },
+      body: expectedConstraints == null
+          ? null
+          : jsonEncode({'expectedConstraints': expectedConstraints}),
+    );
+    if (res.statusCode != 201) {
+      throw Exception('createTripDraftQuote failed: ${res.statusCode}');
+    }
+    return TripDraftQuote.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripDraftQuote> getTripDraftQuote({
+    required String accessToken,
+    required String id,
+  }) async {
+    final res = await _http.get(
+      _u('/v1/trips/drafts/${Uri.encodeComponent(id)}/quote'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('getTripDraftQuote failed: ${res.statusCode}');
+    }
+    return TripDraftQuote.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<TripDraft> updateTripDraft({

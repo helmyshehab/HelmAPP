@@ -5,6 +5,11 @@ import {
   type DrizzleClient,
 } from '../../../infrastructure/adapters/drizzle/drizzle.client';
 import { AppException } from '../../../common/errors/app.exception';
+import {
+  calculateUbudDraftQuote,
+  ubudQuoteRateVersion,
+  type UbudDraftQuotePrice,
+} from '../domain/ubud-draft-quote';
 
 export type TripDraftRow = {
   id: string;
@@ -54,6 +59,20 @@ export type TripDraftItinerary = {
   days: TripDraftItineraryDay[];
 };
 
+export type TripDraftQuote = UbudDraftQuotePrice & {
+  id: string;
+  draftId: string;
+  createdAt: string;
+  expiresAt: string;
+};
+
+const quoteProjection = sql`
+  q.price_json || jsonb_build_object(
+    'id', q.id, 'draftId', q.draft_id,
+    'createdAt', q.created_at, 'expiresAt', q.expires_at
+  ) as quote
+`;
+
 /**
  * Owner-scoped trip draft persistence.
  * Nest uses the table owner role (bypasses RLS), so every query filters by JWT subject.
@@ -69,6 +88,58 @@ export class TripDraftsRepository {
       );
     }
     return this.db;
+  }
+
+  async createQuoteForOwner(
+    userId: string,
+    id: string,
+    expectedConstraints?: Record<string, unknown>,
+  ): Promise<TripDraftQuote | null> {
+    const expectedJson = expectedConstraints === undefined ? null : JSON.stringify(expectedConstraints);
+    return this.requireDb().transaction(async (tx) => {
+      const drafts = await tx.execute<{ constraints: unknown; revision: string; matches: boolean }>(sql`
+        select constraints_json as constraints, updated_at::text as revision,
+          (${expectedJson}::jsonb is null or constraints_json = ${expectedJson}::jsonb) as matches
+        from trips.trip_drafts
+        where id = ${id}::uuid and user_id = ${userId}::uuid
+        for update
+      `);
+      const draft = drafts[0];
+      if (!draft) return null;
+      if (!draft.matches) throw AppException.conflict('The saved draft changed. Save your selections and request a new quote.');
+      const price = calculateUbudDraftQuote(draft.constraints);
+      const rows = await tx.execute<{ quote: TripDraftQuote }>(sql`
+        insert into trips.trip_draft_quotes as q (
+          draft_id, draft_updated_at, price_json, created_at, expires_at
+        ) values (
+          ${id}::uuid, ${draft.revision}::timestamptz, ${JSON.stringify(price)}::jsonb,
+          statement_timestamp(), statement_timestamp() + interval '30 minutes'
+        )
+        on conflict (draft_id) do update set
+          id = excluded.id,
+          draft_updated_at = excluded.draft_updated_at,
+          price_json = excluded.price_json,
+          created_at = excluded.created_at,
+          expires_at = excluded.expires_at
+        returning ${quoteProjection}
+      `);
+      const saved = rows[0];
+      if (!saved) throw new Error('Trip draft quote write returned no row');
+      return saved.quote;
+    });
+  }
+
+  async getQuoteForOwner(userId: string, id: string): Promise<TripDraftQuote | null> {
+    const rows = await this.requireDb().execute<{ quote: TripDraftQuote }>(sql`
+      select ${quoteProjection}
+      from trips.trip_drafts d
+      join trips.trip_draft_quotes q on q.draft_id = d.id
+      where d.id = ${id}::uuid and d.user_id = ${userId}::uuid
+        and q.draft_updated_at = d.updated_at
+        and q.expires_at > statement_timestamp()
+        and q.price_json ->> 'rateVersion' = ${ubudQuoteRateVersion}
+    `);
+    return rows[0]?.quote ?? null;
   }
 
   async create(input: CreateTripDraftInput): Promise<TripDraftRow> {

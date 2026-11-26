@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
 import 'package:helm_mobile/auth/traveler_session.dart';
+import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
+import 'package:helm_mobile/build/trip_gen/trip_planner.dart';
+import 'package:helm_mobile/build/trip_gen/trip_preview_screen.dart';
 import 'package:helm_mobile/tabs/build_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -29,6 +32,107 @@ Finder _previewScrollable() => find
     .first;
 
 void main() {
+  testWidgets(
+      'review saves before quoting, retains the draft on failure, and hides stale quotes',
+      (tester) async {
+    const draftId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    final requests = <String>[];
+    var quoteAttempts = 0;
+    Object? savedConstraints;
+    final now = DateTime.now().toUtc();
+    final api = HelmApiClient(
+      baseUrl: 'https://api.test',
+      httpClient: MockClient((request) async {
+        final path = request.url.path;
+        requests.add('${request.method} $path');
+        expect(request.headers['authorization'], 'Bearer token-a');
+        if (path.endsWith('/bootstrap')) {
+          return _json({
+            'userId': 'user-a',
+            'accountStatus': 'active',
+            'preferredLocale': 'en',
+            'preferredCurrency': 'EGP',
+            'accountCreated': false,
+            'profileCreated': false,
+          });
+        }
+        if (path.endsWith('/quote')) {
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          expect(body['expectedConstraints'], savedConstraints);
+          if (quoteAttempts++ == 0) return _json({}, status: 503);
+          return _json({
+            'id': 'quote-id',
+            'draftId': draftId,
+            'currency': 'EGP',
+            'source': 'demo',
+            'rateVersion': 'ubud-demo-v1',
+            'travelerCount': 2,
+            'nights': 2,
+            'flightTotalEgp': 37000,
+            'lodgingTotalEgp': 19600,
+            'activitiesTotalEgp': 4400,
+            'totalEgp': 61000,
+            'createdAt': now.toIso8601String(),
+            'expiresAt': now.add(const Duration(minutes: 30)).toIso8601String(),
+          }, status: 201);
+        }
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        savedConstraints = body['constraints'];
+        return _json({
+          'id': draftId,
+          'title': body['title'],
+          'constraints': body['constraints'],
+          'status': 'draft',
+          'createdAt': now.toIso8601String(),
+          'updatedAt': now.toIso8601String(),
+        }, status: request.method == 'POST' ? 201 : 200);
+      }),
+    );
+    final auth = FakeTravelerAuth(
+      initial: const TravelerSession(userId: 'user-a', accessToken: 'token-a'),
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: TripPreviewScreen(
+        plan: planDemoTrip(const TripAnswers(
+          budgetEgp: 85000,
+          travelerCount: 2,
+          nights: 2,
+        )),
+        auth: auth,
+        apiClient: api,
+      ),
+    ));
+
+    Future<void> tapVisible(Finder finder) async {
+      await tester.ensureVisible(finder);
+      await tester.tap(finder);
+      await tester.pumpAndSettle();
+    }
+
+    await tapVisible(find.text('Review your trip'));
+    final requestQuote = find.byKey(const Key('trip-review-request-quote'));
+    await tapVisible(requestQuote);
+    expect(find.text('Could not get a quote. Your draft is saved. Try again.'),
+        findsOneWidget);
+    await tapVisible(requestQuote);
+    expect(requests.where((request) => !request.endsWith('/bootstrap')), [
+      'POST /v1/trips/drafts',
+      'POST /v1/trips/drafts/$draftId/quote',
+      'PATCH /v1/trips/drafts/$draftId',
+      'POST /v1/trips/drafts/$draftId/quote',
+    ]);
+    final total = find.byKey(const Key('trip-review-server-quote-total'));
+    expect(tester.widget<Text>(total).data, '61000 EGP');
+    expect(find.textContaining('Expires '), findsOneWidget);
+    expect(_estimateTotal(tester), '60500 EGP');
+
+    await tapVisible(find.byKey(const Key('trip-flight-flexible-example')));
+    expect(total, findsNothing);
+
+    await tester.pumpWidget(const SizedBox());
+    auth.dispose();
+  });
+
   testWidgets(
     'preview estimate updates when flight hotel and activity change',
     (tester) async {

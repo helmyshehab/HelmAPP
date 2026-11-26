@@ -13,6 +13,7 @@ export type MeResponse = components["schemas"]["MeResponse"];
 export type BootstrapCustomerProfileResponse =
   components["schemas"]["BootstrapCustomerProfileResponse"];
 export type TripDraft = components["schemas"]["TripDraft"];
+export type TripDraftQuote = components["schemas"]["TripDraftQuote"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
 export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
 export type UpdateTripDraftRequest = components["schemas"]["UpdateTripDraftRequest"];
@@ -165,6 +166,33 @@ export function createHelmClient(options: HelmClientOptions) {
       );
       if (!res.ok) throw new Error(`getTripDraftItinerary failed: ${res.status}`);
       return (await res.json()) as TripDraftItineraryResponse;
+    },
+    async createTripDraftQuote(
+      id: string,
+      accessToken?: string,
+      expectedConstraints?: Record<string, unknown>,
+    ): Promise<TripDraftQuote> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("createTripDraftQuote requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/drafts/${encodeURIComponent(id)}/quote`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(expectedConstraints === undefined ? {} : { "Content-Type": "application/json" }),
+        },
+        body: expectedConstraints === undefined ? undefined : JSON.stringify({ expectedConstraints }),
+      });
+      if (!res.ok) throw new Error(`createTripDraftQuote failed: ${res.status}`);
+      return (await res.json()) as TripDraftQuote;
+    },
+    async getTripDraftQuote(id: string, accessToken?: string): Promise<TripDraftQuote> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("getTripDraftQuote requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/drafts/${encodeURIComponent(id)}/quote`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`getTripDraftQuote failed: ${res.status}`);
+      return (await res.json()) as TripDraftQuote;
     },
     async updateTripDraft(
       id: string,

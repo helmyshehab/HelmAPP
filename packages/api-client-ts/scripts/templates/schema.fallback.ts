@@ -120,6 +120,11 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/trips/drafts/{id}/quote": {
+        parameters: { path: { id: string } };
+        get: operations["getTripDraftQuote"];
+        post: operations["createTripDraftQuote"];
+    };
     "/v1/trips/drafts/{id}/itinerary": {
         parameters: {
             query?: never;
@@ -242,6 +247,21 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+        };
+        TripDraftQuote: {
+            id: string;
+            draftId: string;
+            currency: "EGP";
+            source: "demo";
+            rateVersion: string;
+            travelerCount: number;
+            nights: number;
+            flightTotalEgp: number;
+            lodgingTotalEgp: number;
+            activitiesTotalEgp: number;
+            totalEgp: number;
+            createdAt: string;
+            expiresAt: string;
         };
         TripDraftItineraryItem: {
             /** Format: uuid */
@@ -515,6 +535,13 @@ export interface operations {
                 };
             };
         };
+    };
+    getTripDraftQuote: {
+        responses: { 200: { content: { "application/json": components["schemas"]["TripDraftQuote"] } } };
+    };
+    createTripDraftQuote: {
+        requestBody?: { content: { "application/json": { expectedConstraints?: Record<string, unknown> } } };
+        responses: { 201: { content: { "application/json": components["schemas"]["TripDraftQuote"] } } };
     };
     getTripDraftItinerary: {
         parameters: {

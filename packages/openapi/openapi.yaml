@@ -272,6 +272,67 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/trips/drafts/{id}/quote:
+    parameters:
+      - $ref: "#/components/parameters/TripDraftId"
+    post:
+      operationId: createTripDraftQuote
+      summary: Calculate and save a demo quote for the caller's saved Ubud draft
+      description: Replaces the previous quote using server-side demo rates. The quote expires after 30 minutes.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                expectedConstraints:
+                  type: object
+                  additionalProperties: true
+                  description: If specified, this snapshot must match the current saved draft before pricing.
+      responses:
+        "201":
+          description: Saved demo quote in whole EGP
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraftQuote"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Saved selections differ from the expected snapshot
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    get:
+      operationId: getTripDraftQuote
+      summary: Get the caller's current draft quote
+      description: Returns 404 if the draft is inaccessible, the quote is missing or expired, the draft has changed, or the demo rate version has changed.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current saved demo quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripDraftQuote"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -1199,6 +1260,23 @@ components:
           type: object
           additionalProperties: true
           description: Must be a JSON object when provided
+    TripDraftQuote:
+      type: object
+      required: [id, draftId, currency, source, rateVersion, travelerCount, nights, flightTotalEgp, lodgingTotalEgp, activitiesTotalEgp, totalEgp, createdAt, expiresAt]
+      properties:
+        id: {type: string, format: uuid}
+        draftId: {type: string, format: uuid}
+        currency: {type: string, enum: [EGP]}
+        source: {type: string, enum: [demo]}
+        rateVersion: {type: string}
+        travelerCount: {type: integer, minimum: 1, maximum: 20}
+        nights: {type: integer, minimum: 1, maximum: 14}
+        flightTotalEgp: {type: integer, minimum: 0}
+        lodgingTotalEgp: {type: integer, minimum: 0}
+        activitiesTotalEgp: {type: integer, minimum: 0}
+        totalEgp: {type: integer, minimum: 0}
+        createdAt: {type: string, format: date-time}
+        expiresAt: {type: string, format: date-time}
     TripDraftItineraryItem:
       type: object
       required:

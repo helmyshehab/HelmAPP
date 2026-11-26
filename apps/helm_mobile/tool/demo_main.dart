@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
+import 'package:helm_mobile/build/trip_gen/trip_demo_pricing.dart';
+import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
 import 'package:helm_mobile/build/trip_gen/ubud_demo_catalog.dart';
 import 'package:helm_mobile/main.dart' show HelmShell;
 import 'package:helm_mobile/theme/helm_theme.dart';
@@ -126,18 +128,85 @@ class _DemoApi {
       }
     }
     if (path.startsWith('$_draftPath/')) {
-      final draft = drafts[request.url.pathSegments.last];
+      final segments = request.url.pathSegments;
+      final draft = drafts[segments[3]];
       if (draft != null) {
+        if (segments.length == 5 && segments.last == 'quote') {
+          if (request.method == 'POST') {
+            final body = request.body.isEmpty
+                ? const <String, dynamic>{}
+                : jsonDecode(request.body) as Map<String, dynamic>;
+            final expected = body['expectedConstraints'];
+            if (expected != null &&
+                jsonEncode(expected) != jsonEncode(draft['constraints'])) {
+              return _json({'title': 'The saved draft changed'},
+                  statusCode: 409);
+            }
+            return _createQuote(draft);
+          }
+          final quote = draft['demoQuote'] as Map<String, dynamic>?;
+          if (request.method == 'GET' &&
+              quote != null &&
+              DateTime.parse(quote['expiresAt'] as String)
+                  .isAfter(DateTime.now())) {
+            return _json(quote);
+          }
+          return _json({'title': 'Current quote not found'}, statusCode: 404);
+        }
         if (request.method == 'GET') return _json(draft);
         if (request.method == 'PATCH') {
           final body = jsonDecode(request.body) as Map<String, dynamic>;
           draft.addAll(body);
+          draft.remove('demoQuote');
           draft['updatedAt'] = DateTime.now().toUtc().toIso8601String();
           return _json(draft);
         }
       }
     }
     return _json({'title': 'Not found'}, statusCode: 404);
+  }
+
+  http.Response _createQuote(Map<String, dynamic> draft) {
+    final constraints = draft['constraints'] as Map<String, dynamic>?;
+    final snapshot =
+        constraints == null ? null : tryParseUbudTripPreviewDraft(constraints);
+    final flight = snapshot == null ? null : demoFlightById(snapshot.flightId);
+    final hotel = snapshot == null ? null : demoHotelBySlug(snapshot.hotelSlug);
+    if (snapshot == null || flight == null || hotel == null) {
+      return _json({'title': 'Draft has no quoteable selections'},
+          statusCode: 400);
+    }
+    final travelers = snapshot.answers.travelerCount!;
+    final nights = snapshot.answers.nights!;
+    final estimate = calculateTripDemoEstimate(
+      travelerCount: travelers,
+      nights: nights,
+      budgetEgp: snapshot.answers.budgetEgp!,
+      flight: flight,
+      hotelTier: hotel.tier,
+      selectedActivityRatesPerTraveler: snapshot.includedActivitySlugs.map(
+        (slug) => demoActivityRateForSlug(slug) ?? 0,
+      ),
+    );
+    final now = DateTime.now().toUtc();
+    final id = draft['id'];
+    final quote = {
+      'id': '$id-quote-${now.microsecondsSinceEpoch}',
+      'draftId': id,
+      'currency': 'EGP',
+      'source': 'demo',
+      'rateVersion': 'ubud-demo-v1',
+      'travelerCount': travelers,
+      'nights': nights,
+      'flightTotalEgp': estimate.flightTotalEgp,
+      'lodgingTotalEgp': estimate.lodgingTotalEgp,
+      'activitiesTotalEgp': estimate.activitiesTotalEgp,
+      'totalEgp': estimate.totalEgp,
+      'createdAt': now.toIso8601String(),
+      'expiresAt': now.add(const Duration(minutes: 30)).toIso8601String(),
+    };
+    draft['demoQuote'] = quote;
+    return _json(quote, statusCode: 201);
   }
 }
 
