@@ -6,6 +6,7 @@ import '../auth/traveler_session.dart';
 import '../build/draft_editor_screen.dart';
 import '../build/draft_title_patch.dart';
 import '../build/sign_in_panel.dart';
+import '../build/trip_gen/confirmed_demo_trip.dart';
 import '../build/trip_gen/trip_answers.dart';
 import '../build/trip_gen/trip_flow_routes.dart';
 import '../build/trip_gen/trip_preview_draft.dart';
@@ -20,10 +21,12 @@ class BuildTab extends StatefulWidget {
     required this.auth,
     this.apiClient,
     this.initialDestination,
+    this.onDemoTripConfirmed,
   });
 
   final TravelerAuth auth;
   final TripDestinationChoice? initialDestination;
+  final ValueChanged<ConfirmedDemoTrip>? onDemoTripConfirmed;
 
   /// Injectable for tests; production uses [ApiConfig.apiBaseUrl].
   final HelmApiClient? apiClient;
@@ -123,6 +126,7 @@ class _BuildTabState extends State<BuildTab> {
           auth: widget.auth,
           apiClient: _client,
           initialAnswers: _tripAnswers,
+          onDemoTripConfirmed: widget.onDemoTripConfirmed,
           onAnswersChanged: (next) {
             _tripAnswers = next;
           },
@@ -216,6 +220,7 @@ class _BuildTabState extends State<BuildTab> {
             initialFlightId: snapshot.flightId,
             initialHotelSlug: snapshot.hotelSlug,
             initialIncludedActivitySlugs: snapshot.includedActivitySlugs,
+            onDemoTripConfirmed: widget.onDemoTripConfirmed,
             onAnswersChanged: (next) {
               _tripAnswers = next;
             },

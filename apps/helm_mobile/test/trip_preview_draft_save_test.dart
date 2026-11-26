@@ -10,6 +10,7 @@ import 'package:helm_mobile/build/trip_gen/trip_demo_checkout_screen.dart';
 import 'package:helm_mobile/build/trip_gen/trip_demo_pricing.dart';
 import 'package:helm_mobile/build/trip_gen/trip_planner.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
+import 'package:helm_mobile/main.dart' show HelmShell;
 import 'package:helm_mobile/tabs/build_tab.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -161,11 +162,14 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: BuildTab(auth: auth, apiClient: client),
-          ),
+          home: HelmShell(auth: auth, apiClient: client),
         ),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
+      await tester.tap(find.text('Build'));
       await tester.pumpAndSettle();
       await _fillAndOpenPreview(tester);
 
@@ -393,6 +397,26 @@ void main() {
           find.byKey(Key('trip-stop-${originalTarget.last.place.slug}'));
       expect(tester.getTopLeft(addedStop).dy,
           lessThan(tester.getTopLeft(lastStop).dy));
+
+      Navigator.of(tester.element(find.byKey(const Key('trip-preview')))).pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Trips'));
+      await tester.pumpAndSettle();
+      final confirmedTrip = find.byKey(const Key('trips-confirmed-demo'));
+      expect(confirmedTrip, findsOneWidget);
+      await tester.tap(confirmedTrip);
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsOneWidget);
+      await tester.tap(find.text('Next day'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ayung River White-Water Rafting'), findsOneWidget);
+
+      auth.setSession(
+          const TravelerSession(userId: 'user-b', accessToken: 'token-b'));
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsNothing);
+      expect(confirmedTrip, findsNothing);
+      expect(find.text('No confirmed trips yet'), findsOneWidget);
 
       auth.dispose();
     },
