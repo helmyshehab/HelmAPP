@@ -20,11 +20,20 @@ class BuildTab extends StatefulWidget {
     required this.auth,
     this.apiClient,
     this.initialDestination,
+    this.initialPackageSnapshot,
+    this.onInitialPackageConsumed,
     this.allowDemoStaffConfirmation = false,
   });
 
   final TravelerAuth auth;
   final TripDestinationChoice? initialDestination;
+
+  /// Packages → Customize handoff; opens the Ubud preview as a new draft.
+  final TripPreviewDraftSnapshot? initialPackageSnapshot;
+
+  /// Cleared in the parent so shell rebuilds do not reopen the same package.
+  final VoidCallback? onInitialPackageConsumed;
+
   final bool allowDemoStaffConfirmation;
 
   /// Injectable for tests; production uses [ApiConfig.apiBaseUrl].
@@ -48,11 +57,13 @@ class _BuildTabState extends State<BuildTab> {
   String? _boundUserId;
   TripAnswers _tripAnswers = const TripAnswers();
   TripDestinationChoice? _pendingDestination;
+  TripPreviewDraftSnapshot? _pendingPackageSnapshot;
 
   @override
   void initState() {
     super.initState();
     _pendingDestination = widget.initialDestination;
+    _pendingPackageSnapshot = widget.initialPackageSnapshot;
     final injected = widget.apiClient;
     if (injected != null) {
       _ownsHttpClient = false;
@@ -67,6 +78,35 @@ class _BuildTabState extends State<BuildTab> {
     }
     widget.auth.sessionListenable.addListener(_onAuthChanged);
     _onAuthChanged();
+  }
+
+  @override
+  void didUpdateWidget(BuildTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialPackageSnapshot != null &&
+        !identical(
+          widget.initialPackageSnapshot,
+          oldWidget.initialPackageSnapshot,
+        )) {
+      _pendingPackageSnapshot = widget.initialPackageSnapshot;
+      _pendingDestination = null;
+      if (widget.auth.session != null) {
+        final generation = widget.auth.authGeneration;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || !_isAuthCurrent(generation)) return;
+          final snapshot = _pendingPackageSnapshot;
+          if (snapshot == null) return;
+          _pendingPackageSnapshot = null;
+          widget.onInitialPackageConsumed?.call();
+          _openPackagePreview(snapshot);
+        });
+      }
+    }
+    if (widget.initialDestination != null &&
+        widget.initialDestination != oldWidget.initialDestination &&
+        _pendingPackageSnapshot == null) {
+      _pendingDestination = widget.initialDestination;
+    }
   }
 
   @override
@@ -96,8 +136,20 @@ class _BuildTabState extends State<BuildTab> {
       return;
     }
     _loadDrafts();
+    final generation = widget.auth.authGeneration;
+    if (_pendingPackageSnapshot != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_isAuthCurrent(generation)) return;
+        final snapshot = _pendingPackageSnapshot;
+        if (snapshot == null) return;
+        _pendingPackageSnapshot = null;
+        _pendingDestination = null;
+        widget.onInitialPackageConsumed?.call();
+        _openPackagePreview(snapshot);
+      });
+      return;
+    }
     if (_pendingDestination != null) {
-      final generation = widget.auth.authGeneration;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_isAuthCurrent(generation)) return;
         final destination = _pendingDestination;
@@ -106,6 +158,36 @@ class _BuildTabState extends State<BuildTab> {
         _tripAnswers = _tripAnswers.copyWith(destination: destination);
         _openTripBuilder();
       });
+    }
+  }
+
+  Future<void> _openPackagePreview(TripPreviewDraftSnapshot snapshot) async {
+    // Fresh editable copy — the curated fixture itself is never mutated.
+    _tripAnswers = snapshot.answers;
+    final plan = planFromUbudTripPreviewDraft(snapshot);
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: const RouteSettings(name: tripPreviewRouteName),
+        builder: (_) => TripPreviewScreen(
+          plan: plan,
+          auth: widget.auth,
+          apiClient: _client,
+          initialFlightId: snapshot.flightId,
+          initialHotelSlug: snapshot.hotelSlug,
+          initialIncludedActivitySlugs: snapshot.includedActivitySlugs,
+          allowDemoStaffConfirmation: widget.allowDemoStaffConfirmation,
+          onAnswersChanged: (next) {
+            _tripAnswers = next;
+          },
+        ),
+      ),
+    );
+    if (!mounted) return;
+    final session = widget.auth.session;
+    if (session != null && session.userId == _boundUserId) {
+      await _loadDrafts();
+    } else {
+      setState(() {});
     }
   }
 
