@@ -183,6 +183,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/trips/demo-bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List simulated bookings owned by the caller */
+        get: operations["listDemoTripBookings"];
+        put?: never;
+        /**
+         * Complete simulated checkout using a current saved quote
+         * @description The first successful checkout saves a snapshot. Retrying the same draft and quote returns that booking, even after the quote itself expires.
+         */
+        post: operations["createDemoTripBooking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/trips/drafts/{id}/quote": {
         parameters: {
             query?: never;
@@ -697,6 +718,30 @@ export interface components {
             constraints?: {
                 [key: string]: unknown;
             };
+        };
+        CreateDemoTripBookingRequest: {
+            /** Format: uuid */
+            draftId: string;
+            /** Format: uuid */
+            quoteId: string;
+        };
+        DemoTripBooking: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            draftId: string;
+            title: string | null;
+            /** @enum {string} */
+            status: "pending_confirmation";
+            quote: components["schemas"]["TripDraftQuote"];
+            constraints: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            createdAt: string;
+        };
+        DemoTripBookingList: {
+            items: components["schemas"]["DemoTripBooking"][];
         };
         TripDraftQuote: {
             /** Format: uuid */
@@ -1608,6 +1653,63 @@ export interface operations {
             404: components["responses"]["NotFound"];
             /** @description Database is not configured or unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listDemoTripBookings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller's saved demo bookings, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoTripBookingList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    createDemoTripBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDemoTripBookingRequest"];
+            };
+        };
+        responses: {
+            /** @description Saved or replayed demo booking */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoTripBooking"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            /** @description The selected quote is missing, replaced, stale, or expired */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

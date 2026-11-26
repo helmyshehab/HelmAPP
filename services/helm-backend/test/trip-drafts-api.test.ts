@@ -73,7 +73,7 @@ async function httpJson(
   return { status: res.status, json };
 }
 
-test('trip drafts: owner CRUD, idempotent create, and current owner-scoped quotes', async (t) => {
+test('trip drafts: private CRUD, current quotes, and idempotent simulated bookings', async (t) => {
   if (!databaseUrl) {
     t.skip('DATABASE_URL not set');
     return;
@@ -342,6 +342,10 @@ test('trip drafts: owner CRUD, idempotent create, and current owner-scoped quote
       [String(quoteDraft.json.id)],
     );
     assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
+    const bookingPath = '/v1/trips/demo-bookings';
+    const bookingBody = (quoteId: unknown) => ({ draftId: quoteDraft.json.id, quoteId });
+    const expiredBooking = await httpJson(baseUrl, 'POST', bookingPath, tokenA, bookingBody(repriced.json.id));
+    assert.equal(expiredBooking.status, 409);
 
     const invalidUpdate = await httpJson(baseUrl, 'PATCH', quoteDraftPath, tokenA, {
       constraints: {
@@ -370,6 +374,37 @@ test('trip drafts: owner CRUD, idempotent create, and current owner-scoped quote
       assert.equal(race[1]?.status, 400);
       assert.equal((await httpJson(baseUrl, 'GET', quotePath, tokenA)).status, 404);
     }
+
+    const checkoutQuote = await httpJson(baseUrl, 'POST', quotePath, tokenA);
+    assert.equal(checkoutQuote.status, 201, JSON.stringify(checkoutQuote.json));
+    const checkout = bookingBody(checkoutQuote.json.id);
+    const replacedBooking = await httpJson(baseUrl, 'POST', bookingPath, tokenA, bookingBody(quote.id));
+    assert.equal(replacedBooking.status, 409);
+    assert.equal((await httpJson(baseUrl, 'POST', bookingPath, tokenB, checkout)).status, 404);
+    assert.equal((await httpJson(baseUrl, 'POST', bookingPath, undefined, checkout)).status, 401);
+    assert.equal((await httpJson(baseUrl, 'GET', bookingPath)).status, 401);
+
+    const [first, retry] = await Promise.all([
+      httpJson(baseUrl, 'POST', bookingPath, tokenA, checkout),
+      httpJson(baseUrl, 'POST', bookingPath, tokenA, checkout),
+    ]);
+    assert.equal(first.status, 201, JSON.stringify(first.json));
+    assert.deepEqual(retry, first);
+    assert.equal(first.json.status, 'pending_confirmation');
+    assert.deepEqual(first.json.quote, checkoutQuote.json);
+    assert.deepEqual(first.json.constraints, quoteConstraints);
+
+    const editAfterCheckout = await httpJson(baseUrl, 'PATCH', quoteDraftPath, tokenA, {
+      constraints: { ...quoteConstraints, answers: { ...quoteConstraints.answers, travelerCount: 4 } },
+    });
+    assert.equal(editAfterCheckout.status, 200);
+    assert.deepEqual(await httpJson(baseUrl, 'POST', bookingPath, tokenA, checkout), first);
+    assert.deepEqual(await httpJson(baseUrl, 'GET', bookingPath, tokenA), {
+      status: 200, json: { items: [first.json] },
+    });
+    assert.deepEqual(await httpJson(baseUrl, 'GET', bookingPath, tokenB), {
+      status: 200, json: { items: [] },
+    });
   } catch (err) {
     primaryError = err;
   } finally {

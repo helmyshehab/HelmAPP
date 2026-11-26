@@ -12,7 +12,7 @@ class TripDemoCheckoutScreen extends StatefulWidget {
     required this.quote,
     required this.destinationName,
     required this.days,
-    required this.validateQuote,
+    required this.createBooking,
     this.onBookingsConfirmed,
   });
 
@@ -20,38 +20,38 @@ class TripDemoCheckoutScreen extends StatefulWidget {
   final TripDraftQuote quote;
   final String destinationName;
   final List<TripPreviewDay> days;
-  final Future<bool> Function() validateQuote;
-  final VoidCallback? onBookingsConfirmed;
+  final Future<DemoTripBooking?> Function() createBooking;
+  final ValueChanged<DemoTripBooking>? onBookingsConfirmed;
 
   @override
   State<TripDemoCheckoutScreen> createState() => _TripDemoCheckoutScreenState();
 }
 
 class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
-  bool _completed = false;
+  DemoTripBooking? _booking;
   bool _showTripMode = false;
   bool _checkingQuote = false;
   String? _quoteError;
 
   Future<void> _simulatePayment() async {
-    if (_checkingQuote || _completed) return;
+    if (_checkingQuote || _booking != null) return;
     setState(() {
       _checkingQuote = true;
       _quoteError = null;
     });
-    var current = false;
+    DemoTripBooking? booking;
     try {
-      current = await widget.validateQuote();
+      booking = await widget.createBooking();
     } catch (_) {
       // The traveler can retry verification or return to request a new quote.
     }
     if (!mounted) return;
     setState(() {
       _checkingQuote = false;
-      _completed = current;
-      if (!current) {
+      _booking = booking;
+      if (booking == null) {
         _quoteError =
-            'Could not verify this quote. Try again or go back for a new quote.';
+            'Could not save this demo booking. Try again or go back for a new quote.';
       }
     });
   }
@@ -69,10 +69,11 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
     }
     final textTheme = Theme.of(context).textTheme;
     final quote = widget.quote;
+    final booking = _booking;
     return Scaffold(
       appBar: AppBar(title: const Text('Demo checkout')),
-      body: _completed
-          ? _buildBookingProgress(context)
+      body: booking != null
+          ? _buildBookingProgress(context, booking)
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
@@ -90,7 +91,7 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
                 Text('Activities · ${formatDemoEgp(quote.activitiesTotalEgp)}'),
                 const SizedBox(height: 16),
                 const Text(
-                  'You can try this checkout without payment details. This simulation creates no charge or booking.',
+                  'This saves a demo booking. No payment details or charge are involved.',
                 ),
                 const SizedBox(height: 24),
                 if (_quoteError != null)
@@ -99,19 +100,19 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
                 FilledButton(
                   onPressed: _checkingQuote ? null : _simulatePayment,
                   child: Text(
-                      _checkingQuote ? 'Checking quote…' : 'Simulate payment'),
+                      _checkingQuote ? 'Saving booking…' : 'Simulate payment'),
                 ),
               ],
             ),
     );
   }
 
-  Widget _buildBookingProgress(BuildContext context) {
+  Widget _buildBookingProgress(BuildContext context, DemoTripBooking booking) {
     final textTheme = Theme.of(context).textTheme;
     final services = [
       _DemoBookingService.flights,
       _DemoBookingService.stay,
-      if (widget.quote.activitiesTotalEgp > 0) _DemoBookingService.activities,
+      if (booking.quote.activitiesTotalEgp > 0) _DemoBookingService.activities,
     ];
     final tripReady = _confirmedServices.length == services.length;
     return ListView(
@@ -120,7 +121,7 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
         Text('Demo payment complete', style: textTheme.headlineSmall),
         const SizedBox(height: 8),
         Text(widget.tripLabel),
-        Text('Simulated total · ${formatDemoEgp(widget.quote.totalEgp)}'),
+        Text('Simulated total · ${formatDemoEgp(booking.quote.totalEgp)}'),
         const SizedBox(height: 20),
         Text('Booking progress', style: textTheme.titleLarge),
         Text(
@@ -144,7 +145,7 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
                       if (_confirmedServices.contains(service)) return;
                       setState(() => _confirmedServices.add(service));
                       if (_confirmedServices.length == services.length) {
-                        widget.onBookingsConfirmed?.call();
+                        widget.onBookingsConfirmed?.call(booking);
                       }
                     },
               child: Text('Confirm ${service.label.toLowerCase()}'),

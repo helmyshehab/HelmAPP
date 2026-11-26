@@ -158,11 +158,11 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         quote: quote,
         destinationName: plan.destinationName,
         days: days,
-        validateQuote: () => _validateCheckoutQuote(quote),
-        onBookingsConfirmed: () {
+        createBooking: () => _createDemoBooking(quote),
+        onBookingsConfirmed: (booking) {
           if (_cleared || !_isAuthCurrent(_boundGeneration)) return;
           widget.onDemoTripConfirmed?.call(ConfirmedDemoTrip(
-            label: _tripLabel(plan),
+            bookingId: booking.id,
             destinationName: plan.destinationName,
             days: days,
           ));
@@ -177,33 +177,25 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     }
   }
 
-  Future<bool> _validateCheckoutQuote(TripDraftQuote quote) async {
+  Future<DemoTripBooking?> _createDemoBooking(TripDraftQuote quote) async {
     final session = widget.auth.session;
-    if (session == null || _cleared || _currentQuote?.id != quote.id) {
-      return false;
+    if (session == null || _cleared || !_isAuthCurrent(_boundGeneration)) {
+      return null;
     }
     final generation = widget.auth.authGeneration;
-    final current = await widget.apiClient.getTripDraftQuote(
+    final booking = await widget.apiClient.createDemoTripBooking(
       accessToken: session.accessToken,
-      id: quote.draftId,
+      draftId: quote.draftId,
+      quoteId: quote.id,
     );
-    if (!mounted ||
-        _cleared ||
-        !_isAuthCurrent(generation) ||
-        _currentQuote?.id != quote.id) {
-      return false;
-    }
-    if (current?.id == quote.id &&
-        current?.draftId == quote.draftId &&
-        current?.totalEgp == quote.totalEgp) {
-      return true;
-    }
+    if (!mounted || _cleared || !_isAuthCurrent(generation)) return null;
+    if (booking != null) return booking;
     _quoteExpiration?.cancel();
     setState(() {
       _quote = null;
       _quoteError = 'This quote is no longer current. Request a new quote.';
     });
-    return false;
+    return null;
   }
 
   void _restoreSelections({

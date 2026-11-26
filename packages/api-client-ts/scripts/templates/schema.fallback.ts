@@ -120,6 +120,10 @@ export interface paths {
         patch: operations["updateTripDraft"];
         trace?: never;
     };
+    "/v1/trips/demo-bookings": {
+        get: operations["listDemoTripBookings"];
+        post: operations["createDemoTripBooking"];
+    };
     "/v1/trips/drafts/{id}/quote": {
         parameters: { path: { id: string } };
         get: operations["getTripDraftQuote"];
@@ -248,6 +252,17 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        CreateDemoTripBookingRequest: { draftId: string; quoteId: string };
+        DemoTripBooking: {
+            id: string;
+            draftId: string;
+            title: string | null;
+            status: "pending_confirmation";
+            quote: components["schemas"]["TripDraftQuote"];
+            constraints: Record<string, unknown>;
+            createdAt: string;
+        };
+        DemoTripBookingList: { items: components["schemas"]["DemoTripBooking"][] };
         TripDraftQuote: {
             id: string;
             draftId: string;
@@ -535,6 +550,13 @@ export interface operations {
                 };
             };
         };
+    };
+    listDemoTripBookings: {
+        responses: { 200: { content: { "application/json": components["schemas"]["DemoTripBookingList"] } } };
+    };
+    createDemoTripBooking: {
+        requestBody: { content: { "application/json": components["schemas"]["CreateDemoTripBookingRequest"] } };
+        responses: { 201: { content: { "application/json": components["schemas"]["DemoTripBooking"] } } };
     };
     getTripDraftQuote: {
         responses: { 200: { content: { "application/json": components["schemas"]["TripDraftQuote"] } } };

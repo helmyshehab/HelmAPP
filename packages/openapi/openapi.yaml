@@ -272,6 +272,54 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/trips/demo-bookings:
+    get:
+      operationId: listDemoTripBookings
+      summary: List simulated bookings owned by the caller
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: The caller's saved demo bookings, newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoTripBookingList"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      operationId: createDemoTripBooking
+      summary: Complete simulated checkout using a current saved quote
+      description: The first successful checkout saves a snapshot. Retrying the same draft and quote returns that booking, even after the quote itself expires.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDemoTripBookingRequest"
+      responses:
+        "201":
+          description: Saved or replayed demo booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoTripBooking"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The selected quote is missing, replaced, stale, or expired
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /v1/trips/drafts/{id}/quote:
     parameters:
       - $ref: "#/components/parameters/TripDraftId"
@@ -1260,6 +1308,35 @@ components:
           type: object
           additionalProperties: true
           description: Must be a JSON object when provided
+    CreateDemoTripBookingRequest:
+      type: object
+      additionalProperties: false
+      required: [draftId, quoteId]
+      properties:
+        draftId: {type: string, format: uuid}
+        quoteId: {type: string, format: uuid}
+    DemoTripBooking:
+      type: object
+      required: [id, draftId, title, status, quote, constraints, createdAt]
+      properties:
+        id: {type: string, format: uuid}
+        draftId: {type: string, format: uuid}
+        title: {type: string, nullable: true}
+        status: {type: string, enum: [pending_confirmation]}
+        quote:
+          $ref: "#/components/schemas/TripDraftQuote"
+        constraints:
+          type: object
+          additionalProperties: true
+        createdAt: {type: string, format: date-time}
+    DemoTripBookingList:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoTripBooking"
     TripDraftQuote:
       type: object
       required: [id, draftId, currency, source, rateVersion, travelerCount, nights, flightTotalEgp, lodgingTotalEgp, activitiesTotalEgp, totalEgp, createdAt, expiresAt]

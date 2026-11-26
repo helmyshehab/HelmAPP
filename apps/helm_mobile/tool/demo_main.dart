@@ -54,6 +54,7 @@ class _DemoApi {
 
   final FakeTravelerAuth auth;
   final _draftsByOwner = <String, Map<String, Map<String, dynamic>>>{};
+  final _bookingsByOwner = <String, Map<String, Map<String, dynamic>>>{};
 
   Future<http.Response> handle(http.Request request) async {
     final path = request.url.path;
@@ -102,6 +103,42 @@ class _DemoApi {
     }
 
     final drafts = _draftsByOwner.putIfAbsent(session.userId, () => {});
+    if (path == '/v1/trips/demo-bookings') {
+      final bookings = _bookingsByOwner.putIfAbsent(session.userId, () => {});
+      if (request.method == 'GET') {
+        return _json({'items': bookings.values.toList().reversed.toList()});
+      }
+      if (request.method == 'POST') {
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        final draft = drafts[body['draftId']];
+        if (draft == null) {
+          return _json({'title': 'Draft not found'}, statusCode: 404);
+        }
+        final quoteId = body['quoteId'] as String;
+        final existing = bookings[quoteId];
+        if (existing != null && existing['draftId'] == draft['id']) {
+          return _json(existing, statusCode: 201);
+        }
+        final quote = draft['demoQuote'] as Map<String, dynamic>?;
+        if (quote == null ||
+            quote['id'] != quoteId ||
+            !DateTime.parse(quote['expiresAt'] as String)
+                .isAfter(DateTime.now())) {
+          return _json({'title': 'Request a current quote'}, statusCode: 409);
+        }
+        final booking = {
+          'id': 'demo-booking-${bookings.length + 1}',
+          'draftId': draft['id'],
+          'title': draft['title'],
+          'status': 'pending_confirmation',
+          'quote': quote,
+          'constraints': draft['constraints'],
+          'createdAt': DateTime.now().toUtc().toIso8601String(),
+        };
+        bookings[quoteId] = booking;
+        return _json(booking, statusCode: 201);
+      }
+    }
     if (path == _draftPath) {
       if (request.method == 'GET') {
         return _json({'items': drafts.values.toList()});
