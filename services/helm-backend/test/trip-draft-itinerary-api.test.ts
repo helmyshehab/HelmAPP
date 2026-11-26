@@ -9,13 +9,14 @@ import 'reflect-metadata';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { randomUUID } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { sql } from 'drizzle-orm';
 import * as schema from '../src/infrastructure/adapters/drizzle/schema.ts';
+import { listPlainPostgresMigrationFiles } from './support/plain-postgres-migrations.ts';
 
 const databaseUrl = process.env.DATABASE_URL;
 const jwtSecret =
@@ -28,9 +29,7 @@ type Json = Record<string, unknown>;
 async function applyMigrationsAndSeed(targetUrl: string, seed: boolean) {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const migrationsDir = path.join(repoRoot, 'supabase/migrations');
-  const files = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith('.sql'))
-    .sort();
+  const files = listPlainPostgresMigrationFiles(repoRoot);
   const client = postgres(targetUrl, { max: 1 });
   try {
     for (const file of files) {

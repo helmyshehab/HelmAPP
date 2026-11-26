@@ -5,7 +5,7 @@
 import 'reflect-metadata';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -22,12 +22,25 @@ if (!databaseUrl) {
 const jwtSecret =
   process.env.SUPABASE_JWT_SECRET ?? 'test-only-helm-jwt-secret-min-32-chars!!';
 
+function listPlainPostgresMigrationFiles(repoRoot) {
+  const manifest = path.join(repoRoot, 'supabase/migrations/SUPABASE_ONLY');
+  const skip = new Set();
+  if (existsSync(manifest)) {
+    for (const raw of readFileSync(manifest, 'utf8').split(/\r?\n/)) {
+      const entry = raw.trim();
+      if (!entry || entry.startsWith('#')) continue;
+      skip.add(entry);
+    }
+  }
+  return readdirSync(path.join(repoRoot, 'supabase/migrations'))
+    .filter((f) => f.endsWith('.sql') && !skip.has(f))
+    .sort();
+}
+
 async function applyMigrationsAndSeed(targetUrl) {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const migrationsDir = path.join(repoRoot, 'supabase/migrations');
-  const files = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith('.sql'))
-    .sort();
+  const files = listPlainPostgresMigrationFiles(repoRoot);
   const client = postgres(targetUrl, { max: 1 });
   try {
     for (const file of files) {

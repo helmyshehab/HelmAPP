@@ -24,11 +24,14 @@ pnpm codegen
 
 # Option A — Supabase local (recommended)
 supabase start
-supabase db reset          # migrations + seed.sql
+supabase db reset          # migrations + seed.sql (includes catalog-media Storage bucket)
 
-# Option B — plain Postgres fallback
+# Option B — plain Postgres fallback (CI-compatible)
 docker compose -f docker/docker-compose.yml up -d postgres
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres SEED=true ./scripts/apply-migrations.sh
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres \
+  MIGRATION_MODE=plain-postgres SEED=true ./scripts/apply-migrations.sh
+# Explicitly SKIPs supabase/migrations/SUPABASE_ONLY entries when Storage is absent.
+# Default MIGRATION_MODE=supabase fails closed without storage.buckets/objects.
 
 # API (AUTH_PROVIDER=mock by default — backend unit tests only)
 pnpm --filter @helm/helm-backend dev
@@ -97,7 +100,24 @@ Never hand-edit `packages/api-client-ts/src/generated` or `packages/api-client-d
 | Migrations / RLS | `supabase/migrations/*.sql` |
 | Seed | `supabase/seed.sql` |
 
-Apply with `supabase db reset` or `scripts/apply-migrations.sh`.
+Apply with `supabase db reset` (full Storage) or:
+
+```bash
+# Plain Postgres / CI
+MIGRATION_MODE=plain-postgres SEED=true ./scripts/apply-migrations.sh
+
+# Supabase DB URL (Storage required; fail closed)
+MIGRATION_MODE=supabase SEED=true ./scripts/apply-migrations.sh
+```
+
+Opt-in real Storage REST check (not run in CI by default):
+
+```bash
+RUN_STORAGE_INTEGRATION=1 STORAGE_PROVIDER=supabase \
+  SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+  pnpm --filter @helm/helm-backend exec node --import tsx --test \
+  test/catalog-media-storage.integration.test.ts
+```
 
 ## Step 2 scope reminder
 

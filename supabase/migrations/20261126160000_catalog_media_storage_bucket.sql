@@ -2,6 +2,21 @@
 -- Backend (service role) is the only writer. Anon/authenticated clients have no write policies.
 -- IMPORTANT: Public object URLs are world-readable. Postgres RLS does NOT protect them.
 -- Only upload media that is intentionally public. Do not store private/staff-only files here.
+--
+-- Requires real Supabase Storage. Do not create stub storage.* tables.
+-- Plain Postgres CI/Compose: apply-migrations.sh with MIGRATION_MODE=plain-postgres
+-- skips this file when storage.buckets/objects are absent.
+
+do $$
+begin
+  if to_regclass('storage.buckets') is null
+     or to_regclass('storage.objects') is null then
+    raise exception
+      'catalog-media migration requires Supabase Storage (storage.buckets and storage.objects). '
+      'Do not stub these tables. Apply on Supabase (hosted or supabase start / db reset), '
+      'or use MIGRATION_MODE=plain-postgres so apply-migrations.sh can SKIP this file explicitly.';
+  end if;
+end $$;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (

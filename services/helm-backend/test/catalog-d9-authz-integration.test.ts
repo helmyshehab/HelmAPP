@@ -80,6 +80,7 @@ test('operator HTTP 403 on published destination mutations via Nest guards', asy
         ...process.env,
         DATABASE_URL: disposableUrl,
         SEED: 'true',
+        MIGRATION_MODE: 'plain-postgres',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });

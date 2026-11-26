@@ -134,28 +134,46 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           SEED: "true"
-        run: ./scripts/apply-migrations.sh
-      - name: Assert seed destinations exist
+          MIGRATION_MODE: plain-postgres
+        run: |
+          set -euo pipefail
+          out="$(mktemp)"
+          ./scripts/apply-migrations.sh | tee "$out"
+          grep -F 'SKIP supabase-only migration: 20261126160000_catalog_media_storage_bucket.sql' "$out"
+      - name: Assert seed destinations exist and no fake storage tables
         env:
           PGPASSWORD: postgres
         run: |
+          set -euo pipefail
           count=$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select count(*) from catalog.destinations where publish_status='published'")
           echo "published_destinations=$count"
           test "$count" -ge 1
           markets=$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select count(*) from markets.markets where code='EG_OUTBOUND'")
           test "$markets" -eq 1
+          # Plain Postgres must not invent storage.* stubs.
+          buckets="$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select coalesce(to_regclass('storage.buckets')::text, '')")"
+          objects="$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select coalesce(to_regclass('storage.objects')::text, '')")"
+          test -z "$buckets"
+          test -z "$objects"
       - name: Seed idempotency (second apply)
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           SEED: "true"
-        run: ./scripts/apply-migrations.sh
+          MIGRATION_MODE: plain-postgres
+        run: |
+          set -euo pipefail
+          out="$(mktemp)"
+          ./scripts/apply-migrations.sh | tee "$out"
+          grep -F 'SKIP supabase-only migration: 20261126160000_catalog_media_storage_bucket.sql' "$out"
       - name: RLS harness (customer / administrator contexts)
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MIGRATION_MODE: plain-postgres
         run: ./scripts/test-rls.sh
       - name: Step 6.3 database integrity harness
         env:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MIGRATION_MODE: plain-postgres
         run: ./scripts/test-db-integrity.sh
       - uses: pnpm/action-setup@v4
         with:

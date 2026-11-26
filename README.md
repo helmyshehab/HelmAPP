@@ -36,7 +36,8 @@ See [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md).
 cp .env.example .env
 pnpm install
 pnpm codegen
-# supabase start && supabase db reset   # or Docker Postgres + scripts/apply-migrations.sh
+# supabase start && supabase db reset
+# or: MIGRATION_MODE=plain-postgres SEED=true ./scripts/apply-migrations.sh
 pnpm --filter @helm/helm-backend dev
 ```
 
