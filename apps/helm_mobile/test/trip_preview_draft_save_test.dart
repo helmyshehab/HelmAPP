@@ -27,6 +27,14 @@ Map<String, dynamic> _bookingJson({
       'draftId': _draftId,
       'title': 'Ubud trip · 2 nights',
       'status': 'pending_confirmation',
+      'services': <Map<String, dynamic>>[
+        for (final kind in [
+          'flights',
+          'stay',
+          if ((quote['activitiesTotalEgp'] as int) > 0) 'activities'
+        ])
+          {'kind': kind, 'confirmedAt': null},
+      ],
       'quote': quote,
       'constraints': constraints,
       'createdAt': '2026-01-01T00:00:00Z',
@@ -179,6 +187,18 @@ void main() {
           booking = _bookingJson(quote: quote, constraints: storedConstraints!);
           return _json(booking!, status: 201);
         }
+        if (request.method == 'PATCH' &&
+            request.url.path.startsWith(
+                '/v1/admin/trips/demo-bookings/$_bookingId/services/')) {
+          final services = booking!['services'] as List<Map<String, dynamic>>;
+          final kind = request.url.pathSegments.last;
+          final service = services.singleWhere((item) => item['kind'] == kind);
+          service['confirmedAt'] = '2026-01-01T00:00:00Z';
+          if (services.every((item) => item['confirmedAt'] != null)) {
+            booking!['status'] = 'confirmed';
+          }
+          return _json(booking!);
+        }
         if (request.url.path.endsWith('/drafts/$_draftId/quote')) {
           if (request.method == 'POST') {
             quote = _quoteJson(id: 'quote-${++quoteWrites}');
@@ -225,7 +245,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: HelmShell(auth: auth, apiClient: client),
+          home: HelmShell(
+              auth: auth, apiClient: client, allowDemoStaffConfirmation: true),
         ),
       );
       await tester.pumpAndSettle();
@@ -496,8 +517,7 @@ void main() {
       expect(confirmedTrip, findsNothing);
       expect(find.text('No confirmed trips yet'), findsOneWidget);
 
-      // A new shell has no in-memory confirmation state, but the booking still
-      // comes back from the signed-in traveler's booking API.
+      // A new shell reopens Trip Mode using the server booking alone.
       await tester.pumpWidget(const SizedBox());
       final restarted = FakeTravelerAuth(
         initial: const TravelerSession(userId: _userId, accessToken: 'token-a'),
@@ -509,7 +529,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('trips-demo-booking-$_bookingId')),
           findsOneWidget);
-      expect(find.textContaining('Awaiting confirmation'), findsOneWidget);
+      expect(find.textContaining('Demo bookings confirmed'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('trips-confirmed-demo')));
+      await tester.pumpAndSettle();
+      expect(find.text('Demo Trip Mode'), findsOneWidget);
+      await tester.tap(find.text('Next day'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ayung River White-Water Rafting'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       restarted.dispose();
 

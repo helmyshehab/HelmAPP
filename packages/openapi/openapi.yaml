@@ -272,6 +272,38 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /v1/admin/trips/demo-bookings/{id}/services/{kind}:
+    patch:
+      operationId: confirmDemoBookingService
+      summary: Confirm a demo booking service as staff
+      description: Requires a database-backed operator or administrator role. Repeating a confirmation preserves its original timestamp.
+      tags: [trips]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string, format: uuid}
+        - name: kind
+          in: path
+          required: true
+          schema: {type: string, enum: [flights, stay, activities]}
+      responses:
+        "200":
+          description: Booking with updated service confirmations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoTripBooking"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/trips/demo-bookings:
     get:
       operationId: listDemoTripBookings
@@ -1317,18 +1349,28 @@ components:
         quoteId: {type: string, format: uuid}
     DemoTripBooking:
       type: object
-      required: [id, draftId, title, status, quote, constraints, createdAt]
+      required: [id, draftId, title, status, services, quote, constraints, createdAt]
       properties:
         id: {type: string, format: uuid}
         draftId: {type: string, format: uuid}
         title: {type: string, nullable: true}
-        status: {type: string, enum: [pending_confirmation]}
+        status: {type: string, enum: [pending_confirmation, confirmed]}
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/DemoBookingService"
         quote:
           $ref: "#/components/schemas/TripDraftQuote"
         constraints:
           type: object
           additionalProperties: true
         createdAt: {type: string, format: date-time}
+    DemoBookingService:
+      type: object
+      required: [kind, confirmedAt]
+      properties:
+        kind: {type: string, enum: [flights, stay, activities]}
+        confirmedAt: {type: string, format: date-time, nullable: true}
     DemoTripBookingList:
       type: object
       required: [items]

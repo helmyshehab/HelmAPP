@@ -405,6 +405,31 @@ test('trip drafts: private CRUD, current quotes, and idempotent simulated bookin
     assert.deepEqual(await httpJson(baseUrl, 'GET', bookingPath, tokenB), {
       status: 200, json: { items: [] },
     });
+
+    const staffPath = `/v1/admin/trips/demo-bookings/${first.json.id}/services`;
+    assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`)).status, 401);
+    assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenA)).status, 403);
+    assert.equal((await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenB)).status, 403);
+    await fixtureSql.unsafe(
+      'insert into identity.user_roles (user_id, role) values ($1::uuid, $2::identity.app_role)',
+      [userB, 'operator'],
+    );
+    const flights = await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenB);
+    assert.equal(flights.status, 200, JSON.stringify(flights.json));
+    assert.equal(flights.json.status, 'pending_confirmation');
+    assert.deepEqual(await httpJson(baseUrl, 'PATCH', `${staffPath}/flights`, tokenB), flights);
+    const remaining = await Promise.all([
+      httpJson(baseUrl, 'PATCH', `${staffPath}/stay`, tokenB),
+      httpJson(baseUrl, 'PATCH', `${staffPath}/activities`, tokenB),
+    ]);
+    for (const result of remaining) assert.equal(result.status, 200, JSON.stringify(result.json));
+    const updatedBookings = await httpJson(baseUrl, 'GET', bookingPath, tokenA);
+    const confirmed = (updatedBookings.json.items as Json[])[0]!;
+    assert.equal(confirmed.status, 'confirmed');
+    const services = confirmed.services as Json[];
+    assert.deepEqual(services.map(({ kind }) => kind), ['flights', 'stay', 'activities']);
+    assert.ok(services.every(({ confirmedAt }) => typeof confirmedAt === 'string'));
+    assert.ok(services.every((service) => !('confirmedBy' in service)));
   } catch (err) {
     primaryError = err;
   } finally {

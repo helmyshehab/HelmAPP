@@ -7,7 +7,6 @@ import 'package:helm_api_client/helm_api_client.dart';
 
 import '../../auth/traveler_session.dart';
 import '../draft_title_patch.dart';
-import 'confirmed_demo_trip.dart';
 import 'trip_answers.dart';
 import 'trip_demo_checkout_screen.dart';
 import 'trip_demo_pricing.dart';
@@ -34,7 +33,7 @@ class TripPreviewScreen extends StatefulWidget {
     this.initialIncludedActivitySlugs,
     this.onAnswersChanged,
     this.onDraftIdChanged,
-    this.onDemoTripConfirmed,
+    this.allowDemoStaffConfirmation = false,
   });
 
   final TripPreviewPlan plan;
@@ -50,7 +49,7 @@ class TripPreviewScreen extends StatefulWidget {
 
   final ValueChanged<TripAnswers>? onAnswersChanged;
   final ValueChanged<String>? onDraftIdChanged;
-  final ValueChanged<ConfirmedDemoTrip>? onDemoTripConfirmed;
+  final bool allowDemoStaffConfirmation;
 
   @override
   State<TripPreviewScreen> createState() => _TripPreviewScreenState();
@@ -139,19 +138,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     final quote = _currentQuote;
     if (quote == null) return;
     final plan = _plan;
-    final days = [
-      for (final day in plan.days)
-        TripPreviewDay(
-          dayNumber: day.dayNumber,
-          title: day.title,
-          stops: [
-            for (final stop in day.stops)
-              if (!isPricedDemoActivity(stop.place) ||
-                  _includedActivitySlugs.contains(stop.place.slug))
-                stop,
-          ],
-        ),
-    ];
+    final days = demoBookingDays(plan, _includedActivitySlugs);
     final route = MaterialPageRoute<void>(
       builder: (_) => TripDemoCheckoutScreen(
         tripLabel: _tripLabel(plan),
@@ -159,14 +146,13 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         destinationName: plan.destinationName,
         days: days,
         createBooking: () => _createDemoBooking(quote),
-        onBookingsConfirmed: (booking) {
-          if (_cleared || !_isAuthCurrent(_boundGeneration)) return;
-          widget.onDemoTripConfirmed?.call(ConfirmedDemoTrip(
-            bookingId: booking.id,
-            destinationName: plan.destinationName,
-            days: days,
-          ));
-        },
+        confirmDemoService: widget.allowDemoStaffConfirmation
+            ? (id, kind) => widget.apiClient.confirmDemoBookingService(
+                  accessToken: widget.auth.session!.accessToken,
+                  bookingId: id,
+                  kind: kind,
+                )
+            : null,
       ),
     );
     _checkoutRoute = route;

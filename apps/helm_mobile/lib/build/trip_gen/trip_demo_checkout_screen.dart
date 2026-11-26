@@ -13,7 +13,7 @@ class TripDemoCheckoutScreen extends StatefulWidget {
     required this.destinationName,
     required this.days,
     required this.createBooking,
-    this.onBookingsConfirmed,
+    this.confirmDemoService,
   });
 
   final String tripLabel;
@@ -21,7 +21,8 @@ class TripDemoCheckoutScreen extends StatefulWidget {
   final String destinationName;
   final List<TripPreviewDay> days;
   final Future<DemoTripBooking?> Function() createBooking;
-  final ValueChanged<DemoTripBooking>? onBookingsConfirmed;
+  final Future<DemoTripBooking> Function(String id, String kind)?
+      confirmDemoService;
 
   @override
   State<TripDemoCheckoutScreen> createState() => _TripDemoCheckoutScreenState();
@@ -56,7 +57,28 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
     });
   }
 
-  final _confirmedServices = <_DemoBookingService>{};
+  bool _confirming = false;
+  String? _confirmationError;
+
+  Future<void> _confirm(String id, String kind) async {
+    final confirm = widget.confirmDemoService;
+    if (confirm == null || _confirming) return;
+    setState(() {
+      _confirming = true;
+      _confirmationError = null;
+    });
+    try {
+      final booking = await confirm(id, kind);
+      if (mounted) setState(() => _booking = booking);
+    } catch (_) {
+      if (mounted) {
+        setState(() =>
+            _confirmationError = 'Could not confirm this service. Try again.');
+      }
+    } finally {
+      if (mounted) setState(() => _confirming = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,12 +131,10 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
 
   Widget _buildBookingProgress(BuildContext context, DemoTripBooking booking) {
     final textTheme = Theme.of(context).textTheme;
-    final services = [
-      _DemoBookingService.flights,
-      _DemoBookingService.stay,
-      if (booking.quote.activitiesTotalEgp > 0) _DemoBookingService.activities,
-    ];
-    final tripReady = _confirmedServices.length == services.length;
+    final services = booking.services;
+    final confirmedCount =
+        services.where((service) => service.confirmedAt != null).length;
+    final tripReady = booking.status == 'confirmed';
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -124,33 +144,31 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
         Text('Simulated total · ${formatDemoEgp(booking.quote.totalEgp)}'),
         const SizedBox(height: 20),
         Text('Booking progress', style: textTheme.titleLarge),
-        Text(
-            '${_confirmedServices.length} of ${services.length} services confirmed'),
+        Text('$confirmedCount of ${services.length} services confirmed'),
         const SizedBox(height: 8),
-        const Text(
-            'Simulate staff confirming each service. No actual bookings are made.'),
+        Text(widget.confirmDemoService == null
+            ? 'Trip Mode opens in Trips after staff have confirmed every service.'
+            : 'Simulate staff confirming each service in this demo.'),
         const SizedBox(height: 8),
         for (final service in services)
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(service.label),
-            subtitle: Text(_confirmedServices.contains(service)
+            title: Text(_serviceLabel(service.kind)),
+            subtitle: Text(service.confirmedAt != null
                 ? 'Confirmed'
                 : 'Awaiting confirmation'),
-            trailing: TextButton(
-              key: Key('trip-demo-confirm-${service.name}'),
-              onPressed: _confirmedServices.contains(service)
-                  ? null
-                  : () {
-                      if (_confirmedServices.contains(service)) return;
-                      setState(() => _confirmedServices.add(service));
-                      if (_confirmedServices.length == services.length) {
-                        widget.onBookingsConfirmed?.call(booking);
-                      }
-                    },
-              child: Text('Confirm ${service.label.toLowerCase()}'),
-            ),
+            trailing: widget.confirmDemoService == null
+                ? null
+                : TextButton(
+                    key: Key('trip-demo-confirm-${service.kind}'),
+                    onPressed: _confirming || service.confirmedAt != null
+                        ? null
+                        : () => _confirm(booking.id, service.kind),
+                    child: Text(
+                        'Confirm ${_serviceLabel(service.kind).toLowerCase()}'),
+                  ),
           ),
+        if (_confirmationError != null) Text(_confirmationError!),
         const SizedBox(height: 16),
         FilledButton(
           onPressed:
@@ -166,12 +184,9 @@ class _TripDemoCheckoutScreenState extends State<TripDemoCheckoutScreen> {
   }
 }
 
-enum _DemoBookingService {
-  flights('Flights'),
-  stay('Stay'),
-  activities('Activities');
-
-  const _DemoBookingService(this.label);
-
-  final String label;
-}
+String _serviceLabel(String kind) => switch (kind) {
+      'flights' => 'Flights',
+      'stay' => 'Stay',
+      'activities' => 'Activities',
+      _ => kind,
+    };

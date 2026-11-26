@@ -3,22 +3,17 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../auth/traveler_session.dart';
-import '../build/trip_gen/confirmed_demo_trip.dart';
 import '../build/trip_gen/trip_demo_pricing.dart';
+import '../build/trip_gen/trip_preview_draft.dart';
 import '../config/api_config.dart';
 
 class TripsTab extends StatefulWidget {
   const TripsTab(
-      {super.key,
-      required this.auth,
-      this.apiClient,
-      this.trip,
-      this.onOpenTrip});
+      {super.key, required this.auth, this.apiClient, this.onOpenTrip});
 
   final TravelerAuth auth;
   final HelmApiClient? apiClient;
-  final ConfirmedDemoTrip? trip;
-  final VoidCallback? onOpenTrip;
+  final ValueChanged<TripPreviewDraftSnapshot>? onOpenTrip;
 
   @override
   State<TripsTab> createState() => _TripsTabState();
@@ -102,13 +97,24 @@ class _TripsTabState extends State<TripsTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+              onPressed: _load,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh trips')),
+        ),
         for (final booking in _bookings) _bookingCard(booking),
       ],
     );
   }
 
   Widget _bookingCard(DemoTripBooking booking) {
-    final confirmed = widget.trip?.bookingId == booking.id;
+    final confirmed = booking.status == 'confirmed';
+    final snapshot =
+        confirmed ? tryParseUbudTripPreviewDraft(booking.constraints) : null;
+    final count =
+        booking.services.where((service) => service.confirmedAt != null).length;
     return Card(
       key: Key('trips-demo-booking-${booking.id}'),
       child: ListTile(
@@ -116,11 +122,12 @@ class _TripsTabState extends State<TripsTab> {
         leading: const Icon(Icons.map_outlined),
         title: Text(booking.title ?? 'Ubud demo trip'),
         subtitle: Text(
-          '${confirmed ? 'Demo bookings confirmed' : 'Demo booking · Awaiting confirmation'}\n'
+          '${confirmed ? 'Demo bookings confirmed' : 'Awaiting confirmation · $count of ${booking.services.length} services confirmed'}\n'
           '${formatDemoEgp(booking.quote.totalEgp)}',
         ),
-        trailing: confirmed ? const Icon(Icons.chevron_right) : null,
-        onTap: confirmed ? widget.onOpenTrip : null,
+        trailing: snapshot != null ? const Icon(Icons.chevron_right) : null,
+        onTap:
+            snapshot == null ? null : () => widget.onOpenTrip?.call(snapshot),
       ),
     );
   }
