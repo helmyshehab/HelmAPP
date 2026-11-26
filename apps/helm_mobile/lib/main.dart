@@ -61,6 +61,8 @@ class HelmShell extends StatefulWidget {
 class _HelmShellState extends State<HelmShell> {
   int index = 0;
   TripDestinationChoice? _buildDestination;
+  TripPreviewDraftSnapshot? _buildPackageSnapshot;
+  final GlobalKey _buildTabKey = GlobalKey();
   Route<void>? _tripModeRoute;
   late int _authGeneration;
 
@@ -110,17 +112,31 @@ class _HelmShellState extends State<HelmShell> {
       DiscoverTab(
         apiClient: widget.apiClient,
         onBuildTrip: (destination) => setState(() {
+          _buildPackageSnapshot = null;
           _buildDestination = destination;
           index = 1;
         }),
       ),
       BuildTab(
+        key: _buildTabKey,
         auth: widget.auth,
         apiClient: widget.apiClient,
         initialDestination: _buildDestination,
+        initialPackageSnapshot: _buildPackageSnapshot,
+        onInitialPackageConsumed: () {
+          // Avoid setState during the handoff push so BuildTab is not disposed.
+          _buildPackageSnapshot = null;
+        },
         allowDemoStaffConfirmation: widget.allowDemoStaffConfirmation,
       ),
-      const PackagesTab(),
+      PackagesTab(
+        apiClient: widget.apiClient,
+        onCustomizeInBuild: (snapshot) => setState(() {
+          _buildDestination = null;
+          _buildPackageSnapshot = snapshot;
+          index = 1;
+        }),
+      ),
       TripsTab(
         auth: widget.auth,
         apiClient: widget.apiClient,
@@ -154,7 +170,10 @@ class _HelmShellState extends State<HelmShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (value) => setState(() {
-          if (value != index) _buildDestination = null;
+          if (value != index) {
+            _buildDestination = null;
+            _buildPackageSnapshot = null;
+          }
           index = value;
         }),
         destinations: const [

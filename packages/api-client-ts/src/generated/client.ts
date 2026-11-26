@@ -54,6 +54,12 @@ export type GeoCountryListResponse = components["schemas"]["GeoCountryListRespon
 export type GeoCityListResponse = components["schemas"]["GeoCityListResponse"];
 export type AuditEventListResponse = components["schemas"]["AuditEventListResponse"];
 export type LifecycleStatus = components["schemas"]["LifecycleStatus"];
+export type PackagePublic = components["schemas"]["PackagePublic"];
+export type PackagePublicListResponse = components["schemas"]["PackagePublicListResponse"];
+export type PackageAdmin = components["schemas"]["PackageAdmin"];
+export type PackageAdminListResponse = components["schemas"]["PackageAdminListResponse"];
+export type CreatePackageRequest = components["schemas"]["CreatePackageRequest"];
+export type UpdatePackageRequest = components["schemas"]["UpdatePackageRequest"];
 
 export type HelmClientOptions = {
   baseUrl: string;
@@ -357,6 +363,80 @@ export function createHelmClient(options: HelmClientOptions) {
           offset: params?.offset,
         })}`,
       );
+    },
+    async listPackages(): Promise<PackagePublicListResponse> {
+      return getJson<PackagePublicListResponse>("/v1/packages");
+    },
+    async getPackage(slug: string): Promise<PackagePublic> {
+      return getJson<PackagePublic>(`/v1/packages/${encodeURIComponent(slug)}`);
+    },
+    async adminListPackages(): Promise<PackageAdminListResponse> {
+      if (!options.accessToken) throw new Error("adminListPackages requires an access token");
+      const res = await fetchImpl(`${base}/v1/admin/packages`, {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${options.accessToken}` },
+      });
+      if (!res.ok) throw new Error(`adminListPackages failed: ${res.status}`);
+      return (await res.json()) as PackageAdminListResponse;
+    },
+    async adminGetPackage(id: string): Promise<PackageAdmin> {
+      if (!options.accessToken) throw new Error("adminGetPackage requires an access token");
+      const res = await fetchImpl(`${base}/v1/admin/packages/${encodeURIComponent(id)}`, {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${options.accessToken}` },
+      });
+      if (!res.ok) throw new Error(`adminGetPackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminCreatePackage(body: CreatePackageRequest): Promise<PackageAdmin> {
+      if (!options.accessToken) throw new Error("adminCreatePackage requires an access token");
+      const res = await fetchImpl(`${base}/v1/admin/packages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${options.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`adminCreatePackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminUpdatePackage(id: string, body: UpdatePackageRequest): Promise<PackageAdmin> {
+      if (!options.accessToken) throw new Error("adminUpdatePackage requires an access token");
+      const res = await fetchImpl(`${base}/v1/admin/packages/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${options.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`adminUpdatePackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminUnpublishPackage(id: string): Promise<PackageAdmin> {
+      if (!options.accessToken) throw new Error("adminUnpublishPackage requires an access token");
+      const res = await fetchImpl(
+        `${base}/v1/admin/packages/${encodeURIComponent(id)}/unpublish`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${options.accessToken}` },
+        },
+      );
+      if (!res.ok) throw new Error(`adminUnpublishPackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminPublishPackage(id: string): Promise<PackageAdmin> {
+      if (!options.accessToken) throw new Error("adminPublishPackage requires an access token");
+      const res = await fetchImpl(
+        `${base}/v1/admin/packages/${encodeURIComponent(id)}/publish`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${options.accessToken}` },
+        },
+      );
+      if (!res.ok) throw new Error(`adminPublishPackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
     },
     async adminListCatalogDestinations(params?: {
       q?: string;

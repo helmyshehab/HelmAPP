@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'published_ubud_fixture.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
@@ -20,6 +22,9 @@ void main() {
   testWidgets('questionnaire to preview preserves answers on edit',
       (tester) async {
     final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return publishedUbudFixture();
+      }
       if (request.url.path.endsWith('/bootstrap')) {
         return _json({
           'userId': 'user-a',
@@ -122,6 +127,9 @@ void main() {
       (tester) async {
     var listCalls = 0;
     final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return publishedUbudFixture();
+      }
       if (request.url.path.endsWith('/bootstrap')) {
         return _json({
           'userId': 'user-a',
@@ -182,6 +190,9 @@ void main() {
     'account switch while preview is open closes Build screens and resets questionnaire',
     (tester) async {
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json({
             'userId': 'user-a',
@@ -280,6 +291,9 @@ void main() {
     (tester) async {
       final navigatorKey = GlobalKey<NavigatorState>();
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json({
             'userId': 'user-a',

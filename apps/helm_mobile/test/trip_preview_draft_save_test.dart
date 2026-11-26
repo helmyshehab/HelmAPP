@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'published_ubud_fixture.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
@@ -168,6 +170,9 @@ void main() {
       Map<String, dynamic>? booking;
 
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
         }
@@ -550,6 +555,9 @@ void main() {
     var patchCalls = 0;
 
     final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return publishedUbudFixture();
+      }
       if (request.url.path.endsWith('/bootstrap')) {
         return _json(_bootstrap());
       }
@@ -632,6 +640,9 @@ void main() {
     Map<String, dynamic>? storedConstraints;
 
     final mock = MockClient((request) async {
+      if (request.url.path == '/v1/catalog/places') {
+        return publishedUbudFixture();
+      }
       if (request.url.path.endsWith('/bootstrap')) {
         return _json(_bootstrap());
       }
@@ -714,6 +725,9 @@ void main() {
       ).toConstraints();
 
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         final authHeader = request.headers['Authorization'] ?? '';
         final forUserB = authHeader.contains('token-b');
 
@@ -845,6 +859,9 @@ void main() {
       var dropNextCreateResponse = true;
 
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
         }
