@@ -176,6 +176,9 @@ void main() {
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
         }
+        if (request.url.path == '/v1/trips/requests') {
+          return _json({'items': <Map<String, dynamic>>[]});
+        }
         if (request.url.path == '/v1/trips/demo-bookings') {
           if (request.method == 'GET') {
             return _json({
@@ -257,7 +260,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Trips'));
       await tester.pumpAndSettle();
-      expect(find.text('No confirmed trips yet'), findsOneWidget);
+      expect(find.text('No trips or requests yet'), findsOneWidget);
       await tester.tap(find.text('Build'));
       await tester.pumpAndSettle();
       await _fillAndOpenPreview(tester);
@@ -520,7 +523,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Demo Trip Mode'), findsNothing);
       expect(confirmedTrip, findsNothing);
-      expect(find.text('No confirmed trips yet'), findsOneWidget);
+      expect(find.text('No trips or requests yet'), findsOneWidget);
 
       // A new shell reopens Trip Mode using the server booking alone.
       await tester.pumpWidget(const SizedBox());
