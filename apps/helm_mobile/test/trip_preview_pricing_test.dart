@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'published_ubud_fixture.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
@@ -32,6 +34,50 @@ Finder _previewScrollable() => find
     .first;
 
 void main() {
+  testWidgets('preview excludes unpublished stops and lodging', (tester) async {
+    final api = HelmApiClient(
+      baseUrl: 'https://api.test',
+      httpClient: MockClient((request) async {
+        expect(request.url.path, '/v1/catalog/places');
+        expect(request.url.queryParameters['destinationSlug'], 'ubud');
+        return publishedUbudFixture(slugs: {
+          'ubud-village-hotel',
+          'ubud-sacred-monkey-forest',
+        });
+      }),
+    );
+    final auth = FakeTravelerAuth(
+      initial: const TravelerSession(userId: 'user-a', accessToken: 'token-a'),
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: TripPreviewScreen(
+        plan: planDemoTrip(const TripAnswers(
+          budgetEgp: 85000,
+          travelerCount: 2,
+          nights: 2,
+        )),
+        auth: auth,
+        apiClient: api,
+        initialHotelSlug: 'ubud-swasti-eco-cottages',
+      ),
+    ));
+    await tester.pumpAndSettle();
+    expect(
+        find.byKey(const Key('trip-hotel-ubud-village-hotel')), findsOneWidget);
+    expect(find.byKey(const Key('trip-hotel-ubud-swasti-eco-cottages')),
+        findsNothing);
+    expect(find.byKey(const Key('trip-stop-ubud-sacred-monkey-forest')),
+        findsOneWidget);
+    expect(find.byKey(const Key('trip-stop-ubud-balinese-cooking-class')),
+        findsNothing);
+    final picker = find.byKey(const Key('trip-day-add-activity-1'));
+    await tester.ensureVisible(picker);
+    await tester.tap(picker);
+    await tester.pumpAndSettle();
+    expect(find.text('No additional published activities are available.'),
+        findsOneWidget);
+  });
+
   testWidgets(
       'review saves before quoting, retains the draft on failure, and hides stale quotes',
       (tester) async {
@@ -43,6 +89,9 @@ void main() {
     final api = HelmApiClient(
       baseUrl: 'https://api.test',
       httpClient: MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         final path = request.url.path;
         requests.add('${request.method} $path');
         expect(request.headers['authorization'], 'Bearer token-a');
@@ -102,6 +151,7 @@ void main() {
         apiClient: api,
       ),
     ));
+    await tester.pumpAndSettle();
 
     Future<void> tapVisible(Finder finder) async {
       await tester.ensureVisible(finder);
@@ -137,6 +187,9 @@ void main() {
     'preview estimate updates when flight hotel and activity change',
     (tester) async {
       final mock = MockClient((request) async {
+        if (request.url.path == '/v1/catalog/places') {
+          return publishedUbudFixture();
+        }
         if (request.url.path.endsWith('/bootstrap')) {
           return _json({
             'userId': 'user-a',

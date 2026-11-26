@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 
 import '../../auth/traveler_session.dart';
+import '../../discover/place_list_item.dart';
 import '../draft_title_patch.dart';
 import 'trip_answers.dart';
 import 'trip_demo_checkout_screen.dart';
@@ -73,6 +74,8 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   Timer? _quoteExpiration;
   bool _requestingQuote = false;
   bool _cleared = false;
+  Set<String>? _publishedSlugs;
+  bool _catalogFailed = false;
   int? _activityPickerDay;
   Route<void>? _checkoutRoute;
 
@@ -96,7 +99,64 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       includedActivitySlugs: widget.initialIncludedActivitySlugs,
     );
     widget.auth.sessionListenable.addListener(_onAuthChanged);
+    unawaited(_loadCatalog());
   }
+
+  Future<void> _loadCatalog() async {
+    if (_catalogFailed || _publishedSlugs != null) {
+      setState(() {
+        _catalogFailed = false;
+        _publishedSlugs = null;
+      });
+    }
+    try {
+      final slugs = <String>{};
+      var offset = 0;
+      while (true) {
+        final page =
+            PlaceListPage.fromJson(await widget.apiClient.listCatalogPlaces(
+          destinationSlug: _plan.destinationSlug,
+          limit: 100,
+          offset: offset,
+        ));
+        slugs.addAll(page.items.map((place) => place.slug));
+        if (!page.hasMore) break;
+        if (page.items.isEmpty || page.offset != offset) {
+          throw StateError('Incomplete catalog page');
+        }
+        offset += page.items.length;
+      }
+      if (!mounted || _cleared) return;
+      setState(() {
+        _publishedSlugs = slugs;
+        if (!slugs.contains(_hotelSlug) && _availableHotels.isNotEmpty) {
+          _hotelSlug = _availableHotels.first.slug;
+        }
+        if (_availableHotels.isNotEmpty) {
+          _plan = _publishedPlan(_plan);
+          _includedActivitySlugs.retainAll(previewPlaceSlugs(_plan));
+        }
+      });
+    } catch (_) {
+      if (mounted && !_cleared) setState(() => _catalogFailed = true);
+    }
+  }
+
+  bool _isPublished(String slug) => _publishedSlugs?.contains(slug) ?? false;
+
+  List<DemoHotelOption> get _availableHotels =>
+      demoHotelOptions.where((option) => _isPublished(option.slug)).toList();
+
+  TripPreviewPlan _publishedPlan(TripPreviewPlan plan) => plan.withDays([
+        for (final day in plan.days)
+          TripPreviewDay(
+            dayNumber: day.dayNumber,
+            title: day.title,
+            stops: List.unmodifiable(
+              day.stops.where((stop) => _isPublished(stop.place.slug)),
+            ),
+          ),
+      ]);
 
   @override
   void dispose() {
@@ -239,6 +299,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   }
 
   void _selectHotel(String slug) {
+    if (!_isPublished(slug)) return;
     setState(() {
       _hotelSlug = slug;
       _saveMessage = null;
@@ -302,7 +363,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   }
 
   void _addActivity(int dayNumber, UbudDemoPlace place) {
-    if (_saving || _cleared || previewPlaceSlugs(_plan).contains(place.slug)) {
+    if (_saving ||
+        _cleared ||
+        !_isPublished(place.slug) ||
+        previewPlaceSlugs(_plan).contains(place.slug)) {
       return;
     }
     setState(() {
@@ -332,7 +396,9 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     final scheduled = expanded ? previewPlaceSlugs(_plan) : const <String>{};
     final options = expanded
         ? ubudDemoPlaces.where((place) =>
-            isPricedDemoActivity(place) && !scheduled.contains(place.slug))
+            _isPublished(place.slug) &&
+            isPricedDemoActivity(place) &&
+            !scheduled.contains(place.slug))
         : const <UbudDemoPlace>[];
 
     return Column(
@@ -349,7 +415,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
           label: Text(expanded ? 'Close activity list' : 'Add activity'),
         ),
         if (expanded && options.isEmpty)
-          const Text('All catalog activities are already in your itinerary.'),
+          const Text('No additional published activities are available.'),
         for (final place in options)
           ListTile(
             key: Key('trip-catalog-activity-${place.slug}'),
@@ -386,7 +452,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     final keepItinerary = previous.nights == updated.nights &&
         previous.lifestyle == updated.lifestyle &&
         previous.destination == updated.destination;
-    final nextPlan = planDemoTrip(updated);
+    final nextPlan = _publishedPlan(planDemoTrip(updated));
     setState(() {
       if (keepItinerary) {
         _plan = nextPlan.withDays(_plan.days);
@@ -402,12 +468,6 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         };
         _plan = nextPlan;
         _activityPickerDay = null;
-      }
-      // Keep flight; keep hotel when still a demo option, else follow suggestion.
-      if (demoHotelBySlug(_hotelSlug) == null) {
-        final suggested = demoHotelBySlug(nextPlan.staySuggestion.slug);
-        _hotelSlug =
-            suggested?.slug ?? demoHotelsInTier(DemoHotelTier.base).first.slug;
       }
       _saveMessage = null;
     });
@@ -595,6 +655,27 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       );
     }
 
+    if (_publishedSlugs == null || _availableHotels.isEmpty) {
+      final message = _catalogFailed
+          ? 'Could not load published places.'
+          : _publishedSlugs == null
+              ? 'Loading published places…'
+              : 'No published lodging is available for this demo trip.';
+      return Scaffold(
+        appBar: AppBar(title: const Text('Trip preview')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(message),
+              if (_catalogFailed || _publishedSlugs != null)
+                TextButton(onPressed: _loadCatalog, child: const Text('Retry')),
+            ],
+          ),
+        ),
+      );
+    }
+
     final theme = Theme.of(context);
     final estimate = _estimate;
     final quote = _currentQuote;
@@ -670,29 +751,21 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 8),
-            Text('Base tier', style: theme.textTheme.labelLarge),
-            ...demoHotelsInTier(DemoHotelTier.base).map(
-              (option) => _HotelTile(
-                option: option,
-                selectedSlug: _hotelSlug,
-                suggestedSlug: _plan.staySuggestion.slug,
-                nights: nights,
-                selectedStayTotal: estimate.lodgingTotalEgp,
-                onSelect: _selectHotel,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text('Upgrade tier', style: theme.textTheme.labelLarge),
-            ...demoHotelsInTier(DemoHotelTier.upgrade).map(
-              (option) => _HotelTile(
-                option: option,
-                selectedSlug: _hotelSlug,
-                suggestedSlug: _plan.staySuggestion.slug,
-                nights: nights,
-                selectedStayTotal: estimate.lodgingTotalEgp,
-                onSelect: _selectHotel,
-              ),
-            ),
+            for (final tier in DemoHotelTier.values)
+              if (_availableHotels.any((option) => option.tier == tier)) ...[
+                Text(tier == DemoHotelTier.base ? 'Base tier' : 'Upgrade tier',
+                    style: theme.textTheme.labelLarge),
+                for (final option
+                    in _availableHotels.where((option) => option.tier == tier))
+                  _HotelTile(
+                    option: option,
+                    selectedSlug: _hotelSlug,
+                    suggestedSlug: _plan.staySuggestion.slug,
+                    nights: nights,
+                    selectedStayTotal: estimate.lodgingTotalEgp,
+                    onSelect: _selectHotel,
+                  ),
+              ],
             const SizedBox(height: 20),
             Text(
               'Requested preferences',
