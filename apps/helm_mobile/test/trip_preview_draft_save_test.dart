@@ -15,6 +15,25 @@ import 'package:http/testing.dart';
 const _draftId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 const _userId = 'user-a';
 
+Map<String, dynamic> _quoteJson({String id = 'quote-a'}) {
+  final now = DateTime.now().toUtc();
+  return {
+    'id': id,
+    'draftId': _draftId,
+    'currency': 'EGP',
+    'source': 'demo',
+    'rateVersion': 'ubud-demo-v1',
+    'travelerCount': 3,
+    'nights': 2,
+    'flightTotalEgp': 79500,
+    'lodgingTotalEgp': 9000,
+    'activitiesTotalEgp': 6500,
+    'totalEgp': 95000,
+    'createdAt': now.toIso8601String(),
+    'expiresAt': now.add(const Duration(minutes: 30)).toIso8601String(),
+  };
+}
+
 http.Response _json(Object body, {int status = 200}) => http.Response(
       jsonEncode(body),
       status,
@@ -97,10 +116,22 @@ void main() {
       Map<String, dynamic>? storedConstraints;
       var createCalls = 0;
       var listPhase = 0;
+      var quoteReadCalls = 0;
+      var quoteWrites = 0;
+      var quote = _quoteJson();
 
       final mock = MockClient((request) async {
         if (request.url.path.endsWith('/bootstrap')) {
           return _json(_bootstrap());
+        }
+        if (request.url.path.endsWith('/drafts/$_draftId/quote')) {
+          if (request.method == 'POST') {
+            quote = _quoteJson(id: 'quote-${++quoteWrites}');
+            return _json(quote, status: 201);
+          }
+          quoteReadCalls++;
+          return _json(
+              quoteReadCalls == 1 ? {...quote, 'id': 'other-quote'} : quote);
         }
         if (request.url.path.endsWith('/drafts') && request.method == 'GET') {
           listPhase += 1;
@@ -124,6 +155,12 @@ void main() {
             _draftJson(constraints: storedConstraints!),
             status: 201,
           );
+        }
+        if (request.method == 'PATCH' &&
+            request.url.path.endsWith('/drafts/$_draftId')) {
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          storedConstraints = body['constraints'] as Map<String, dynamic>;
+          return _json(_draftJson(constraints: storedConstraints!));
         }
         return http.Response('unexpected ${request.method}', 500);
       });
@@ -223,19 +260,35 @@ void main() {
           reviewText('Sacred Monkey Forest Sanctuary (excluded from estimate)'),
           findsOneWidget);
       expect(reviewText('Balinese Cooking Class & Market Tour'), findsNothing);
-      await _tapPreviewKey(tester, const Key('trip-demo-checkout'));
+      const checkoutKey = Key('trip-demo-checkout');
+      expect(tester.widget<FilledButton>(find.byKey(checkoutKey)).onPressed,
+          isNull);
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
+      await _tapPreviewKey(tester, checkoutKey);
       expect(find.text('Demo checkout'), findsOneWidget);
       expect(
         tester
             .widget<Text>(find.byKey(const Key('trip-demo-checkout-total')))
             .data,
-        editedTotal,
+        '95000 EGP',
       );
       expect(find.byType(TextField), findsNothing);
       await tester.tap(find.text('Simulate payment'));
       await tester.pumpAndSettle();
+      expect(
+          find.byKey(const Key('trip-checkout-quote-error')), findsOneWidget);
+      expect(find.text('Demo payment complete'), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(find.byKey(checkoutKey)).onPressed,
+          isNull);
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
+      await _tapPreviewKey(tester, checkoutKey);
+      await tester.tap(find.text('Simulate payment'));
+      await tester.pumpAndSettle();
       expect(find.text('Demo payment complete'), findsOneWidget);
-      expect(createCalls, 0);
+      expect(quoteReadCalls, 2);
+      expect(createCalls, 1);
       await tester.tap(find.text('Preview Trip Mode'));
       await tester.pumpAndSettle();
       expect(find.text('Demo Trip Mode'), findsOneWidget);
@@ -268,7 +321,6 @@ void main() {
       await tester.tap(reviewTitle);
       await tester.pumpAndSettle();
 
-      await _tapPreviewKey(tester, const Key('trip-preview-save'));
       expect(
           find.byKey(const Key('trip-preview-save-success')), findsOneWidget);
       expect(createCalls, 1);
@@ -574,6 +626,14 @@ void main() {
             'updatedAt': '2026-01-01T12:00:00.000Z',
           });
         }
+        if (request.method == 'PATCH' &&
+            request.url.path.endsWith('/drafts/$_draftId')) {
+          return _json(_draftJson(constraints: previewConstraints));
+        }
+        if (request.method == 'POST' &&
+            request.url.path.endsWith('/drafts/$_draftId/quote')) {
+          return _json(_quoteJson(), status: 201);
+        }
         return http.Response('unexpected ${request.url}', 500);
       });
 
@@ -601,6 +661,7 @@ void main() {
       expect(find.byKey(const Key('trip-preview')), findsOneWidget);
 
       await _tapPreviewKey(tester, const Key('trip-review'));
+      await _tapPreviewKey(tester, const Key('trip-review-request-quote'));
       await _tapPreviewKey(tester, const Key('trip-demo-checkout'));
       expect(find.text('Demo checkout'), findsOneWidget);
       auth.setSession(
