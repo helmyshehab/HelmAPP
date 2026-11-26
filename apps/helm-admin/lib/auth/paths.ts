@@ -8,6 +8,7 @@ const STAFF_PREFIXES = [
   "/packages",
   "/import",
   "/demo-bookings",
+  "/trip-requests",
 ] as const;
 
 export function isLoginPath(pathname: string): boolean {

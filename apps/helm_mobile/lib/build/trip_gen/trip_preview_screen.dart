@@ -74,6 +74,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   String? _quoteError;
   Timer? _quoteExpiration;
   bool _requestingQuote = false;
+  bool _submittingRequest = false;
+  String? _requestError;
+  String? _requestStatus;
+  String? _requestId;
   bool _cleared = false;
   Set<String>? _publishedSlugs;
   bool _catalogFailed = false;
@@ -101,6 +105,64 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     );
     widget.auth.sessionListenable.addListener(_onAuthChanged);
     unawaited(_loadCatalog());
+    unawaited(_loadExistingRequest());
+  }
+
+  Future<void> _loadExistingRequest() async {
+    final session = widget.auth.session;
+    final draftId = _draftId;
+    if (session == null || draftId == null) return;
+    final generation = widget.auth.authGeneration;
+    try {
+      final items =
+          await widget.apiClient.listTripRequests(accessToken: session.accessToken);
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
+      for (final item in items) {
+        if (item.draftId == draftId) {
+          setState(() {
+            _requestId = item.id;
+            _requestStatus = item.status;
+          });
+          return;
+        }
+      }
+    } catch (_) {
+      // Request status is optional until the traveler submits.
+    }
+  }
+
+  Future<void> _submitTripRequest() async {
+    if (!canStartMutation(_saving || _submittingRequest) || _cleared) return;
+    final session = widget.auth.session;
+    final draftId = _draftId;
+    if (session == null || session.userId != _boundUserId || draftId == null) {
+      return;
+    }
+    final generation = widget.auth.authGeneration;
+    setState(() {
+      _submittingRequest = true;
+      _requestError = null;
+    });
+    try {
+      final request = await widget.apiClient.createTripRequest(
+        accessToken: session.accessToken,
+        draftId: draftId,
+      );
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
+      setState(() {
+        _requestId = request.id;
+        _requestStatus = request.status;
+        _saveMessage =
+            'Trip requested. You can keep editing this private draft.';
+      });
+    } catch (error) {
+      if (!mounted || !_isAuthCurrent(generation) || _cleared) return;
+      setState(() => _requestError = error.toString());
+    } finally {
+      if (mounted && _isAuthCurrent(generation) && !_cleared) {
+        setState(() => _submittingRequest = false);
+      }
+    }
   }
 
   Future<void> _loadCatalog() async {
@@ -864,6 +926,32 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
               onPressed: _saving ? null : () => _saveDraft(),
               child: Text(_saving ? 'Saving…' : 'Save draft'),
             ),
+            if (_draftId != null) ...[
+              const SizedBox(height: 8),
+              if (_requestStatus != null)
+                Text(
+                  'Trip request status: ${_requestStatusLabel(_requestStatus!)}',
+                  key: const Key('trip-preview-request-status'),
+                )
+              else
+                FilledButton.tonal(
+                  key: const Key('trip-preview-request'),
+                  onPressed: (_saving || _submittingRequest)
+                      ? null
+                      : _submitTripRequest,
+                  child: Text(
+                    _submittingRequest ? 'Requesting…' : 'Request this trip',
+                  ),
+                ),
+              if (_requestError != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _requestError!,
+                  key: const Key('trip-preview-request-error'),
+                  style: TextStyle(color: theme.colorScheme.error),
+                ),
+              ],
+            ],
             const SizedBox(height: 8),
             OutlinedButton(
               key: const Key('trip-preview-edit'),
@@ -874,6 +962,19 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         ),
       ),
     );
+  }
+}
+
+String _requestStatusLabel(String status) {
+  switch (status) {
+    case 'submitted':
+      return 'Submitted';
+    case 'under_review':
+      return 'Under review';
+    case 'declined':
+      return 'Declined';
+    default:
+      return status;
   }
 }
 

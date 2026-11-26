@@ -11,6 +11,7 @@ const NAV = [
   { href: "/packages", label: "Packages" },
   { href: "/import", label: "Import" },
   { href: "/demo-bookings", label: "Demo Bookings" },
+  { href: "/trip-requests", label: "Trip Requests" },
 ] as const;
 
 type StaffShellProps = {

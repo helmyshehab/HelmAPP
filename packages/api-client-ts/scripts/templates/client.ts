@@ -20,6 +20,12 @@ export type DemoTripBookingList = components["schemas"]["DemoTripBookingList"];
 export type StaffDemoTripBooking = components["schemas"]["StaffDemoTripBooking"];
 export type StaffDemoTripBookingList = components["schemas"]["StaffDemoTripBookingList"];
 export type CreateDemoTripBookingRequest = components["schemas"]["CreateDemoTripBookingRequest"];
+export type CreateTripRequestRequest = components["schemas"]["CreateTripRequestRequest"];
+export type UpdateTripRequestRequest = components["schemas"]["UpdateTripRequestRequest"];
+export type TripRequest = components["schemas"]["TripRequest"];
+export type StaffTripRequest = components["schemas"]["StaffTripRequest"];
+export type TripRequestList = components["schemas"]["TripRequestList"];
+export type StaffTripRequestList = components["schemas"]["StaffTripRequestList"];
 export type TripDraftListResponse = components["schemas"]["TripDraftListResponse"];
 export type CreateTripDraftRequest = components["schemas"]["CreateTripDraftRequest"];
 export type UpdateTripDraftRequest = components["schemas"]["UpdateTripDraftRequest"];
@@ -229,6 +235,75 @@ export function createHelmClient(options: HelmClientOptions) {
       });
       if (!res.ok) throw new Error(`createDemoTripBooking failed: ${res.status}`);
       return (await res.json()) as DemoTripBooking;
+    },
+    async listStaffTripRequests(id?: string): Promise<StaffTripRequestList> {
+      if (!options.accessToken) throw new Error("listStaffTripRequests requires an access token");
+      const query = id ? `?id=${encodeURIComponent(id)}` : "";
+      const res = await fetchImpl(`${base}/v1/admin/trips/requests${query}`, {
+        cache: "no-store",
+        headers: { Authorization: `Bearer ${options.accessToken}` },
+      });
+      if (!res.ok) throw new Error(`listStaffTripRequests failed: ${res.status}`);
+      return (await res.json()) as StaffTripRequestList;
+    },
+    async getStaffTripRequest(id: string): Promise<StaffTripRequest> {
+      if (!options.accessToken) throw new Error("getStaffTripRequest requires an access token");
+      const res = await fetchImpl(
+        `${base}/v1/admin/trips/requests/${encodeURIComponent(id)}`,
+        {
+          cache: "no-store",
+          headers: { Authorization: `Bearer ${options.accessToken}` },
+        },
+      );
+      if (!res.ok) throw new Error(`getStaffTripRequest failed: ${res.status}`);
+      return (await res.json()) as StaffTripRequest;
+    },
+    async updateStaffTripRequest(
+      id: string,
+      body: UpdateTripRequestRequest,
+      accessToken?: string,
+    ): Promise<StaffTripRequest> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("updateStaffTripRequest requires an access token");
+      const res = await fetchImpl(`${base}/v1/admin/trips/requests/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`updateStaffTripRequest failed: ${res.status}`);
+      return (await res.json()) as StaffTripRequest;
+    },
+    async listTripRequests(accessToken?: string): Promise<TripRequestList> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("listTripRequests requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/requests`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`listTripRequests failed: ${res.status}`);
+      return (await res.json()) as TripRequestList;
+    },
+    async getTripRequest(id: string, accessToken?: string): Promise<TripRequest> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("getTripRequest requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/requests/${encodeURIComponent(id)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`getTripRequest failed: ${res.status}`);
+      return (await res.json()) as TripRequest;
+    },
+    async createTripRequest(
+      body: CreateTripRequestRequest,
+      accessToken?: string,
+    ): Promise<TripRequest> {
+      const token = accessToken ?? options.accessToken;
+      if (!token) throw new Error("createTripRequest requires an access token");
+      const res = await fetchImpl(`${base}/v1/trips/requests`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`createTripRequest failed: ${res.status}`);
+      return (await res.json()) as TripRequest;
     },
     async createTripDraftQuote(
       id: string,

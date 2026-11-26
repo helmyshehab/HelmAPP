@@ -322,6 +322,39 @@ class DemoTripBooking {
       );
 }
 
+class TripRequest {
+  const TripRequest({
+    required this.id,
+    required this.draftId,
+    required this.title,
+    required this.destinationSlug,
+    required this.status,
+    required this.constraints,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  final String id;
+  final String draftId;
+  final String? title;
+  final String destinationSlug;
+  final String status;
+  final Map<String, dynamic> constraints;
+  final String createdAt;
+  final String updatedAt;
+
+  factory TripRequest.fromJson(Map<String, dynamic> json) => TripRequest(
+        id: json['id'] as String,
+        draftId: json['draftId'] as String,
+        title: json['title'] as String?,
+        destinationSlug: json['destinationSlug'] as String,
+        status: json['status'] as String,
+        constraints: Map<String, dynamic>.from(json['constraints'] as Map),
+        createdAt: json['createdAt'] as String,
+        updatedAt: json['updatedAt'] as String,
+      );
+}
+
 const Object _omit = Object();
 
 /// Generated Helm حلم API client (meta/identity + catalog discovery + trip drafts).
@@ -535,6 +568,54 @@ class HelmApiClient {
       throw Exception('createDemoTripBooking failed: ${res.statusCode}');
     }
     return DemoTripBooking.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<List<TripRequest>> listTripRequests({
+    required String accessToken,
+  }) async {
+    final res = await _http.get(
+      _u('/v1/trips/requests'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('listTripRequests failed: ${res.statusCode}');
+    }
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    return (data['items'] as List<dynamic>)
+        .map((item) => TripRequest.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<TripRequest> getTripRequest({
+    required String accessToken,
+    required String id,
+  }) async {
+    final res = await _http.get(
+      _u('/v1/trips/requests/${Uri.encodeComponent(id)}'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 200) {
+      throw Exception('getTripRequest failed: ${res.statusCode}');
+    }
+    return TripRequest.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<TripRequest> createTripRequest({
+    required String accessToken,
+    required String draftId,
+  }) async {
+    final res = await _http.post(
+      _u('/v1/trips/requests'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'draftId': draftId}),
+    );
+    if (res.statusCode != 201) {
+      throw Exception('createTripRequest failed: ${res.statusCode}');
+    }
+    return TripRequest.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<TripDraftQuote> createTripDraftQuote({
