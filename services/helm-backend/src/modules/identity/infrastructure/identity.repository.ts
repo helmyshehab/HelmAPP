@@ -44,29 +44,15 @@ export class IdentityRepository {
     const userId = input.userId;
     const email = normalizeEmail(input.email);
 
-    try {
-      return await db.transaction(async (tx) => {
-        const accountCreated = await this.ensureAccount(tx, userId, email);
-        const profileCreated = await this.ensureProfile(tx, userId);
-        const row = await this.loadBootstrapRow(tx, userId);
-        if (!row) {
-          throw new Error('Bootstrap failed to load account/profile after ensure');
-        }
-        return {
-          userId: row.userId,
-          email: row.email,
-          accountStatus: row.accountStatus,
-          displayName: row.displayName,
-          preferredLocale: row.preferredLocale,
-          preferredCurrency: row.preferredCurrency,
-          accountCreated,
-          profileCreated,
-        };
-      });
-    } catch (err) {
-      if (err instanceof AppException) throw err;
-      throw err instanceof Error ? err : new Error(collectErrorText(err));
-    }
+    return db.transaction(async (tx) => {
+      const accountCreated = await this.ensureAccount(tx, userId, email);
+      const profileCreated = await this.ensureProfile(tx, userId);
+      const row = await this.loadBootstrapRow(tx, userId);
+      if (!row) {
+        throw new Error('Bootstrap failed to load account/profile after ensure');
+      }
+      return { ...row, accountCreated, profileCreated };
+    });
   }
 
   /**
@@ -79,33 +65,10 @@ export class IdentityRepository {
     userId: string,
     email: string | null,
   ): Promise<boolean> {
-    let emailToUse = email;
-    if (emailToUse) {
-      const owners = await tx.execute(sql`
-        select id::text as id
-        from identity.user_accounts
-        where primary_email = ${emailToUse}
-        limit 1
-      `);
-      const owner = asRowArray(owners)[0] as { id?: string } | undefined;
-      if (owner?.id && owner.id !== userId) {
-        emailToUse = null;
-      }
+    if (email !== null && (await this.insertAccount(tx, userId, email))) {
+      return true;
     }
-
-    try {
-      await tx.execute(sql`savepoint bootstrap_account_insert`);
-      const created = await this.insertAccount(tx, userId, emailToUse);
-      await tx.execute(sql`release savepoint bootstrap_account_insert`);
-      return created;
-    } catch (err) {
-      await tx.execute(sql`rollback to savepoint bootstrap_account_insert`);
-      if (emailToUse && isPrimaryEmailUniqueViolation(err)) {
-        const created = await this.insertAccount(tx, userId, null);
-        return created;
-      }
-      throw err;
-    }
+    return this.insertAccount(tx, userId, null);
   }
 
   private async insertAccount(
@@ -113,16 +76,18 @@ export class IdentityRepository {
     userId: string,
     email: string | null,
   ): Promise<boolean> {
-    const emailSql = email === null ? sql`null` : sql`${email}`;
+    // An email-bearing insert can race on either the subject or the email
+    // index. The fallback omits the email and only ignores an existing subject.
+    const conflictTarget = email === null ? sql`(id)` : sql``;
     const rows = await tx.execute(sql`
       insert into identity.user_accounts (id, auth_provider_ref, primary_email, status)
       values (
         ${userId}::uuid,
         ${userId},
-        ${emailSql},
+        ${email},
         'active'
       )
-      on conflict (id) do nothing
+      on conflict ${conflictTarget} do nothing
       returning id
     `);
     return rowCount(rows) > 0;
@@ -192,17 +157,6 @@ function normalizeEmail(email: string | undefined): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function isPrimaryEmailUniqueViolation(err: unknown): boolean {
-  const code = collectErrorCode(err);
-  if (code !== '23505') return false;
-  const blob = collectErrorText(err);
-  return (
-    /idx_user_accounts_primary_email/i.test(blob) ||
-    /primary_email/i.test(blob) ||
-    /user_accounts/i.test(blob)
-  );
-}
-
 function rowCount(result: unknown): number {
   if (Array.isArray(result)) return result.length;
   if (result && typeof result === 'object' && 'rowCount' in result) {
@@ -222,32 +176,4 @@ function asRowArray(result: unknown): unknown[] {
     return (result as { rows: unknown[] }).rows;
   }
   return [];
-}
-
-function collectErrorText(err: unknown): string {
-  const parts: string[] = [];
-  let cur: unknown = err;
-  for (let depth = 0; cur && depth < 5; depth += 1) {
-    if (cur instanceof Error) {
-      parts.push(cur.message);
-      cur = cur.cause;
-      continue;
-    }
-    if (cur && typeof cur === 'object' && 'message' in cur) {
-      parts.push(String((cur as { message: unknown }).message));
-    }
-    break;
-  }
-  return parts.join('\n');
-}
-
-function collectErrorCode(err: unknown): string {
-  let cur: unknown = err;
-  for (let depth = 0; cur && depth < 5; depth += 1) {
-    if (cur && typeof cur === 'object' && 'code' in cur && (cur as { code: unknown }).code) {
-      return String((cur as { code: unknown }).code);
-    }
-    cur = cur instanceof Error ? cur.cause : undefined;
-  }
-  return '';
 }
