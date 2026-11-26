@@ -46,6 +46,28 @@ flutter run \
   --dart-define=HELM_SUPABASE_ANON_KEY=your-anon-key
 ```
 
+## Staging web preview (GitHub Pages)
+
+After CI is green on `main`, Actions builds `lib/main.dart` for web against the
+staging API and Supabase anon credentials, then publishes a single shared
+preview:
+
+**https://helmyshehab.github.io/HelmAPP/**
+
+The AppBar shows `Preview · <shortSha>` for the deployed commit.
+
+One-time setup (repo admins):
+
+1. **Settings → Pages → Source:** GitHub Actions.
+2. **Settings → Secrets and variables → Actions** — add:
+   - `HELM_SUPABASE_URL` — staging project URL
+   - `HELM_SUPABASE_ANON_KEY` — anon/publishable key only (never the service role)
+3. In Supabase Auth URL config, allow `https://helmyshehab.github.io` (and the
+   `/HelmAPP/` path as needed) for traveler email/password redirects.
+
+Local builds omit the commit badge unless you pass
+`--dart-define=HELM_GIT_SHA=...`.
+
 ## Develop
 
 ```bash
@@ -53,3 +75,6 @@ flutter pub get
 flutter analyze
 flutter test
 ```
+
+CI uses Flutter **3.27.4** (see `.github/workflows/ci.yml`). Match that SDK
+locally when verifying analyze/tests against GitHub.
