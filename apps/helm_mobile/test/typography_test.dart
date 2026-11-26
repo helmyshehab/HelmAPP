@@ -294,7 +294,7 @@ String _readPubspec() {
 }
 
 List<_DeclaredFont> _parseFontDeclarations(String pubspec) {
-  final lines = pubspec.split('\n');
+  final lines = const LineSplitter().convert(pubspec);
   final start = lines.indexWhere((line) => line == '  fonts:');
   expect(start, greaterThanOrEqualTo(0));
   final declared = <_DeclaredFont>[];
