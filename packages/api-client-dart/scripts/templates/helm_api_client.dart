@@ -412,7 +412,7 @@ class HelmApiClient {
     return TripDraftQuote.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
-  Future<TripDraftQuote> getTripDraftQuote({
+  Future<TripDraftQuote?> getTripDraftQuote({
     required String accessToken,
     required String id,
   }) async {
@@ -420,6 +420,7 @@ class HelmApiClient {
       _u('/v1/trips/drafts/${Uri.encodeComponent(id)}/quote'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
+    if (res.statusCode == 404) return null;
     if (res.statusCode != 200) {
       throw Exception('getTripDraftQuote failed: ${res.statusCode}');
     }

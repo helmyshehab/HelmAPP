@@ -133,8 +133,9 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
 
   Future<void> _openDemoCheckout() async {
     if (_cleared || _saving || _checkoutRoute != null) return;
+    final quote = _currentQuote;
+    if (quote == null) return;
     final plan = _plan;
-    final estimate = _estimate;
     final days = [
       for (final day in plan.days)
         TripPreviewDay(
@@ -151,9 +152,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     final route = MaterialPageRoute<void>(
       builder: (_) => TripDemoCheckoutScreen(
         tripLabel: _tripLabel(plan),
-        estimate: estimate,
+        quote: quote,
         destinationName: plan.destinationName,
         days: days,
+        validateQuote: () => _validateCheckoutQuote(quote),
       ),
     );
     _checkoutRoute = route;
@@ -162,6 +164,35 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
     } finally {
       _checkoutRoute = null;
     }
+  }
+
+  Future<bool> _validateCheckoutQuote(TripDraftQuote quote) async {
+    final session = widget.auth.session;
+    if (session == null || _cleared || _currentQuote?.id != quote.id) {
+      return false;
+    }
+    final generation = widget.auth.authGeneration;
+    final current = await widget.apiClient.getTripDraftQuote(
+      accessToken: session.accessToken,
+      id: quote.draftId,
+    );
+    if (!mounted ||
+        _cleared ||
+        !_isAuthCurrent(generation) ||
+        _currentQuote?.id != quote.id) {
+      return false;
+    }
+    if (current?.id == quote.id &&
+        current?.draftId == quote.draftId &&
+        current?.totalEgp == quote.totalEgp) {
+      return true;
+    }
+    _quoteExpiration?.cancel();
+    setState(() {
+      _quote = null;
+      _quoteError = 'This quote is no longer current. Request a new quote.';
+    });
+    return false;
   }
 
   void _restoreSelections({
@@ -402,6 +433,17 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
         includedActivitySlugs: _includedActivitySlugs,
       ).toConstraints();
 
+  TripDraftQuote? get _currentQuote {
+    final quote = _quote;
+    if (quote == null ||
+        !DateTime.parse(quote.expiresAt).isAfter(DateTime.now())) {
+      return null;
+    }
+    return _quoteConstraints == jsonEncode(_snapshotConstraints())
+        ? quote
+        : null;
+  }
+
   Future<void> _saveDraft({bool requestQuote = false}) async {
     if (!canStartMutation(_saving) || _cleared) return;
     final session = widget.auth.session;
@@ -566,10 +608,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
 
     final theme = Theme.of(context);
     final estimate = _estimate;
-    final quote = _quote != null &&
-            _quoteConstraints == jsonEncode(_snapshotConstraints())
-        ? _quote
-        : null;
+    final quote = _currentQuote;
     final travelers = _plan.answers.travelerCount!;
     final nights = _plan.answers.nights!;
 
@@ -727,7 +766,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
               requestingQuote: _requestingQuote,
               onRequestQuote:
                   _saving ? null : () => _saveDraft(requestQuote: true),
-              onCheckout: _saving ? null : _openDemoCheckout,
+              onCheckout: _saving || quote == null ? null : _openDemoCheckout,
             ),
             if (_saveError != null) ...[
               const SizedBox(height: 8),
@@ -852,6 +891,8 @@ class _TripReview extends StatelessWidget {
             child: Text(
                 requestingQuote ? 'Getting quote…' : 'Save and get demo quote'),
           ),
+          if (currentQuote == null)
+            const Text('Get a current quote to try demo checkout.'),
           FilledButton(
             key: const Key('trip-demo-checkout'),
             onPressed: onCheckout,
