@@ -5,12 +5,15 @@ import { StructuredLogger } from '../../../common/logging/structured-logger';
 import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
 import {
   CATALOG_MEDIA_BUCKET,
+  PLACE_COVER_BUCKET,
+  PLACE_COVER_URL_TTL_SECONDS,
   STORAGE_PORT,
   type StoragePort,
 } from '../../../infrastructure/ports/storage.port';
 import { DRIZZLE, type DrizzleClient } from '../../../infrastructure/adapters/drizzle/drizzle.client';
 import {
   buildDestinationCoverObjectPath,
+  buildPlaceCoverObjectPath,
   validateCatalogCoverImage,
 } from '../../../infrastructure/storage/catalog-media';
 import { AuditService } from '../../audit/audit.service';
@@ -38,6 +41,8 @@ export type DestinationCoverUploadFile = {
   mimetype?: string;
   size?: number;
 };
+
+export type PlaceCoverUploadFile = DestinationCoverUploadFile;
 
 @Injectable()
 export class CatalogAdminService {
@@ -365,6 +370,191 @@ export class CatalogAdminService {
     });
 
     return this.hydrateDestination(destinationId);
+  }
+
+  async getStaffPlace(id: string) {
+    return this.hydratePlace(id);
+  }
+
+  /**
+   * Upload or replace the place cover.
+   * Storage object is written first; DB replacement is atomic; failures compensate.
+   * Does not change lifecycle_status or published_at.
+   */
+  async uploadPlaceCover(
+    actor: AuthPrincipal,
+    placeId: string,
+    file: PlaceCoverUploadFile | undefined,
+    altTextEn: string | undefined,
+    altTextAr?: string | null,
+  ) {
+    this.assertAdmin(actor);
+    const place = await this.repo.getPlaceById(placeId);
+    if (!place) throw AppException.notFound('Place not found');
+
+    const altEn = altTextEn?.trim() ?? '';
+    if (!altEn) {
+      throw AppException.validation('altTextEn is required');
+    }
+    if (altEn.length > 500) {
+      throw AppException.validation('altTextEn must be at most 500 characters');
+    }
+    const altArRaw = altTextAr?.trim() ?? '';
+    if (altArRaw.length > 500) {
+      throw AppException.validation('altTextAr must be at most 500 characters');
+    }
+    const altAr = altArRaw.length > 0 ? altArRaw : null;
+
+    if (!file?.buffer || file.buffer.byteLength === 0) {
+      throw AppException.validation('Cover image file is required');
+    }
+    const body =
+      file.buffer instanceof Uint8Array
+        ? file.buffer
+        : Uint8Array.from(file.buffer);
+    const validated = validateCatalogCoverImage(body, file.mimetype);
+
+    const mediaId = randomUUID();
+    const storagePath = buildPlaceCoverObjectPath({
+      placeId,
+      objectId: mediaId,
+      extension: validated.extension,
+    });
+    const storage = this.requireStorage();
+
+    await storage.uploadPrivateObject({
+      bucket: PLACE_COVER_BUCKET,
+      path: storagePath,
+      body: validated.body,
+      contentType: validated.mimeType,
+      upsert: false,
+    });
+
+    let replaced: Array<{
+      mediaId: string;
+      storageBucket: string;
+      storagePath: string;
+    }> = [];
+    try {
+      const result = await this.repo.replacePlaceCover({
+        placeId,
+        mediaId,
+        storageBucket: PLACE_COVER_BUCKET,
+        storagePath,
+        mimeType: validated.mimeType,
+        byteSize: validated.byteSize,
+        altTextEn: altEn,
+        altTextAr: altAr,
+      });
+      replaced = result.replaced;
+    } catch (err) {
+      await this.safeRemoveStorageObject(
+        PLACE_COVER_BUCKET,
+        storagePath,
+        'compensating_cleanup_after_db_failure',
+      );
+      throw err;
+    }
+
+    for (const old of replaced) {
+      await this.retireUnreferencedMediaAsset(old);
+    }
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.place.cover.upload',
+      entityType: 'place',
+      entityId: placeId,
+      after: {
+        mediaId,
+        storagePath,
+        replacedMediaIds: replaced.map((r) => r.mediaId),
+      },
+    });
+
+    return this.hydratePlace(placeId);
+  }
+
+  async updatePlaceCoverAlt(
+    actor: AuthPrincipal,
+    placeId: string,
+    input: { altTextEn: string; altTextAr?: string | null },
+  ) {
+    this.assertAdmin(actor);
+    const place = await this.repo.getPlaceById(placeId);
+    if (!place) throw AppException.notFound('Place not found');
+
+    const altEn = input.altTextEn?.trim() ?? '';
+    if (!altEn) {
+      throw AppException.validation('altTextEn is required');
+    }
+    if (altEn.length > 500) {
+      throw AppException.validation('altTextEn must be at most 500 characters');
+    }
+    const altArRaw = input.altTextAr?.trim() ?? '';
+    if (altArRaw.length > 500) {
+      throw AppException.validation('altTextAr must be at most 500 characters');
+    }
+    const altAr = altArRaw.length > 0 ? altArRaw : null;
+
+    const updated = await this.repo.updatePlaceCoverAltTexts(placeId, {
+      altTextEn: altEn,
+      altTextAr: altAr,
+    });
+    if (!updated) {
+      throw AppException.notFound('Place cover not found');
+    }
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.place.cover.alt_update',
+      entityType: 'place',
+      entityId: placeId,
+      after: { mediaId: updated.mediaId },
+    });
+
+    return this.hydratePlace(placeId);
+  }
+
+  async deletePlaceCover(actor: AuthPrincipal, placeId: string) {
+    this.assertAdmin(actor);
+    const place = await this.repo.getPlaceById(placeId);
+    if (!place) throw AppException.notFound('Place not found');
+
+    const deactivated = await this.repo.deactivatePlaceCover(placeId);
+    if (!deactivated) {
+      throw AppException.notFound('Place cover not found');
+    }
+
+    await this.retireUnreferencedMediaAsset(deactivated);
+
+    await this.audit.record({
+      actorUserId: actor.userId,
+      action: 'catalog.place.cover.delete',
+      entityType: 'place',
+      entityId: placeId,
+      after: { mediaId: deactivated.mediaId },
+    });
+
+    return this.hydratePlace(placeId);
+  }
+
+  private async hydratePlace(id: string) {
+    const row = await this.repo.getPlaceById(id);
+    if (!row) throw AppException.notFound('Place not found');
+    const media = await this.repo.listPlaceMedia(id);
+    const cover = media.find((item) => item.isCover && item.storageBucket === PLACE_COVER_BUCKET);
+    let coverPreviewUrl: string | undefined;
+    if (cover && typeof cover.storagePath === 'string' && this.storage) {
+      try {
+        coverPreviewUrl = await this.storage.createSignedDownloadUrl(
+          cover.storagePath, PLACE_COVER_URL_TTL_SECONDS, PLACE_COVER_BUCKET,
+        );
+      } catch {
+        // Keep staff metadata and cover controls available during storage outages.
+      }
+    }
+    return { ...row, media, coverPreviewUrl };
   }
 
   private async retireUnreferencedMediaAsset(asset: {

@@ -4,6 +4,7 @@ import 'package:helm_api_client/helm_api_client.dart';
 import '../geo/country_label.dart';
 import '../theme/helm_directional_text.dart';
 import '../theme/helm_wrapping_text.dart';
+import '../widgets/helm_editorial_row.dart';
 import 'destination_detail.dart';
 import 'place_list_item.dart';
 
@@ -435,29 +436,57 @@ class _PlaceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final languageCode = Localizations.localeOf(context).languageCode;
     final short = place.availableShortDescription;
+    final showImage = helmResolvableMediaUrl(place.coverImageUrl);
+    final alt = place.coverAltForLanguage(languageCode);
 
-    return Column(
+    return Row(
       key: Key('destination-place-${place.slug}'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          place.nameEn,
-          key: Key('destination-place-name-${place.slug}'),
-          style: theme.textTheme.titleMedium,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                place.nameEn,
+                key: Key('destination-place-name-${place.slug}'),
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                place.categoryLabel,
+                key: Key('destination-place-category-${place.slug}'),
+                style: theme.textTheme.bodySmall,
+              ),
+              if (short != null) ...[
+                const SizedBox(height: 4),
+                HelmDirectionalText(
+                  short,
+                  key: Key('destination-place-short-${place.slug}'),
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ],
+          ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          place.categoryLabel,
-          key: Key('destination-place-category-${place.slug}'),
-          style: theme.textTheme.bodySmall,
-        ),
-        if (short != null) ...[
-          const SizedBox(height: 4),
-          HelmDirectionalText(
-            short,
-            key: Key('destination-place-short-${place.slug}'),
-            style: theme.textTheme.bodyMedium,
+        if (showImage) ...[
+          const SizedBox(width: 12),
+          SizedBox(
+            width: HelmEditorialRow.narrowThumbnailSize.width,
+            height: HelmEditorialRow.narrowThumbnailSize.height,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                place.coverImageUrl!.trim(),
+                key: Key('destination-place-cover-${place.slug}'),
+                fit: BoxFit.cover,
+                semanticLabel: (alt != null && alt.isNotEmpty) ? alt : place.nameEn,
+                errorBuilder: (context, error, stackTrace) =>
+                    const SizedBox.shrink(),
+              ),
+            ),
           ),
         ],
       ],

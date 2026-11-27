@@ -36,13 +36,18 @@ export type TripDraftItineraryItem = components["schemas"]["TripDraftItineraryIt
 export type DestinationListResponse = components["schemas"]["DestinationListResponse"];
 export type DestinationPublic = components["schemas"]["DestinationPublic"];
 export type DestinationCoverPublic = components["schemas"]["DestinationCoverPublic"];
+export type PlaceCoverPublic = components["schemas"]["PlaceCoverPublic"];
+export type CatalogCoverPublic = components["schemas"]["CatalogCoverPublic"];
 export type UpdateDestinationCoverAltRequest =
   components["schemas"]["UpdateDestinationCoverAltRequest"];
+export type UpdatePlaceCoverAltRequest =
+  components["schemas"]["UpdatePlaceCoverAltRequest"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
 export type PlacePublic = components["schemas"]["PlacePublic"];
 export type CategoryListResponse = components["schemas"]["CategoryListResponse"];
 export type TagListResponse = components["schemas"]["TagListResponse"];
 export type PlaceAdminSummary = components["schemas"]["PlaceAdminSummary"];
+export type PlaceAdmin = components["schemas"]["PlaceAdmin"];
 export type CatalogImportResult = components["schemas"]["CatalogImportResult"];
 export type CatalogImportRunStatus = components["schemas"]["CatalogImportRunStatus"];
 export type CatalogImportRunListItem = components["schemas"]["CatalogImportRunListItem"];
@@ -658,6 +663,58 @@ export function createHelmClient(options: HelmClientOptions) {
         method: "POST",
         body: JSON.stringify(body),
       });
+    },
+    async adminGetCatalogPlace(id: string): Promise<PlaceAdmin> {
+      return getJson<PlaceAdmin>(
+        `/v1/admin/catalog/places/${encodeURIComponent(id)}`,
+      );
+    },
+    async adminUploadPlaceCover(
+      id: string,
+      input: {
+        file: Blob;
+        altTextEn: string;
+        altTextAr?: string;
+        fileName?: string;
+      },
+    ): Promise<PlaceAdmin> {
+      const form = new FormData();
+      form.append("file", input.file, input.fileName ?? "cover");
+      form.append("altTextEn", input.altTextEn);
+      if (input.altTextAr !== undefined) {
+        form.append("altTextAr", input.altTextAr);
+      }
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/catalog/places/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, {
+        method: "POST",
+        headers,
+        body: form,
+      });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+      return (await res.json()) as PlaceAdmin;
+    },
+    async adminUpdatePlaceCoverAlt(
+      id: string,
+      body: UpdatePlaceCoverAltRequest,
+    ): Promise<PlaceAdmin> {
+      return sendJson<PlaceAdmin>(
+        `/v1/admin/catalog/places/${encodeURIComponent(id)}/cover`,
+        { method: "PATCH", body: JSON.stringify(body) },
+      );
+    },
+    async adminDeletePlaceCover(id: string): Promise<PlaceAdmin> {
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/catalog/places/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, { method: "DELETE", headers });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+      return (await res.json()) as PlaceAdmin;
     },
     async adminTransitionCatalogPlace(
       id: string,

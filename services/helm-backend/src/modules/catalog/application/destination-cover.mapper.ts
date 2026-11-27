@@ -1,32 +1,45 @@
 import type { StoragePort } from '../../../infrastructure/ports/storage.port';
 
-export type DestinationCoverRow = {
-  destinationId: string;
+export type CatalogCoverRow = {
   storageBucket: string;
   storagePath: string;
   altTextEn: string | null;
   altTextAr: string | null;
 };
 
-export type DestinationCoverPublic = {
+export type DestinationCoverRow = CatalogCoverRow & {
+  destinationId: string;
+};
+
+export type PlaceCoverRow = CatalogCoverRow & {
+  placeId: string;
+};
+
+/** Traveler-facing cover. Never includes storage bucket/path or credentials. */
+export type CatalogCoverPublic = {
   url: string;
   altTextEn?: string;
   altTextAr?: string;
 };
 
+export type DestinationCoverPublic = CatalogCoverPublic;
+
 /**
  * Resolve a public cover DTO. Never exposes bucket/path or credentials.
  */
-export function toPublicDestinationCover(
-  row: Pick<DestinationCoverRow, 'storageBucket' | 'storagePath' | 'altTextEn' | 'altTextAr'>,
+export function toPublicCatalogCover(
+  row: Pick<CatalogCoverRow, 'storageBucket' | 'storagePath' | 'altTextEn' | 'altTextAr'>,
   storage: Pick<StoragePort, 'publicObjectUrl'>,
-): DestinationCoverPublic {
+): CatalogCoverPublic {
   const altTextEn = row.altTextEn?.trim();
   const altTextAr = row.altTextAr?.trim();
-  const cover: DestinationCoverPublic = {
+  const cover: CatalogCoverPublic = {
     url: storage.publicObjectUrl(row.storageBucket, row.storagePath),
   };
   if (altTextEn) cover.altTextEn = altTextEn;
   if (altTextAr) cover.altTextAr = altTextAr;
   return cover;
 }
+
+/** @deprecated Prefer toPublicCatalogCover — kept for destination call sites. */
+export const toPublicDestinationCover = toPublicCatalogCover;

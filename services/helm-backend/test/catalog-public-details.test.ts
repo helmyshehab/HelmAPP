@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import test from 'node:test';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
@@ -7,6 +8,8 @@ import * as schema from '../src/infrastructure/adapters/drizzle/schema.ts';
 import { CatalogRepository } from '../src/modules/catalog/infrastructure/catalog.repository.ts';
 import { CatalogQueryService } from '../src/modules/catalog/application/catalog-query.service.ts';
 import { assertNoInternalLeak } from '../src/modules/catalog/application/public-catalog.mapper.ts';
+import { MockStorageAdapter } from '../src/infrastructure/adapters/mock/mock-storage.adapter.ts';
+import { PLACE_COVER_BUCKET } from '../src/infrastructure/ports/storage.port.ts';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -30,7 +33,7 @@ async function withDb<T>(fn: (svc: CatalogQueryService, db: ReturnType<typeof dr
   const client = postgres(databaseUrl, { max: 1 });
   try {
     const db = drizzle(client, { schema });
-    const svc = new CatalogQueryService(new CatalogRepository(db as never));
+    const svc = new CatalogQueryService(new CatalogRepository(db as never), new MockStorageAdapter());
     return await fn(svc, db);
   } finally {
     await client.end({ timeout: 5 });
@@ -67,6 +70,7 @@ test('public place details map every category; hide drafts, internals, and list 
 
   await withDb(async (svc, db) => {
     const runId = `pd${Date.now()}`;
+    const coverId = randomUUID();
     await cleanupFixtures(db);
 
     try {
@@ -332,8 +336,31 @@ test('public place details map every category; hide drafts, internals, and list 
       const listedRestaurant = listedDining.items.find((i) => i.slug === restaurantSlug);
       assert.ok(listedRestaurant);
       assert.equal('details' in listedRestaurant!, false);
+
+      const repo = new CatalogRepository(db as never);
+      const coverPath = `places/${FIXTURE.draft}/cover/${coverId}.jpg`;
+      await repo.replacePlaceCover({
+        placeId: FIXTURE.draft,
+        mediaId: coverId,
+        storageBucket: PLACE_COVER_BUCKET,
+        storagePath: coverPath,
+        mimeType: 'image/jpeg',
+        byteSize: 32,
+        altTextEn: 'Test cover',
+        altTextAr: null,
+      });
+      assert.equal(await repo.getActivePlaceCover(FIXTURE.draft), null);
+      await publish(FIXTURE.draft);
+      const withCover = await svc.getPublicPlace(draftSlug);
+      assert.match(String(asRecord(withCover.cover)?.url), /^mock:\/\/storage\/signed/);
+      assert.ok(Array.isArray(withCover.media));
+      assert.equal(withCover.media.length, 0);
+      await db.execute(sql`update catalog.places set lifecycle_status = 'archived' where id = ${FIXTURE.draft}::uuid`);
+      assert.equal(await repo.getActivePlaceCover(FIXTURE.draft), null);
+      await assert.rejects(() => svc.getPublicPlace(draftSlug));
     } finally {
       await cleanupFixtures(db);
+      await db.execute(sql`delete from catalog.media_assets where id = ${coverId}::uuid`);
     }
   });
 });

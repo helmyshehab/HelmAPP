@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
 import { APP_ENV, type AppEnv } from '../../config/env';
+import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../../ports/storage.port';
 import type {
   StoragePort,
   UploadPublicObjectInput,
@@ -55,9 +56,10 @@ export class SupabaseStorageAdapter implements StoragePort {
   async createSignedDownloadUrl(
     path: string,
     expiresInSeconds: number,
+    bucketName = CATALOG_MEDIA_BUCKET,
   ): Promise<string> {
     const objectPath = assertSafeObjectPath(path);
-    const bucket = assertCatalogMediaBucket('catalog-media');
+    const bucket = assertCatalogMediaBucket(bucketName);
     const url = `${this.baseUrl}/storage/v1/object/sign/${encodeURIComponent(bucket)}/${encodeObjectPath(objectPath)}`;
     const response = await this.fetchFn(url, {
       method: 'POST',
@@ -88,6 +90,19 @@ export class SupabaseStorageAdapter implements StoragePort {
   async uploadPublicObject(
     input: UploadPublicObjectInput,
   ): Promise<UploadPublicObjectResult> {
+    const publicUrl = this.publicObjectUrl(input.bucket, input.path);
+    const { bucket, path } = await this.uploadObject(input);
+    return { bucket, path, publicUrl, contentType: input.contentType, byteSize: input.body.byteLength };
+  }
+
+  async uploadPrivateObject(input: UploadPublicObjectInput): Promise<void> {
+    if (input.bucket !== PLACE_COVER_BUCKET) {
+      throw AppException.validation('Expected private place cover bucket');
+    }
+    await this.uploadObject(input);
+  }
+
+  private async uploadObject(input: UploadPublicObjectInput) {
     const bucket = assertCatalogMediaBucket(input.bucket);
     const path = assertSafeObjectPath(input.path);
     if (!(input.body instanceof Uint8Array) || input.body.byteLength === 0) {
@@ -115,13 +130,7 @@ export class SupabaseStorageAdapter implements StoragePort {
       );
     }
 
-    return {
-      bucket,
-      path,
-      publicUrl: this.publicObjectUrl(bucket, path),
-      contentType: input.contentType,
-      byteSize: input.body.byteLength,
-    };
+    return { bucket, path };
   }
 
   async removeObject(bucket: string, path: string): Promise<void> {
@@ -150,6 +159,9 @@ export class SupabaseStorageAdapter implements StoragePort {
 
   publicObjectUrl(bucket: string, path: string): string {
     const safeBucket = assertCatalogMediaBucket(bucket);
+    if (safeBucket !== CATALOG_MEDIA_BUCKET) {
+      throw AppException.validation('Public URL requires the public catalog bucket');
+    }
     const safePath = assertSafeObjectPath(path);
     return `${this.baseUrl}/storage/v1/object/public/${encodeURIComponent(safeBucket)}/${encodeObjectPath(safePath)}`;
   }

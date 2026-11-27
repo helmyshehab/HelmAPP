@@ -7,6 +7,7 @@ import 'package:helm_api_client/helm_api_client.dart';
 
 import '../../auth/traveler_session.dart';
 import '../../discover/place_list_item.dart';
+import '../../widgets/helm_editorial_row.dart';
 import '../draft_title_patch.dart';
 import 'istanbul_demo_catalog.dart';
 import 'trip_answers.dart';
@@ -80,6 +81,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   String? _requestStatus;
   bool _cleared = false;
   Set<String>? _publishedSlugs;
+  Map<String, PlaceListItem> _publishedPlacesBySlug = const {};
   bool _catalogFailed = false;
   int? _activityPickerDay;
   Route<void>? _checkoutRoute;
@@ -167,10 +169,12 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       setState(() {
         _catalogFailed = false;
         _publishedSlugs = null;
+        _publishedPlacesBySlug = const {};
       });
     }
     try {
       final slugs = <String>{};
+      final bySlug = <String, PlaceListItem>{};
       var offset = 0;
       while (true) {
         final page =
@@ -179,7 +183,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
           limit: 100,
           offset: offset,
         ));
-        slugs.addAll(page.items.map((place) => place.slug));
+        for (final place in page.items) {
+          slugs.add(place.slug);
+          bySlug[place.slug] = place;
+        }
         if (!page.hasMore) break;
         if (page.items.isEmpty || page.offset != offset) {
           throw StateError('Incomplete catalog page');
@@ -189,6 +196,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       if (!mounted || _cleared) return;
       setState(() {
         _publishedSlugs = slugs;
+        _publishedPlacesBySlug = Map.unmodifiable(bySlug);
         if (!slugs.contains(_hotelSlug) && _availableHotels.isNotEmpty) {
           _hotelSlug = _availableHotels.first.slug;
         }
@@ -203,6 +211,29 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   }
 
   bool _isPublished(String slug) => _publishedSlugs?.contains(slug) ?? false;
+
+  PlaceListItem? _publishedPlace(String slug) =>
+      _publishedPlacesBySlug[slug];
+
+  Widget? _placeCoverThumb(String slug, {Key? key}) {
+    final place = _publishedPlace(slug);
+    final url = place?.coverImageUrl;
+    if (!helmResolvableMediaUrl(url)) return null;
+    return SizedBox(
+      key: key,
+      width: 48,
+      height: 48,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          url!.trim(),
+          fit: BoxFit.cover,
+          semanticLabel: place?.availableCoverAlt ?? place?.nameEn,
+          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+        ),
+      ),
+    );
+  }
 
   List<DemoHotelOption> get _availableHotels =>
       demoHotelOptions.where((option) => _isPublished(option.slug)).toList();
@@ -501,6 +532,10 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
           ListTile(
             key: Key('trip-catalog-activity-${place.slug}'),
             contentPadding: EdgeInsets.zero,
+            leading: _placeCoverThumb(
+              place.slug,
+              key: Key('trip-catalog-activity-cover-${place.slug}'),
+            ),
             title: Text(place.nameEn),
             subtitle: Text('${place.shortDescriptionEn}\n'
                 'Demo ${formatDemoEgp(demoActivityRateForSlug(place.slug)! * travelers)} for group'),
@@ -882,6 +917,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
                 activityPicker: _activityPicker(day, travelers),
                 includedActivitySlugs: _includedActivitySlugs,
                 travelers: travelers,
+                coverForSlug: _placeCoverThumb,
                 onRemove: _removeActivity,
                 onRestore: _restoreActivity,
                 onRemoveScheduled: _saving
@@ -1331,6 +1367,7 @@ class _DayCard extends StatelessWidget {
     required this.activityPicker,
     required this.includedActivitySlugs,
     required this.travelers,
+    required this.coverForSlug,
     required this.onRemove,
     required this.onRestore,
     required this.onRemoveScheduled,
@@ -1344,6 +1381,7 @@ class _DayCard extends StatelessWidget {
   final Widget activityPicker;
   final Set<String> includedActivitySlugs;
   final int travelers;
+  final Widget? Function(String slug, {Key? key}) coverForSlug;
   final ValueChanged<String> onRemove;
   final ValueChanged<String> onRestore;
   final ValueChanged<String>? onRemoveScheduled;
@@ -1399,6 +1437,10 @@ class _DayCard extends StatelessWidget {
                   stop: stop,
                   included: includedActivitySlugs.contains(stop.place.slug),
                   travelers: travelers,
+                  cover: coverForSlug(
+                    stop.place.slug,
+                    key: Key('trip-stop-cover-${stop.place.slug}'),
+                  ),
                   onRemove: onRemove,
                   onRestore: onRestore,
                   onRemoveScheduled: onRemoveScheduled,
@@ -1438,6 +1480,7 @@ class _StopBlock extends StatelessWidget {
     required this.stop,
     required this.included,
     required this.travelers,
+    required this.cover,
     required this.onRemove,
     required this.onRestore,
     required this.onRemoveScheduled,
@@ -1451,6 +1494,7 @@ class _StopBlock extends StatelessWidget {
   final TripPreviewStop stop;
   final bool included;
   final int travelers;
+  final Widget? cover;
   final ValueChanged<String> onRemove;
   final ValueChanged<String> onRestore;
   final ValueChanged<String>? onRemoveScheduled;
@@ -1475,6 +1519,10 @@ class _StopBlock extends StatelessWidget {
         children: [
           Row(
             children: [
+              if (cover != null) ...[
+                cover!,
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: Text(
                   stop.roleLabel == TripPreviewStop.unscheduledRole

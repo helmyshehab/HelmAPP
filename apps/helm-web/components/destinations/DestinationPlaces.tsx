@@ -61,16 +61,35 @@ export function DestinationPlaces({
         <ul className="place-list">
           {places.map((place) => {
             const description = placeDescription(place);
+            const coverUrl = place.cover?.url?.trim();
+            const coverAlt =
+              place.cover?.altTextEn?.trim() ||
+              place.cover?.altTextAr?.trim() ||
+              place.nameEn;
             return (
               <li key={place.id} className="place-item">
-                <p className="place-name">{place.nameEn}</p>
-                {place.nameAr ? (
-                  <p className="place-name-ar" lang="ar" dir="rtl">{place.nameAr}</p>
-                ) : null}
-                <p className="place-meta">{formatCategory(place.category)}</p>
-                {description ? (
-                  <p className="place-summary">{description}</p>
-                ) : null}
+                <div className="place-item-row">
+                  <div className="place-item-copy">
+                    <p className="place-name">{place.nameEn}</p>
+                    {place.nameAr ? (
+                      <p className="place-name-ar" lang="ar" dir="rtl">
+                        {place.nameAr}
+                      </p>
+                    ) : null}
+                    <p className="place-meta">{formatCategory(place.category)}</p>
+                    {description ? (
+                      <p className="place-summary">{description}</p>
+                    ) : null}
+                  </div>
+                  {coverUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      className="place-cover"
+                      src={coverUrl}
+                      alt={coverAlt}
+                    />
+                  ) : null}
+                </div>
               </li>
             );
           })}

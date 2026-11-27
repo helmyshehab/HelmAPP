@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
+import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../../ports/storage.port';
 import type {
   StoragePort,
   UploadPublicObjectInput,
@@ -23,14 +24,28 @@ export class MockStorageAdapter implements StoragePort {
     return `${bucket}:${path}`;
   }
 
-  async createSignedDownloadUrl(path: string, expiresInSeconds: number): Promise<string> {
+  async createSignedDownloadUrl(path: string, expiresInSeconds: number, bucket = CATALOG_MEDIA_BUCKET): Promise<string> {
     const safePath = assertSafeObjectPath(path);
+    assertCatalogMediaBucket(bucket);
     return `mock://storage/signed?path=${encodeURIComponent(safePath)}&exp=${expiresInSeconds}`;
   }
 
   async uploadPublicObject(
     input: UploadPublicObjectInput,
   ): Promise<UploadPublicObjectResult> {
+    const publicUrl = this.publicObjectUrl(input.bucket, input.path);
+    const { bucket, path } = this.uploadObject(input);
+    return { bucket, path, publicUrl, contentType: input.contentType, byteSize: input.body.byteLength };
+  }
+
+  async uploadPrivateObject(input: UploadPublicObjectInput): Promise<void> {
+    if (input.bucket !== PLACE_COVER_BUCKET) {
+      throw AppException.validation('Expected private place cover bucket');
+    }
+    this.uploadObject(input);
+  }
+
+  private uploadObject(input: UploadPublicObjectInput) {
     const bucket = assertCatalogMediaBucket(input.bucket);
     const path = assertSafeObjectPath(input.path);
     const key = this.key(bucket, path);
@@ -41,13 +56,7 @@ export class MockStorageAdapter implements StoragePort {
       body: Uint8Array.from(input.body),
       contentType: input.contentType,
     });
-    return {
-      bucket,
-      path,
-      publicUrl: this.publicObjectUrl(bucket, path),
-      contentType: input.contentType,
-      byteSize: input.body.byteLength,
-    };
+    return { bucket, path };
   }
 
   async removeObject(bucket: string, path: string): Promise<void> {
@@ -58,6 +67,9 @@ export class MockStorageAdapter implements StoragePort {
 
   publicObjectUrl(bucket: string, path: string): string {
     const safeBucket = assertCatalogMediaBucket(bucket);
+    if (safeBucket !== CATALOG_MEDIA_BUCKET) {
+      throw AppException.validation('Public URL requires the public catalog bucket');
+    }
     const safePath = assertSafeObjectPath(path);
     return `mock://storage/public/${safeBucket}/${safePath}`;
   }

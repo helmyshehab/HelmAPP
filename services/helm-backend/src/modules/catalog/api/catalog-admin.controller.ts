@@ -263,6 +263,52 @@ export class CatalogAdminController {
     return this.admin.createPlace(user, body);
   }
 
+  @Get('places/:id')
+  @Roles('operator', 'administrator', 'super-administrator')
+  getPlace(@Param('id') id: string) {
+    return this.admin.getStaffPlace(id);
+  }
+
+  @Post('places/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  @UseInterceptors(CatalogCoverUploadInterceptor('file'))
+  uploadPlaceCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @UploadedFile() file: UploadedCoverFile | undefined,
+    @Body() body: { altTextEn?: string; altTextAr?: string },
+  ) {
+    return this.admin.uploadPlaceCover(
+      user,
+      id,
+      file?.buffer
+        ? { buffer: file.buffer, mimetype: file.mimetype, size: file.size }
+        : undefined,
+      body?.altTextEn,
+      body?.altTextAr,
+    );
+  }
+
+  @Patch('places/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  updatePlaceCoverAlt(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateCoverAltBody))
+    body: z.infer<typeof updateCoverAltBody>,
+  ) {
+    return this.admin.updatePlaceCoverAlt(user, id, body);
+  }
+
+  @Delete('places/:id/cover')
+  @Roles('administrator', 'super-administrator')
+  deletePlaceCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+  ) {
+    return this.admin.deletePlaceCover(user, id);
+  }
+
   @Post('places/:id/transition')
   @Roles('operator', 'administrator', 'super-administrator')
   transition(
