@@ -51,7 +51,7 @@ Future<void> main() async {
 }
 
 class _DemoApi {
-  _DemoApi(this.auth);
+  _DemoApi(this.auth) : _destinations = _loadDestinations();
 
   static const _destination = {
     'id': 'd1f3cc7e-7aea-403a-b27f-0eb8648737b1',
@@ -72,25 +72,42 @@ class _DemoApi {
   static const _requestPath = '/v1/trips/requests';
 
   final FakeTravelerAuth auth;
+  final List<Map<String, dynamic>> _destinations;
   final _draftsByOwner = <String, Map<String, Map<String, dynamic>>>{};
   final _requestsByOwner = <String, Map<String, Map<String, dynamic>>>{};
   final _bookingsByOwner = <String, Map<String, Map<String, dynamic>>>{};
+
+  static List<Map<String, dynamic>> _loadDestinations() {
+    const catalog = String.fromEnvironment('HELM_DEMO_DESTINATIONS');
+    if (catalog.isEmpty) return [_destination];
+    return (jsonDecode(catalog) as List).cast<Map<String, dynamic>>();
+  }
 
   Future<http.Response> handle(http.Request request) async {
     final path = request.url.path;
     final query = request.url.queryParameters;
     if (request.method == 'GET') {
+      if (request.url.pathSegments.length == 3 &&
+          path.startsWith('/v1/destinations/')) {
+        for (final destination in _destinations) {
+          if (destination['slug'] == request.url.pathSegments.last) {
+            return _json(destination);
+          }
+        }
+      }
       switch (path) {
         case '/v1/destinations':
           final search = query['q']?.trim().toLowerCase() ?? '';
           final country = query['country'];
           return _page(query, [
-            if ((country == null || country == 'ID') &&
-                ('ubud'.contains(search) || 'أوبود'.contains(search)))
-              _destination,
+            for (final destination in _destinations)
+              if ((country == null || country == destination['countryCode']) &&
+                  [destination['nameEn'], destination['nameAr']].any(
+                    (name) =>
+                        name is String && name.toLowerCase().contains(search),
+                  ))
+                destination,
           ]);
-        case '/v1/destinations/ubud':
-          return _json(_destination);
         case '/v1/catalog/places':
           return _page(query, [
             if (query['destinationSlug'] == 'ubud')
