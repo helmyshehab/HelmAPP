@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/auth/fake_traveler_auth.dart';
+import 'package:helm_mobile/build/trip_gen/trip_answers.dart';
 import 'package:helm_mobile/build/trip_gen/trip_demo_pricing.dart';
 import 'package:helm_mobile/build/trip_gen/trip_preview_draft.dart';
 import 'package:helm_mobile/build/trip_gen/ubud_demo_catalog.dart';
@@ -68,9 +69,11 @@ class _DemoApi {
     'longitude': 115.2625,
   };
   static const _draftPath = '/v1/trips/drafts';
+  static const _requestPath = '/v1/trips/requests';
 
   final FakeTravelerAuth auth;
   final _draftsByOwner = <String, Map<String, Map<String, dynamic>>>{};
+  final _requestsByOwner = <String, Map<String, Map<String, dynamic>>>{};
   final _bookingsByOwner = <String, Map<String, Map<String, dynamic>>>{};
 
   Future<http.Response> handle(http.Request request) async {
@@ -136,6 +139,54 @@ class _DemoApi {
 
     final drafts = _draftsByOwner.putIfAbsent(session.userId, () => {});
     final segments = request.url.pathSegments;
+    if (path == _requestPath) {
+      final requests = _requestsByOwner.putIfAbsent(session.userId, () => {});
+      if (request.method == 'GET') {
+        return _json({'items': requests.values.toList().reversed.toList()});
+      }
+      if (request.method == 'POST') {
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        final draftId = body['draftId'];
+        final draft = drafts[draftId];
+        if (draftId is! String || draft == null) {
+          return _json({'title': 'Draft not found'}, statusCode: 404);
+        }
+        final existing = requests[draftId];
+        if (existing != null) return _json(existing, statusCode: 201);
+
+        final constraints = draft['constraints'] as Map<String, dynamic>;
+        final snapshot = tryParseTripPreviewDraft(constraints);
+        if (snapshot == null) {
+          return _json({'title': 'Save a supported itinerary first'},
+              statusCode: 422);
+        }
+        final now = DateTime.now().toUtc().toIso8601String();
+        final submitted = {
+          'id': 'demo-request-${requests.length + 1}',
+          'draftId': draftId,
+          'title': draft['title'],
+          'destinationSlug':
+              snapshot.answers.destination == TripDestinationChoice.istanbul
+                  ? 'istanbul'
+                  : 'ubud',
+          'status': 'submitted',
+          'constraints': constraints,
+          'createdAt': now,
+          'updatedAt': now,
+        };
+        requests[draftId] = submitted;
+        return _json(submitted, statusCode: 201);
+      }
+    }
+    if (request.method == 'GET' &&
+        segments.length == 4 &&
+        path.startsWith('$_requestPath/')) {
+      final requests = _requestsByOwner[session.userId]?.values ??
+          const <Map<String, dynamic>>[];
+      for (final submitted in requests) {
+        if (submitted['id'] == segments.last) return _json(submitted);
+      }
+    }
     if (request.method == 'PATCH' &&
         segments.length == 7 &&
         path.startsWith('/v1/admin/trips/demo-bookings/') &&

@@ -70,6 +70,13 @@ void main() {
         findsOneWidget);
     expect(find.byKey(const Key('trip-stop-ubud-balinese-cooking-class')),
         findsNothing);
+    final coverage = find.byKey(const Key('trip-preview-coverage'));
+    expect(coverage, findsOneWidget);
+    expect(find.descendant(of: coverage, matching: find.text('Trip Mode')),
+        findsOneWidget);
+    expect(find.text('• Domestic flights'), findsNothing);
+    expect(find.byKey(const Key('trip-preview-day-1-food')), findsOneWidget);
+    expect(find.byKey(const Key('trip-preview-day-2-food')), findsOneWidget);
     final picker = find.byKey(const Key('trip-day-add-activity-1'));
     await tester.ensureVisible(picker);
     await tester.tap(picker);
