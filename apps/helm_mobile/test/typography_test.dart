@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_mobile/theme/helm_theme.dart';
+import 'package:helm_mobile/theme/helm_tokens.dart';
 import 'package:helm_mobile/theme/helm_typography.dart';
 
 /// Code points in حِلْم: ha, kasra, lam, sukun, meem.
@@ -102,6 +103,24 @@ const Set<String> _frauncesRoles = <String>{
   'titleLarge',
 };
 
+const Map<String, double> _approvedSizes = <String, double>{
+  'displayLarge': HelmTypeSize.page,
+  'displayMedium': HelmTypeSize.page,
+  'displaySmall': HelmTypeSize.page,
+  'headlineLarge': HelmTypeSize.page,
+  'headlineMedium': HelmTypeSize.section,
+  'headlineSmall': HelmTypeSize.section,
+  'titleLarge': HelmTypeSize.card,
+  'titleMedium': HelmTypeSize.body,
+  'titleSmall': HelmTypeSize.bodySmall,
+  'bodyLarge': HelmTypeSize.body,
+  'bodyMedium': HelmTypeSize.bodySmall,
+  'bodySmall': HelmTypeSize.meta,
+  'labelLarge': HelmTypeSize.action,
+  'labelMedium': HelmTypeSize.meta,
+  'labelSmall': HelmTypeSize.meta,
+};
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -170,7 +189,7 @@ void main() {
       ('light', HelmTheme.light(), HelmTheme.lightScheme),
       ('dark', HelmTheme.dark(), HelmTheme.darkScheme),
     ]) {
-      test('$name keeps Material 3 metrics and assigns HELM families', () {
+      test('$name assigns HELM families and Phase 1A sizes', () {
         final baseline = ThemeData(
           useMaterial3: true,
           colorScheme: scheme,
@@ -185,8 +204,9 @@ void main() {
             final original = role.read(reference);
             expect(style, isNotNull, reason: role.name);
             expect(original, isNotNull, reason: role.name);
-            expect(style!.fontSize, original!.fontSize, reason: role.name);
-            expect(style.fontWeight, original.fontWeight, reason: role.name);
+            expect(style!.fontSize, _approvedSizes[role.name],
+                reason: role.name);
+            expect(style.fontWeight, original!.fontWeight, reason: role.name);
             expect(style.height, original.height, reason: role.name);
             expect(style.letterSpacing, original.letterSpacing,
                 reason: role.name);
@@ -202,6 +222,19 @@ void main() {
         }
       });
     }
+  });
+
+  group('spacing tokens', () {
+    test('exposes the approved scale including screen padding', () {
+      expect(HelmSpacing.xs, 4);
+      expect(HelmSpacing.sm, 8);
+      expect(HelmSpacing.md, 12);
+      expect(HelmSpacing.lg, 16);
+      expect(HelmSpacing.screen, 20);
+      expect(HelmSpacing.xl, 24);
+      expect(HelmSpacing.xxl, 32);
+      expect(HelmSpacing.xxxl, 48);
+    });
   });
 }
 

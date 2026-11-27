@@ -12,35 +12,56 @@ The Arabic wordmark is custom, refined Naskh-inspired calligraphy with visible �
 
 ## Color
 
-Approved palette:
+Approved Phase 1A traveler Flutter palette:
 
-- Midnight `#0C1B2A` — dark discovery surfaces
-- Deep Ocean `#163747` — dark discovery panels
-- Teal `#177F83` — primary interactive accent
-- Coral `#F1A38D` — selective accent
-- Ivory `#F7F5F0` — light planning and admin surfaces
+Light (luxury editorial):
+
+- Background `#F7F4ED`
+- Surface `#FFFFFF`
+- Sand `#E5DED2`
+- Primary `#173D35`
+- Sage `#789D8C` — decorative accent only
+- Champagne `#BCA47E` — tertiary fill only
+
+Dark (cinematic):
+
+- Background `#0B151C`
+- Surface `#142831`
+- Selected surface `#24534F`
+- Primary `#68B5A5`
+- Text `#F3EFE6`
+- Muted text `#A6C0BC`
 
 Brand colors are not interchangeable foregrounds and backgrounds. Text, focus, control boundaries, and interactive states must meet WCAG on the surface they actually sit on.
 
-Approved contrast:
+Approved contrast (approximate):
 
-- Ivory on Midnight: about 15.98:1. Discovery text.
-- Ivory on Deep Ocean: about 11.53:1. Discovery text on raised panels.
-- White on Teal: about 4.77:1. Teal control labels.
-- Teal on Ivory: about 4.38:1. Large text and non-text UI only. Insufficient for normal-size WCAG AA text.
-- Teal on Midnight: about 3.65:1. Large text and focus rings only. Insufficient for normal-size WCAG AA text.
-- Coral on Ivory: about 1.86:1. Insufficient as a standalone control boundary. Pair a coral fill with a Midnight or Deep Ocean edge, and put Midnight or Deep Ocean text on the fill.
+- Primary on light background: about 10.89:1. Body text.
+- Primary on white surface: about 11.96:1. Body text.
+- White / light surface on primary: about 11.96:1. Primary control labels.
+- Dark text on dark background: about 16.08:1. Body text.
+- Dark muted on dark surface: about 7.90:1. Secondary text.
+- Dark primary on dark background: about 7.68:1. Accent and focus.
+- Sage on white: about 3.00:1. Insufficient for text or reliable non-text UI. Decorative only.
+- Champagne on light background: about 2.18:1. Insufficient as text or boundary. Use primary labels on champagne fills.
+- Dark muted on selected surface: about 4.49:1. Insufficient for AA body text — do not place muted copy on selected surfaces.
 
-Small text and links on Ivory use Midnight or Deep Ocean. A semantic danger, success, or neutral token needs a stated contrast reason and review before it becomes a visual convention.
+Flutter maps these into `ColorScheme` in `HelmTheme`. Legacy token names (`ivory`, `midnight`, `deepOcean`, `teal`, `coral`) remain as aliases onto Phase 1A values for existing call sites.
+
+Semantic error and success colors stay non-brand Material-style roles (`HelmErrorColors`, `HelmSuccessColors`) with AA contrast on Phase 1A surfaces. A new semantic danger, success, or neutral convention still needs review before it becomes a broader visual rule.
 
 ## Type
 
-- English headings: Fraunces.
-- English UI and body: Outfit.
+- English headings: Fraunces — page 32, section 24, card 20 dp.
+- English UI and body: Outfit — body 16 / 14, actions 14, metadata 12 dp.
 - Arabic UI: IBM Plex Sans Arabic.
 - Arabic branding: the separate Naskh-inspired wordmark.
 
 Arabic runs use `lang="ar"` and RTL direction. Keep diacritics visible and line spacing comfortable. Keep decorative calligraphy off long-form Arabic interface copy.
+
+## Spacing
+
+Approved scale: 4, 8, 12, 16, 24, 32, 48 dp. Standard screen padding: 20 dp (`HelmSpacing.screen`). Soft radii remain 8 / 12 / 16 / 24 (sheet).
 
 ## Components and styling
 
@@ -48,9 +69,9 @@ Use soft, refined radii on buttons, cards, inputs, and bottom sheets. Every inte
 
 Share token names across Next.js and Flutter. Implement them in the platform's current system:
 
-- Traveler web: existing global CSS.
-- Admin: existing CSS Modules and global tokens.
-- Flutter: `ThemeData` and reusable widgets.
+- Traveler web: existing global CSS (not yet migrated to Phase 1A).
+- Admin: existing CSS Modules and global tokens (not yet migrated to Phase 1A).
+- Flutter: `ThemeData` and reusable widgets (`HelmColors`, `HelmTheme`, `HelmTokens`, `HelmTypography`).
 
 Do not add a styling library, UI package, or design dependency without separate approval.
 

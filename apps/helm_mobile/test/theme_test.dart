@@ -28,21 +28,69 @@ List<Color> _surfaces(ColorScheme s) => [
 
 void main() {
   group('palette', () {
-    test('matches the approved hex values', () {
-      expect(HelmColors.midnight, const Color(0xFF0C1B2A));
-      expect(HelmColors.deepOcean, const Color(0xFF163747));
-      expect(HelmColors.teal, const Color(0xFF177F83));
-      expect(HelmColors.coral, const Color(0xFFF1A38D));
-      expect(HelmColors.ivory, const Color(0xFFF7F5F0));
+    test('matches the approved Phase 1A hex values', () {
+      expect(HelmColors.lightBackground, const Color(0xFFF7F4ED));
+      expect(HelmColors.lightSurface, const Color(0xFFFFFFFF));
+      expect(HelmColors.sand, const Color(0xFFE5DED2));
+      expect(HelmColors.lightPrimary, const Color(0xFF173D35));
+      expect(HelmColors.sage, const Color(0xFF789D8C));
+      expect(HelmColors.champagne, const Color(0xFFBCA47E));
+
+      expect(HelmColors.darkBackground, const Color(0xFF0B151C));
+      expect(HelmColors.darkSurface, const Color(0xFF142831));
+      expect(HelmColors.darkSelected, const Color(0xFF24534F));
+      expect(HelmColors.darkPrimary, const Color(0xFF68B5A5));
+      expect(HelmColors.darkText, const Color(0xFFF3EFE6));
+      expect(HelmColors.darkMuted, const Color(0xFFA6C0BC));
     });
 
-    test('reproduces the approved contrast figures', () {
-      expect(contrast(HelmColors.ivory, HelmColors.midnight), closeTo(15.98, 0.05));
-      expect(contrast(HelmColors.ivory, HelmColors.deepOcean), closeTo(11.53, 0.05));
-      expect(contrast(HelmColors.white, HelmColors.teal), closeTo(4.77, 0.05));
-      expect(contrast(HelmColors.teal, HelmColors.ivory), closeTo(4.38, 0.05));
-      expect(contrast(HelmColors.teal, HelmColors.midnight), closeTo(3.65, 0.05));
-      expect(contrast(HelmColors.coral, HelmColors.ivory), closeTo(1.86, 0.05));
+    test('keeps legacy aliases pointed at Phase 1A tokens', () {
+      expect(HelmColors.ivory, HelmColors.lightBackground);
+      expect(HelmColors.white, HelmColors.lightSurface);
+      expect(HelmColors.midnight, HelmColors.darkBackground);
+      expect(HelmColors.deepOcean, HelmColors.darkSurface);
+      expect(HelmColors.teal, HelmColors.lightPrimary);
+      expect(HelmColors.coral, HelmColors.champagne);
+      expect(HelmColors.midnightMuted, HelmColors.lightMuted);
+      expect(HelmColors.ivoryMuted, HelmColors.darkMuted);
+      expect(HelmColors.midnightDivider, HelmColors.lightDivider);
+      expect(HelmColors.ivoryDivider, HelmColors.darkDivider);
+    });
+
+    test('documents approved contrast figures', () {
+      expect(
+        contrast(HelmColors.lightPrimary, HelmColors.lightBackground),
+        closeTo(10.89, 0.05),
+      );
+      expect(
+        contrast(HelmColors.lightPrimary, HelmColors.lightSurface),
+        closeTo(11.96, 0.05),
+      );
+      expect(
+        contrast(HelmColors.lightSurface, HelmColors.lightPrimary),
+        closeTo(11.96, 0.05),
+      );
+      expect(
+        contrast(HelmColors.darkText, HelmColors.darkBackground),
+        closeTo(16.08, 0.05),
+      );
+      expect(
+        contrast(HelmColors.darkMuted, HelmColors.darkSurface),
+        closeTo(7.90, 0.05),
+      );
+      expect(
+        contrast(HelmColors.darkPrimary, HelmColors.darkBackground),
+        closeTo(7.68, 0.05),
+      );
+      // Sage and Champagne fail as light text / boundaries.
+      expect(
+        contrast(HelmColors.sage, HelmColors.lightSurface),
+        lessThan(_nonTextAA),
+      );
+      expect(
+        contrast(HelmColors.champagne, HelmColors.lightBackground),
+        lessThan(_nonTextAA),
+      );
     });
   });
 
@@ -94,19 +142,19 @@ void main() {
         }
       });
 
-      test('Teal indicators and focus meet 3:1 on the base surface', () {
+      test('primary indicators and focus meet 3:1 on the base surface', () {
         expect(contrast(scheme.primary, scheme.surface),
             greaterThanOrEqualTo(_nonTextAA));
       });
 
-      test('text and outlined button labels meet AA, not Teal', () {
+      test('text and outlined button labels meet AA, not Sage', () {
         final labels = [
           theme.textButtonTheme.style!.foregroundColor!.resolve({}),
           theme.outlinedButtonTheme.style!.foregroundColor!.resolve({}),
         ];
         for (final label in labels) {
           expect(label, isNotNull);
-          expect(label, isNot(HelmColors.teal));
+          expect(label, isNot(HelmColors.sage));
           expect(contrast(label!, scheme.surface),
               greaterThanOrEqualTo(_textAA));
         }
@@ -121,39 +169,96 @@ void main() {
     });
   }
 
-  group('Coral', () {
+  group('Champagne', () {
     test('is legible as an accent on dark surfaces', () {
-      expect(contrast(HelmColors.coral, HelmColors.midnight),
+      expect(contrast(HelmColors.champagne, HelmColors.darkBackground),
           greaterThanOrEqualTo(_textAA));
-      expect(contrast(HelmColors.coral, HelmColors.deepOcean),
+      expect(contrast(HelmColors.champagne, HelmColors.darkSurface),
           greaterThanOrEqualTo(_textAA));
     });
 
-    test('fills carry Midnight or Deep Ocean text', () {
-      expect(contrast(HelmColors.midnight, HelmColors.coral),
+    test('fills carry primary or dark-background text', () {
+      expect(contrast(HelmColors.lightPrimary, HelmColors.champagne),
           greaterThanOrEqualTo(_textAA));
-      expect(contrast(HelmColors.deepOcean, HelmColors.coral),
+      expect(contrast(HelmColors.darkBackground, HelmColors.champagne),
           greaterThanOrEqualTo(_textAA));
-      for (final scheme in [HelmTheme.lightScheme, HelmTheme.darkScheme]) {
-        expect(scheme.tertiary, HelmColors.coral);
-        expect(scheme.onTertiary, HelmColors.midnight);
-      }
+      expect(HelmTheme.lightScheme.tertiary, HelmColors.champagne);
+      expect(HelmTheme.lightScheme.onTertiary, HelmColors.lightPrimary);
+      expect(HelmTheme.darkScheme.tertiary, HelmColors.champagne);
+      expect(HelmTheme.darkScheme.onTertiary, HelmColors.darkBackground);
     });
 
     test('is never text or a boundary on light surfaces', () {
-      expect(contrast(HelmColors.coral, HelmColors.ivory),
+      expect(contrast(HelmColors.champagne, HelmColors.lightBackground),
           lessThan(_nonTextAA));
       const light = HelmTheme.lightScheme;
       for (final role in [
         light.primary,
-        light.secondary,
         light.onSurface,
         light.onSurfaceVariant,
         light.outline,
         light.error,
       ]) {
-        expect(role, isNot(HelmColors.coral));
+        expect(role, isNot(HelmColors.champagne));
       }
+    });
+  });
+
+  group('Sage', () {
+    test('is decorative on light surfaces, not text or outline', () {
+      expect(contrast(HelmColors.sage, HelmColors.lightSurface),
+          lessThan(_nonTextAA));
+      const light = HelmTheme.lightScheme;
+      for (final role in [
+        light.primary,
+        light.onSurface,
+        light.onSurfaceVariant,
+        light.outline,
+        light.tertiary,
+      ]) {
+        expect(role, isNot(HelmColors.sage));
+      }
+    });
+  });
+
+  group('success', () {
+    test('light and dark success pairs meet AA on Phase 1A surfaces', () {
+      expect(
+        contrast(HelmSuccessColors.lightSuccess, HelmColors.lightBackground),
+        greaterThanOrEqualTo(_textAA),
+      );
+      expect(
+        contrast(
+          HelmSuccessColors.lightOnSuccess,
+          HelmSuccessColors.lightSuccess,
+        ),
+        greaterThanOrEqualTo(_textAA),
+      );
+      expect(
+        contrast(
+          HelmSuccessColors.lightOnSuccessContainer,
+          HelmSuccessColors.lightSuccessContainer,
+        ),
+        greaterThanOrEqualTo(_textAA),
+      );
+      expect(
+        contrast(HelmSuccessColors.darkSuccess, HelmColors.darkBackground),
+        greaterThanOrEqualTo(_textAA),
+      );
+      expect(
+        contrast(
+          HelmSuccessColors.darkOnSuccess,
+          HelmSuccessColors.darkSuccess,
+        ),
+        greaterThanOrEqualTo(_textAA),
+      );
+      expect(
+        contrast(
+          HelmSuccessColors.darkOnSuccessContainer,
+          HelmSuccessColors.darkSuccessContainer,
+        ),
+        greaterThanOrEqualTo(_textAA),
+      );
     });
   });
 
@@ -167,7 +272,7 @@ void main() {
       expect(app.themeMode, ThemeMode.system);
       expect(
         Theme.of(tester.element(find.byType(Scaffold))).colorScheme.surface,
-        HelmColors.midnight,
+        HelmColors.darkBackground,
       );
 
       // Discover's spinner never settles without a mock client, so pump only
@@ -177,7 +282,7 @@ void main() {
       await tester.pump(kThemeAnimationDuration);
       expect(
         Theme.of(tester.element(find.byType(Scaffold))).colorScheme.surface,
-        HelmColors.ivory,
+        HelmColors.lightBackground,
       );
     });
   });
