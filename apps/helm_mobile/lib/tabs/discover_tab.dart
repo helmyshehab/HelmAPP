@@ -11,7 +11,6 @@ import '../discover/discover_globe.dart';
 import '../discover/discover_hero.dart';
 import '../discover/discover_search.dart';
 import '../geo/country_names.dart';
-import '../theme/helm_colors.dart';
 import '../theme/helm_tokens.dart';
 import '../theme/helm_typography.dart';
 import '../theme/helm_wrapping_text.dart';
@@ -339,27 +338,6 @@ class _DiscoverTabState extends State<DiscoverTab> {
               key: _pageError != null
                   ? const Key('discover-page-retry')
                   : const Key('discover-load-more'),
-              style: FilledButton.styleFrom(
-                backgroundColor: HelmColors.teal,
-                foregroundColor: HelmColors.white,
-                minimumSize: const Size(0, 44),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                tapTargetSize: MaterialTapTargetSize.padded,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(HelmRadius.md),
-                  ),
-                ),
-                textStyle: const TextStyle(
-                  fontFamily: HelmFonts.outfit,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                ),
-              ),
               onPressed: _loadMore,
               child: Text(_pageError != null ? 'Retry' : 'Load more'),
             ),

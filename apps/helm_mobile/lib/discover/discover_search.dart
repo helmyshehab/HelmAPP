@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../theme/helm_colors.dart';
 import '../theme/helm_tokens.dart';
 import '../theme/helm_typography.dart';
 
@@ -91,7 +90,7 @@ class _DiscoverSearchState extends State<DiscoverSearch> {
             fontSize: 16,
             height: 1.4,
           ),
-          cursorColor: HelmColors.teal,
+          cursorColor: scheme.primary,
           inputFormatters: [
             LengthLimitingTextInputFormatter(120),
           ],
@@ -137,8 +136,8 @@ class _DiscoverSearchState extends State<DiscoverSearch> {
                   tooltip: 'Search',
                   onPressed: widget.onSubmit,
                   style: IconButton.styleFrom(
-                    foregroundColor: HelmColors.white,
-                    backgroundColor: HelmColors.teal,
+                    foregroundColor: scheme.onPrimary,
+                    backgroundColor: scheme.primary,
                     minimumSize: const Size(44, 44),
                     tapTargetSize: MaterialTapTargetSize.padded,
                     shape: RoundedRectangleBorder(
@@ -160,7 +159,7 @@ class _DiscoverSearchState extends State<DiscoverSearch> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(HelmRadius.md),
-              borderSide: const BorderSide(color: HelmColors.teal, width: 2),
+              borderSide: BorderSide(color: scheme.primary, width: 2),
             ),
           ),
         ),

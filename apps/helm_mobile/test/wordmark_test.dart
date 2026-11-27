@@ -260,7 +260,7 @@ void main() {
     ]) {
       expect(
         tester.widget<Text>(find.byKey(key)).style!.color,
-        HelmColors.midnight,
+        HelmColors.lightPrimary,
       );
     }
 
@@ -273,7 +273,7 @@ void main() {
     ]) {
       expect(
         tester.widget<Text>(find.byKey(key)).style!.color,
-        HelmColors.ivory,
+        HelmColors.darkText,
       );
     }
   });
@@ -339,8 +339,9 @@ void main() {
         expect(_isStacked(tester), isTrue);
         expect(find.byType(DiscoverTab), findsOneWidget);
 
-        final color =
-            mode == ThemeMode.dark ? HelmColors.ivory : HelmColors.midnight;
+        final color = mode == ThemeMode.dark
+            ? HelmColors.darkText
+            : HelmColors.lightPrimary;
         for (final key in <Key>[
           HelmWordmark.englishKey,
           HelmWordmark.separatorKey,
