@@ -32,6 +32,14 @@ abstract final class HelmColors {
   /// Decorative dividers on dark surfaces; never a control boundary.
   static const Color darkDivider = Color(0x26F3EFE6);
 
+  // —— Cinematic globe (fixed in both app themes) ——
+  static const Color globeOcean = darkBackground;
+  static const Color globePanel = darkSurface;
+  static const Color globeLand = Color(0xFF8FA8B3);
+  static const Color globeAccent = darkPrimary;
+  static const Color globeMarkerSelected = champagne;
+  static const Color globeFrameBorder = darkDivider;
+
   // —— Legacy aliases (pre–Phase 1A names still referenced by screens) ——
   static const Color ivory = lightBackground;
   static const Color white = lightSurface;

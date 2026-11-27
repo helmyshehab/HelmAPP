@@ -67,17 +67,18 @@ class DiscoverGlobeState extends State<DiscoverGlobe>
   static const double _markerSize = 6;
   static const double _markerSizeSelected = 9;
 
+  /// Cinematic globe look — independent of the traveler light/dark chrome.
   static final GlobeTheme _helmTheme = GlobeSkins.classic.copyWith(
-    accentColor: HelmColors.teal,
+    accentColor: HelmColors.globeAccent,
     surface: const GlobeSurfaceStyle(
-      surfaceColor: HelmColors.midnight,
-      landColor: Color(0xFF8FA8B3),
+      surfaceColor: HelmColors.globeOcean,
+      landColor: HelmColors.globeLand,
       pointSize: 1.55,
       pointOpacity: 0.92,
     ),
     atmosphere: const GlobeAtmosphereStyle(
       visible: true,
-      color: HelmColors.teal,
+      color: HelmColors.globeAccent,
       altitude: 0.18,
       glowIntensity: 0.55,
     ),
@@ -177,10 +178,14 @@ class DiscoverGlobeState extends State<DiscoverGlobe>
             latitude: item.latitude!,
             longitude: item.longitude!,
           ),
-          color: item.id == selectedId ? HelmColors.coral : HelmColors.teal,
+          color: item.id == selectedId
+              ? HelmColors.globeMarkerSelected
+              : HelmColors.globeAccent,
           size: item.id == selectedId ? _markerSizeSelected : _markerSize,
           pulse: !reduceMotion,
-          pulseColor: (item.id == selectedId ? HelmColors.coral : HelmColors.teal)
+          pulseColor: (item.id == selectedId
+                  ? HelmColors.globeMarkerSelected
+                  : HelmColors.globeAccent)
               .withValues(alpha: 0.45),
           label: item.nameEn,
           data: item,
@@ -328,27 +333,6 @@ class DiscoverGlobeState extends State<DiscoverGlobe>
             const SizedBox(height: HelmSpacing.md),
             FilledButton(
               key: DiscoverGlobe.exploreKey,
-              style: FilledButton.styleFrom(
-                backgroundColor: HelmColors.teal,
-                foregroundColor: HelmColors.white,
-                minimumSize: const Size(0, 44),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
-                ),
-                tapTargetSize: MaterialTapTargetSize.padded,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(HelmRadius.md),
-                  ),
-                ),
-                textStyle: const TextStyle(
-                  fontFamily: HelmFonts.outfit,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2,
-                ),
-              ),
               onPressed: () => _explore(item),
               child: const Text('Explore destination'),
             ),
@@ -401,9 +385,9 @@ class DiscoverGlobeState extends State<DiscoverGlobe>
                   key: DiscoverGlobe.canvasKey,
                   height: 320,
                   decoration: BoxDecoration(
-                    color: HelmColors.midnight,
+                    color: HelmColors.globeOcean,
                     borderRadius: BorderRadius.circular(HelmRadius.lg),
-                    border: Border.all(color: HelmColors.ivoryDivider),
+                    border: Border.all(color: HelmColors.globeFrameBorder),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Globe(

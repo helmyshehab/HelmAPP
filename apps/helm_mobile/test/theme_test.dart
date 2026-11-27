@@ -57,6 +57,15 @@ void main() {
       expect(HelmColors.ivoryDivider, HelmColors.darkDivider);
     });
 
+    test('names cinematic globe tokens separately from chrome roles', () {
+      expect(HelmColors.globeOcean, HelmColors.darkBackground);
+      expect(HelmColors.globePanel, HelmColors.darkSurface);
+      expect(HelmColors.globeAccent, HelmColors.darkPrimary);
+      expect(HelmColors.globeMarkerSelected, HelmColors.champagne);
+      expect(HelmColors.globeFrameBorder, HelmColors.darkDivider);
+      expect(HelmColors.globeLand, const Color(0xFF8FA8B3));
+    });
+
     test('documents approved contrast figures', () {
       expect(
         contrast(HelmColors.lightPrimary, HelmColors.lightBackground),
