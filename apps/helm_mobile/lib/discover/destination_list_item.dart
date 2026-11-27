@@ -64,6 +64,26 @@ class DestinationListItem {
     return ar;
   }
 
+  /// Primary destination name for the active UI language (`ar` prefers Arabic).
+  String nameForLanguage(String languageCode) {
+    if (languageCode.toLowerCase() == 'ar') {
+      final ar = nameAr?.trim();
+      if (ar != null && ar.isNotEmpty) return ar;
+    }
+    return nameEn;
+  }
+
+  /// Secondary bilingual name when it differs from [nameForLanguage].
+  String? alternateNameForLanguage(String languageCode) {
+    final primary = nameForLanguage(languageCode);
+    if (languageCode.toLowerCase() == 'ar') {
+      final en = nameEn.trim();
+      if (en.isNotEmpty && en != primary) return en;
+      return null;
+    }
+    return displayNameAr;
+  }
+
   String? get displayCountryCode {
     final code = countryCode?.trim();
     if (code == null || code.isEmpty) return null;

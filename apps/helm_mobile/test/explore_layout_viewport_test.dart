@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:helm_api_client/helm_api_client.dart';
 import 'package:helm_mobile/tabs/discover_tab.dart';
 import 'package:helm_mobile/theme/helm_theme.dart';
+import 'package:helm_mobile/widgets/helm_editorial_row.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -25,10 +26,11 @@ HelmApiClient _client(MockClient mock) =>
 Future<void> _pumpExplore(
   WidgetTester tester, {
   required ThemeData theme,
+  required Size viewport,
   bool includeCover = false,
 }) async {
   tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = explorePhone;
+  tester.view.physicalSize = viewport;
   addTearDown(tester.view.reset);
   final mock = MockClient((request) async {
     if (request.url.path.contains('/geo/countries')) {
@@ -89,7 +91,11 @@ Future<void> _pumpExplore(
 void main() {
   testWidgets('Explore 390x844 light: search integrated, no dropdown overflow',
       (tester) async {
-    await _pumpExplore(tester, theme: HelmTheme.light());
+    await _pumpExplore(
+      tester,
+      theme: HelmTheme.light(),
+      viewport: explorePhone,
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('explore-heading')), findsOneWidget);
@@ -120,7 +126,11 @@ void main() {
 
   testWidgets('Explore 390x844 dark: rows use theme surface containers',
       (tester) async {
-    await _pumpExplore(tester, theme: HelmTheme.dark());
+    await _pumpExplore(
+      tester,
+      theme: HelmTheme.dark(),
+      viewport: explorePhone,
+    );
 
     expect(tester.takeException(), isNull);
     final row = tester.widget<Material>(
@@ -135,7 +145,12 @@ void main() {
   testWidgets('Explore 390x844 light: cover renders without breaking layout',
       (tester) async {
     await withTestNetworkImages(() async {
-      await _pumpExplore(tester, theme: HelmTheme.light(), includeCover: true);
+      await _pumpExplore(
+        tester,
+        theme: HelmTheme.light(),
+        viewport: explorePhone,
+        includeCover: true,
+      );
 
       expect(tester.takeException(), isNull);
       expect(find.byType(Image), findsOneWidget);
@@ -148,18 +163,31 @@ void main() {
       expect(row.left, greaterThanOrEqualTo(0));
       expect(row.right, lessThanOrEqualTo(explorePhone.width + 0.5));
       expect(row.width, lessThanOrEqualTo(explorePhone.width));
+      // Image floor is ~172; meta/title/body/action may grow slightly without clipping.
+      expect(row.height, greaterThanOrEqualTo(156));
+      expect(row.height, lessThanOrEqualTo(200));
+
+      final imageSize = tester.getSize(find.byType(Image));
+      expect(imageSize.width, HelmEditorialRow.thumbnailSize.width);
+      expect(imageSize.height, HelmEditorialRow.thumbnailSize.height);
 
       // Destination without cover stays text-only.
       final canggu =
           tester.getRect(find.byKey(const Key('discover-item-canggu')));
       expect(canggu.width, lessThanOrEqualTo(explorePhone.width));
+      expect(find.text('Explore'), findsWidgets);
     });
   });
 
   testWidgets('Explore 390x844 dark: cover + missing cover coexist',
       (tester) async {
     await withTestNetworkImages(() async {
-      await _pumpExplore(tester, theme: HelmTheme.dark(), includeCover: true);
+      await _pumpExplore(
+        tester,
+        theme: HelmTheme.dark(),
+        viewport: explorePhone,
+        includeCover: true,
+      );
 
       expect(tester.takeException(), isNull);
       expect(find.byType(Image), findsOneWidget);
@@ -177,4 +205,49 @@ void main() {
       );
     });
   });
+
+  for (final width in const <double>[320, 390, 1024, 1440]) {
+    testWidgets(
+        'Explore ${width.toInt()}dp: content maxWidth and bounded cover row',
+        (tester) async {
+      await withTestNetworkImages(() async {
+        final viewport = Size(width, 900);
+        await _pumpExplore(
+          tester,
+          theme: HelmTheme.light(),
+          viewport: viewport,
+          includeCover: true,
+        );
+
+        expect(tester.takeException(), isNull);
+
+        final column =
+            tester.getRect(find.byKey(const Key('explore-content-column')));
+        expect(column.width, lessThanOrEqualTo(DiscoverTab.contentMaxWidth + 0.5));
+        if (width > DiscoverTab.contentMaxWidth + 40) {
+          expect(column.width, closeTo(DiscoverTab.contentMaxWidth, 0.5));
+        }
+
+        final heading = tester.getRect(find.byKey(const Key('explore-heading')));
+        final search =
+            tester.getRect(find.byKey(const Key('discover-search-field')));
+        final row = tester.getRect(find.byKey(const Key('discover-item-ubud')));
+        expect(heading.left, closeTo(column.left, 1));
+        expect(search.left, closeTo(column.left, 1));
+        expect(row.left, closeTo(column.left, 1));
+        expect(row.right, closeTo(column.right, 1));
+
+        final imageSize = tester.getSize(find.byType(Image));
+        final expectedThumb = width <= 320
+            ? HelmEditorialRow.narrowThumbnailSize
+            : HelmEditorialRow.thumbnailSize;
+        // At 320 viewport, list padding leaves ~280 content → narrow thumb.
+        expect(imageSize.width, expectedThumb.width);
+        expect(imageSize.height, expectedThumb.height);
+
+        expect(row.height, greaterThanOrEqualTo(140));
+        expect(row.height, lessThanOrEqualTo(200));
+      });
+    });
+  }
 }

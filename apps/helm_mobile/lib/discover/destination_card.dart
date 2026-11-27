@@ -13,6 +13,7 @@ class DestinationCard extends StatelessWidget {
     this.countryNames = const {},
     this.imageUrl,
     this.imageAlt,
+    this.actionLabel,
   });
 
   final DestinationListItem item;
@@ -27,17 +28,21 @@ class DestinationCard extends StatelessWidget {
   /// Optional override. Defaults to locale-aware cover alt on [item].
   final String? imageAlt;
 
+  /// Optional override. Defaults to locale-aware Explore label.
+  final String? actionLabel;
+
   @override
   Widget build(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
     return HelmEditorialRow(
       rowKey: Key('discover-item-${item.slug}'),
       meta: helmCountryLabel(item.countryCode, namesByCode: countryNames),
-      title: item.nameEn,
-      subtitle: item.displayNameAr,
+      title: item.nameForLanguage(languageCode),
+      subtitle: item.alternateNameForLanguage(languageCode),
       body: item.availableSummary,
       imageUrl: imageUrl ?? item.coverImageUrl,
       imageAlt: imageAlt ?? item.coverAltForLanguage(languageCode),
+      actionLabel: actionLabel,
       onTap: onTap,
     );
   }

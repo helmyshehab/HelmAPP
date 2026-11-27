@@ -15,9 +15,15 @@ bool helmResolvableMediaUrl(String? raw) {
   return uri.host.isNotEmpty;
 }
 
+/// Default Explore/Packages action copy for the active locale.
+String helmEditorialActionLabelForLocale(Locale locale) {
+  if (locale.languageCode.toLowerCase() == 'ar') return 'استكشف';
+  return 'Explore';
+}
+
 /// Shared editorial list row for Explore destinations and future Packages.
 ///
-/// Optional trailing media uses ~35% of the row width. When [imageUrl] is
+/// Optional trailing media uses a bounded portrait thumbnail. When [imageUrl] is
 /// missing, invalid, or fails to load, the image frame is omitted entirely.
 class HelmEditorialRow extends StatefulWidget {
   const HelmEditorialRow({
@@ -30,6 +36,7 @@ class HelmEditorialRow extends StatefulWidget {
     this.body,
     this.imageUrl,
     this.imageAlt,
+    this.actionLabel,
   });
 
   /// Applied to the tappable [Material] surface for tests and semantics.
@@ -41,6 +48,20 @@ class HelmEditorialRow extends StatefulWidget {
   final String? body;
   final String? imageUrl;
   final String? imageAlt;
+
+  /// Visible action text beside the directional arrow. Defaults to a
+  /// locale-aware Explore label so Packages can override later.
+  final String? actionLabel;
+
+  /// Nominal thumbnail size at comfortable widths.
+  static const Size thumbnailSize = Size(112, 140);
+
+  /// Slightly smaller thumbnail when the row is very narrow (~320dp).
+  static const Size narrowThumbnailSize = Size(96, 120);
+
+  /// Image-driven outer height floor at text scale 1.0 (padding + 140 thumb).
+  /// Rows with meta/body/action may grow modestly; large text scale may grow further.
+  static const double targetHeightWithImage = 172;
 
   @override
   State<HelmEditorialRow> createState() => _HelmEditorialRowState();
@@ -60,6 +81,12 @@ class _HelmEditorialRowState extends State<HelmEditorialRow> {
   bool get _showImage =>
       !_imageFailed && helmResolvableMediaUrl(widget.imageUrl);
 
+  Size _thumbnailForWidth(double maxWidth) {
+    // Keep text usable beside the thumb inside ~280dp content (320 − padding).
+    if (maxWidth < 300) return HelmEditorialRow.narrowThumbnailSize;
+    return HelmEditorialRow.thumbnailSize;
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -72,6 +99,9 @@ class _HelmEditorialRowState extends State<HelmEditorialRow> {
     final hasMeta = meta != null && meta.isNotEmpty;
     final hasSubtitle = subtitle != null && subtitle.isNotEmpty;
     final hasBody = body != null && body.isNotEmpty;
+    final actionLabel = (widget.actionLabel?.trim().isNotEmpty == true)
+        ? widget.actionLabel!.trim()
+        : helmEditorialActionLabelForLocale(Localizations.localeOf(context));
 
     return Material(
       key: widget.rowKey,
@@ -83,22 +113,27 @@ class _HelmEditorialRowState extends State<HelmEditorialRow> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: widget.onTap,
+        hoverColor: scheme.onSurface.withValues(alpha: 0.04),
+        focusColor: scheme.onSurface.withValues(alpha: 0.08),
+        highlightColor: scheme.onSurface.withValues(alpha: 0.06),
+        splashColor: scheme.primary.withValues(alpha: 0.12),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 44),
           child: Padding(
             padding: const EdgeInsets.all(HelmSpacing.lg),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: _showImage ? 65 : 100,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final thumb = _showImage
+                    ? _thumbnailForWidth(constraints.maxWidth)
+                    : null;
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                             if (hasMeta) ...[
                               Text(
                                 meta,
@@ -133,7 +168,7 @@ class _HelmEditorialRowState extends State<HelmEditorialRow> {
                                   textWidthBasis: TextWidthBasis.longestLine,
                                   style: TextStyle(
                                     color: foreground,
-                                    fontFamily: HelmFonts.plexArabic,
+                                    fontFamily: HelmFonts.outfit,
                                     fontFamilyFallback: HelmFonts.arabicFallback,
                                     fontSize: 16,
                                     height: 1.5,
@@ -156,47 +191,65 @@ class _HelmEditorialRowState extends State<HelmEditorialRow> {
                                 ),
                               ),
                             ],
+                            const SizedBox(height: HelmSpacing.sm),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  actionLabel,
+                                  style: TextStyle(
+                                    color: muted,
+                                    fontFamily: HelmFonts.outfit,
+                                    fontFamilyFallback: HelmFonts.arabicFallback,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(width: HelmSpacing.xs),
+                                Icon(
+                                  Icons.arrow_forward,
+                                  color: muted,
+                                  size: 18,
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: HelmSpacing.sm),
-                      Icon(
-                        Icons.chevron_right,
-                        color: muted,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                ),
-                if (_showImage) ...[
-                  const SizedBox(width: HelmSpacing.md),
-                  Expanded(
-                    flex: 35,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(HelmRadius.md),
-                      child: AspectRatio(
-                        aspectRatio: 4 / 5,
-                        child: Image.network(
-                          widget.imageUrl!.trim(),
-                          fit: BoxFit.cover,
-                          semanticLabel:
-                              widget.imageAlt?.trim().isNotEmpty == true
-                                  ? widget.imageAlt!.trim()
-                                  : widget.title,
-                          errorBuilder: (context, error, stackTrace) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (mounted && !_imageFailed) {
-                                setState(() => _imageFailed = true);
-                              }
-                            });
-                            return const SizedBox.shrink();
-                          },
+                    if (thumb != null) ...[
+                      const SizedBox(width: HelmSpacing.md),
+                      SizedBox(
+                        width: thumb.width,
+                        height: thumb.height,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(HelmRadius.md),
+                          child: Image.network(
+                            widget.imageUrl!.trim(),
+                            width: thumb.width,
+                            height: thumb.height,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
+                            semanticLabel:
+                                widget.imageAlt?.trim().isNotEmpty == true
+                                    ? widget.imageAlt!.trim()
+                                    : widget.title,
+                            errorBuilder: (context, error, stackTrace) {
+                              WidgetsBinding.instance
+                                  .addPostFrameCallback((_) {
+                                if (mounted && !_imageFailed) {
+                                  setState(() => _imageFailed = true);
+                                }
+                              });
+                              return const SizedBox.shrink();
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ],
+                    ],
+                  ],
+                );
+              },
             ),
           ),
         ),
