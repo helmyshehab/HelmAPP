@@ -19,6 +19,7 @@ void main() {
     expect(estimate.flightTotalEgp, 18500 * 3);
     expect(estimate.lodgingTotalEgp, demoHotelBaseRateEgpPerNight * 4);
     expect(estimate.activitiesTotalEgp, (2200 + 350) * 3);
+    expect(estimate.airportTransfersTotalEgp, isNull);
     expect(
       estimate.totalEgp,
       estimate.flightTotalEgp +
@@ -26,6 +27,21 @@ void main() {
           estimate.activitiesTotalEgp,
     );
     expect(estimate.totalEgp, 55500 + 18000 + 7650);
+  });
+
+  test('a priced airport transfer is added once for the group', () {
+    final estimate = calculateTripDemoEstimate(
+      travelerCount: 3,
+      nights: 4,
+      budgetEgp: 120000,
+      flight: economy,
+      hotelTier: DemoHotelTier.base,
+      selectedActivityRatesPerTraveler: const [],
+      airportTransfersTotalEgp: 1500,
+    );
+
+    expect(estimate.airportTransfersTotalEgp, 1500);
+    expect(estimate.totalEgp, 55500 + 18000 + 1500);
   });
 
   test('removing then restoring an activity changes the total correctly', () {

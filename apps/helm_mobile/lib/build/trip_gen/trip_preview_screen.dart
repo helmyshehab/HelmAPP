@@ -11,6 +11,7 @@ import '../draft_title_patch.dart';
 import 'istanbul_demo_catalog.dart';
 import 'trip_answers.dart';
 import 'trip_demo_checkout_screen.dart';
+import 'trip_demo_mode_screen.dart';
 import 'trip_demo_pricing.dart';
 import 'trip_flow_routes.dart';
 import 'trip_planner.dart';
@@ -82,6 +83,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
   bool _catalogFailed = false;
   int? _activityPickerDay;
   Route<void>? _checkoutRoute;
+  Route<void>? _tripModeRoute;
 
   /// Stable owner-scoped create key until the first create succeeds.
   String? _createClientRequestKey;
@@ -243,11 +245,32 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
       _saveMessage = null;
     });
     final navigator = Navigator.of(context);
+    final tripMode = _tripModeRoute;
+    if (tripMode != null && tripMode.isActive) navigator.removeRoute(tripMode);
     final checkout = _checkoutRoute;
     if (checkout != null && checkout.isActive) navigator.removeRoute(checkout);
     final self = ModalRoute.of(context);
     if (self != null && self.isActive) {
       navigator.removeRoute(self);
+    }
+  }
+
+  Future<void> _openTripModePreview() async {
+    if (_cleared || _tripModeRoute != null) return;
+    final plan = _plan;
+    final route = MaterialPageRoute<void>(
+      builder: (_) => TripDemoModeScreen(
+        destinationName: plan.destinationName,
+        // Current Build day plan, including stops still being edited.
+        days: plan.days,
+        fromBuildPreview: true,
+      ),
+    );
+    _tripModeRoute = route;
+    try {
+      await Navigator.of(context).push(route);
+    } finally {
+      if (identical(_tripModeRoute, route)) _tripModeRoute = null;
     }
   }
 
@@ -910,6 +933,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
                     if (_includedActivitySlugs.contains(stop.place.slug))
                       stop.place.nameEn,
               },
+              onPreviewTripMode: _cleared || _saving ? null : _openTripModePreview,
             ),
             if (_saveError != null) ...[
               const SizedBox(height: 8),
@@ -1044,6 +1068,9 @@ class _TripReview extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Stay', style: textTheme.titleSmall),
           Text('${stay.nameEn} · ${formatDemoEgp(estimate.lodgingTotalEgp)}'),
+          const SizedBox(height: 8),
+          Text('Airport transfers', style: textTheme.titleSmall),
+          Text(formatAirportTransfersEstimate(estimate.airportTransfersTotalEgp)),
           const SizedBox(height: 12),
           Text('Activity estimate', style: textTheme.titleSmall),
           Text(formatDemoEgp(estimate.activitiesTotalEgp)),
@@ -1156,10 +1183,20 @@ class _EstimateCard extends StatelessWidget {
               'Activities: ${formatDemoEgp(estimate.activitiesTotalEgp)}',
               key: const Key('trip-preview-estimate-activities'),
             ),
+            Text(
+              'Airport transfers: ${formatAirportTransfersEstimate(estimate.airportTransfersTotalEgp)}',
+              key: const Key('trip-preview-estimate-airport-transfers'),
+            ),
+            if (estimate.airportTransfersTotalEgp == null)
+              Text(
+                'The current total covers priced items only.',
+                style: theme.textTheme.bodySmall,
+              ),
             const SizedBox(height: 8),
             Text(
-              'Excluded from this demo estimate: taxes and fees, ground '
-              'transfers, meals and drinks not listed as priced activities, '
+              'Excluded from this demo estimate: taxes and fees, local '
+              'transportation within the city, meals and drinks not listed '
+              'as priced activities, '
               'travel insurance, tips, and any live booking or inventory costs.',
               style: theme.textTheme.bodySmall,
             ),
@@ -1226,10 +1263,12 @@ class _TripCoverage extends StatelessWidget {
   const _TripCoverage({
     required this.includesDomesticFlights,
     required this.activities,
+    required this.onPreviewTripMode,
   });
 
   final bool includesDomesticFlights;
   final Set<String> activities;
+  final VoidCallback? onPreviewTripMode;
 
   @override
   Widget build(BuildContext context) {
@@ -1262,8 +1301,15 @@ class _TripCoverage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Trip Mode is currently a demo itinerary preview.',
+              'Preview your current itinerary in Trip Mode without saving or '
+              'checking out. Trip alerts and Travel chat are planned features.',
               style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              key: const Key('trip-preview-open-trip-mode'),
+              onPressed: onPreviewTripMode,
+              child: const Text('Preview Trip Mode'),
             ),
             const SizedBox(height: 16),
             Text('Exclusions', style: theme.textTheme.titleMedium),

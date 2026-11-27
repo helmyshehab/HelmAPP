@@ -121,6 +121,7 @@ class TripDemoEstimate {
     required this.flightTotalEgp,
     required this.lodgingTotalEgp,
     required this.activitiesTotalEgp,
+    this.airportTransfersTotalEgp,
     required this.totalEgp,
     required this.budgetEgp,
   });
@@ -128,6 +129,7 @@ class TripDemoEstimate {
   final int flightTotalEgp;
   final int lodgingTotalEgp;
   final int activitiesTotalEgp;
+  final int? airportTransfersTotalEgp;
   final int totalEgp;
   final int budgetEgp;
 
@@ -140,7 +142,8 @@ class TripDemoEstimate {
 }
 
 /// Plain Dart estimate:
-/// flight×travelers + lodging×nights + Σ(activity×travelers).
+/// Flight and activities are per traveler, lodging is per night, and airport
+/// transfers are a group total when a rate is available.
 TripDemoEstimate calculateTripDemoEstimate({
   required int travelerCount,
   required int nights,
@@ -148,6 +151,7 @@ TripDemoEstimate calculateTripDemoEstimate({
   required DemoFlightOption flight,
   required DemoHotelTier hotelTier,
   required Iterable<int> selectedActivityRatesPerTraveler,
+  int? airportTransfersTotalEgp,
 }) {
   final flightTotal = flight.rateEgpPerTraveler * travelerCount;
   final lodgingTotal = demoHotelRateEgpPerNight(hotelTier) * nights;
@@ -155,14 +159,21 @@ TripDemoEstimate calculateTripDemoEstimate({
   for (final rate in selectedActivityRatesPerTraveler) {
     activitiesTotal += rate * travelerCount;
   }
-  final total = flightTotal + lodgingTotal + activitiesTotal;
+  final total = flightTotal +
+      lodgingTotal +
+      activitiesTotal +
+      (airportTransfersTotalEgp ?? 0);
   return TripDemoEstimate(
     flightTotalEgp: flightTotal,
     lodgingTotalEgp: lodgingTotal,
     activitiesTotalEgp: activitiesTotal,
+    airportTransfersTotalEgp: airportTransfersTotalEgp,
     totalEgp: total,
     budgetEgp: budgetEgp,
   );
 }
 
 String formatDemoEgp(int amount) => '$amount EGP';
+
+String formatAirportTransfersEstimate(int? amount) =>
+    amount == null ? 'City pricing pending' : formatDemoEgp(amount);
