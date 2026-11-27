@@ -241,6 +241,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/trips/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List up to 25 recent trip requests or find an exact request ID */
+        get: operations["listStaffTripRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/trips/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a trip request for staff review */
+        get: operations["getStaffTripRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Move a trip request to under review or declined
+         * @description Allowed transitions - submitted→under_review|declined; under_review→declined.
+         *     Declined is final in v1. Optional staffNote is staff-only.
+         */
+        patch: operations["updateStaffTripRequest"];
+        trace?: never;
+    };
+    "/v1/trips/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List trip requests owned by the caller */
+        get: operations["listTripRequests"];
+        put?: never;
+        /**
+         * Submit a saved Build draft as an immutable trip request
+         * @description Verifies draft ownership and copies the saved itinerary into a frozen snapshot.
+         *     One request per draft; retries and concurrent submissions return the same request.
+         */
+        post: operations["createTripRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/trips/requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a trip request owned by the caller */
+        get: operations["getTripRequest"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/trips/drafts/{id}/quote": {
         parameters: {
             query?: never;
@@ -912,6 +990,44 @@ export interface components {
             draftId: string;
             /** Format: uuid */
             quoteId: string;
+        };
+        CreateTripRequestRequest: {
+            /** Format: uuid */
+            draftId: string;
+        };
+        UpdateTripRequestRequest: {
+            /** @enum {string} */
+            status: "under_review" | "declined";
+            staffNote?: string | null;
+        };
+        TripRequest: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            draftId: string;
+            title: string | null;
+            destinationSlug: string;
+            /** @enum {string} */
+            status: "submitted" | "under_review" | "declined";
+            /** @description Immutable Build itinerary snapshot at submit */
+            constraints: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        StaffTripRequest: components["schemas"]["TripRequest"] & {
+            /** Format: uuid */
+            userId: string;
+            staffNote: string | null;
+        };
+        TripRequestList: {
+            items: components["schemas"]["TripRequest"][];
+        };
+        StaffTripRequestList: {
+            items: components["schemas"]["StaffTripRequest"][];
         };
         DemoTripBooking: {
             /** Format: uuid */
@@ -2062,6 +2178,167 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problem"];
                 };
             };
+        };
+    };
+    listStaffTripRequests: {
+        parameters: {
+            query?: {
+                id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff trip request summaries (includes staff-only note) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTripRequestList"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    getStaffTripRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff trip request with itinerary snapshot and staff note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTripRequest"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateStaffTripRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTripRequestRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated staff trip request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffTripRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Illegal status transition (e.g. changing a declined request) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listTripRequests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller's trip requests, newest first (no staff notes) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripRequestList"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    createTripRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTripRequestRequest"];
+            };
+        };
+        responses: {
+            /** @description Created or replayed trip request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripRequest"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getTripRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Owned trip request (no staff notes) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripRequest"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
         };
     };
     getTripDraftQuote: {

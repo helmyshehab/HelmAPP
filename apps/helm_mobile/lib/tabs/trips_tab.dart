@@ -23,6 +23,7 @@ class _TripsTabState extends State<TripsTab> {
   http.Client? _ownedClient;
   late final HelmApiClient _api;
   List<DemoTripBooking> _bookings = const [];
+  List<TripRequest> _requests = const [];
   bool _loading = false;
   bool _failed = false;
   late int _generation;
@@ -51,6 +52,7 @@ class _TripsTabState extends State<TripsTab> {
     final generation = _generation;
     setState(() {
       _bookings = const [];
+      _requests = const [];
       _loading = session != null;
       _failed = false;
     });
@@ -58,9 +60,12 @@ class _TripsTabState extends State<TripsTab> {
     try {
       final bookings =
           await _api.listDemoTripBookings(accessToken: session.accessToken);
+      final requests =
+          await _api.listTripRequests(accessToken: session.accessToken);
       if (!mounted || generation != _generation) return;
       setState(() {
         _bookings = bookings;
+        _requests = requests;
         _loading = false;
       });
     } catch (_) {
@@ -90,8 +95,8 @@ class _TripsTabState extends State<TripsTab> {
           child: OutlinedButton(
               onPressed: _load, child: const Text('Retry loading trips')));
     }
-    if (_bookings.isEmpty) {
-      return const Center(child: Text('No confirmed trips yet'));
+    if (_bookings.isEmpty && _requests.isEmpty) {
+      return const Center(child: Text('No trips or requests yet'));
     }
 
     return ListView(
@@ -104,8 +109,69 @@ class _TripsTabState extends State<TripsTab> {
               icon: const Icon(Icons.refresh),
               label: const Text('Refresh trips')),
         ),
+        for (final request in _requests) _requestCard(request),
         for (final booking in _bookings) _bookingCard(booking),
       ],
+    );
+  }
+
+  Widget _requestCard(TripRequest request) {
+    final snapshot = tryParseTripPreviewDraft(request.constraints);
+    return Card(
+      key: Key('trips-request-${request.id}'),
+      child: ListTile(
+        leading: const Icon(Icons.assignment_outlined),
+        title: Text(request.title ?? 'Trip request'),
+        subtitle: Text(
+          '${_requestStatusLabel(request.status)} · ${request.destinationSlug}\n'
+          'Submitted itinerary is fixed; edit continues in Build.',
+        ),
+        trailing: snapshot != null ? const Icon(Icons.chevron_right) : null,
+        onTap: snapshot == null
+            ? null
+            : () => _openSubmittedItinerary(context, request, snapshot),
+      ),
+    );
+  }
+
+  Future<void> _openSubmittedItinerary(
+    BuildContext context,
+    TripRequest request,
+    TripPreviewDraftSnapshot snapshot,
+  ) async {
+    final plan = planFromTripPreviewDraft(snapshot);
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => Scaffold(
+          appBar: AppBar(title: Text(request.title ?? 'Submitted itinerary')),
+          body: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                _requestStatusLabel(request.status),
+                key: const Key('trips-request-status'),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text('Destination: ${request.destinationSlug}'),
+              Text('Hotel: ${snapshot.hotelSlug}'),
+              Text(
+                'Included: ${snapshot.includedActivitySlugs.isEmpty ? '—' : snapshot.includedActivitySlugs.join(', ')}',
+              ),
+              const SizedBox(height: 16),
+              for (final day in plan.days) ...[
+                Text(day.title, style: Theme.of(context).textTheme.titleSmall),
+                if (day.stops.isEmpty) const Text('Open time'),
+                for (final stop in day.stops) Text(stop.place.nameEn),
+                const SizedBox(height: 12),
+              ],
+              const Text(
+                'This is the submitted copy. Keep editing your private draft in Build.',
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -130,5 +196,18 @@ class _TripsTabState extends State<TripsTab> {
             snapshot == null ? null : () => widget.onOpenTrip?.call(snapshot),
       ),
     );
+  }
+}
+
+String _requestStatusLabel(String status) {
+  switch (status) {
+    case 'submitted':
+      return 'Submitted';
+    case 'under_review':
+      return 'Under review';
+    case 'declined':
+      return 'Declined';
+    default:
+      return status;
   }
 }
