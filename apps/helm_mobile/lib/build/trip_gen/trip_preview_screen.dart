@@ -855,6 +855,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
             ..._plan.days.map(
               (day) => _DayCard(
                 day: day,
+                destinationSlug: _plan.destinationSlug,
                 activityPicker: _activityPicker(day, travelers),
                 includedActivitySlugs: _includedActivitySlugs,
                 travelers: travelers,
@@ -899,6 +900,16 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
               onCheckout: !_supportsDemoQuote || _saving || quote == null
                   ? null
                   : _openDemoCheckout,
+            ),
+            const SizedBox(height: 16),
+            _TripCoverage(
+              includesDomesticFlights: _flight.includesDomesticFlights,
+              activities: {
+                for (final day in _plan.days)
+                  for (final stop in day.stops)
+                    if (_includedActivitySlugs.contains(stop.place.slug))
+                      stop.place.nameEn,
+              },
             ),
             if (_saveError != null) ...[
               const SizedBox(height: 8),
@@ -1211,9 +1222,66 @@ class _HotelTile extends StatelessWidget {
   }
 }
 
+class _TripCoverage extends StatelessWidget {
+  const _TripCoverage({
+    required this.includesDomesticFlights,
+    required this.activities,
+  });
+
+  final bool includesDomesticFlights;
+  final Set<String> activities;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      key: const Key('trip-preview-coverage'),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Inclusions', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            const Text('• International flights'),
+            if (includesDomesticFlights) const Text('• Domestic flights'),
+            const Text('• Accommodation'),
+            const Text('• Airport transfers'),
+            const Text('• Visa assistance'),
+            const Text('• Activities selected in your itinerary'),
+            for (final activity in activities)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 16),
+                child: Text('• $activity'),
+              ),
+            const SizedBox(height: 12),
+            Text('Trip Mode', style: theme.textTheme.titleSmall),
+            const Text(
+              'Your travel companion for your day-by-day itinerary, trip '
+              'alerts, and a chatbot for questions on the go.',
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Trip Mode is currently a demo itinerary preview.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            Text('Exclusions', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            const Text('• Meals and drinks. See suggestions in each day.'),
+            const Text('• Shopping and personal expenses'),
+            const Text('• Local transportation within the city'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _DayCard extends StatelessWidget {
   const _DayCard({
     required this.day,
+    required this.destinationSlug,
     required this.activityPicker,
     required this.includedActivitySlugs,
     required this.travelers,
@@ -1226,6 +1294,7 @@ class _DayCard extends StatelessWidget {
   });
 
   final TripPreviewDay day;
+  final String destinationSlug;
   final Widget activityPicker;
   final Set<String> includedActivitySlugs;
   final int travelers;
@@ -1238,6 +1307,24 @@ class _DayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final diningStops = [
+      for (final stop in day.stops)
+        if (stop.place.category == 'restaurant' ||
+            stop.place.category == 'cafe')
+          stop.place.nameEn,
+    ];
+    const istanbulSuggestions = [
+      'Try simit and Turkish tea.',
+      'Try a bowl of lentil soup and a pide.',
+      'Try grilled köfte or a plate of meze.',
+    ];
+    const ubudSuggestions = [
+      'Try nasi campur with Balinese side dishes.',
+      'Try satay lilit with rice and sambal.',
+      'Try gado-gado with peanut sauce.',
+    ];
+    final suggestions =
+        destinationSlug == 'istanbul' ? istanbulSuggestions : ubudSuggestions;
     return Card(
       key: Key('trip-preview-day-${day.dayNumber}'),
       margin: const EdgeInsets.only(bottom: 12),
@@ -1281,6 +1368,17 @@ class _DayCard extends StatelessWidget {
                 );
               }),
             activityPicker,
+            const SizedBox(height: 12),
+            Text(
+              'Food suggestions',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            Text(
+              diningStops.isEmpty
+                  ? suggestions[(day.dayNumber - 1) % suggestions.length]
+                  : diningStops.join(', '),
+              key: Key('trip-preview-day-${day.dayNumber}-food'),
+            ),
           ],
         ),
       ),

@@ -12,11 +12,13 @@ class DemoFlightOption {
     required this.id,
     required this.label,
     required this.rateEgpPerTraveler,
+    this.includesDomesticFlights = false,
   });
 
   final String id;
   final String label;
   final int rateEgpPerTraveler;
+  final bool includesDomesticFlights;
 }
 
 const demoFlightOptions = <DemoFlightOption>[
