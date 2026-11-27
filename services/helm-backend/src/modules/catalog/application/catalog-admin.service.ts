@@ -5,6 +5,8 @@ import { StructuredLogger } from '../../../common/logging/structured-logger';
 import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
 import {
   CATALOG_MEDIA_BUCKET,
+  PLACE_COVER_BUCKET,
+  PLACE_COVER_URL_TTL_SECONDS,
   STORAGE_PORT,
   type StoragePort,
 } from '../../../infrastructure/ports/storage.port';
@@ -420,8 +422,8 @@ export class CatalogAdminService {
     });
     const storage = this.requireStorage();
 
-    await storage.uploadPublicObject({
-      bucket: CATALOG_MEDIA_BUCKET,
+    await storage.uploadPrivateObject({
+      bucket: PLACE_COVER_BUCKET,
       path: storagePath,
       body: validated.body,
       contentType: validated.mimeType,
@@ -437,7 +439,7 @@ export class CatalogAdminService {
       const result = await this.repo.replacePlaceCover({
         placeId,
         mediaId,
-        storageBucket: CATALOG_MEDIA_BUCKET,
+        storageBucket: PLACE_COVER_BUCKET,
         storagePath,
         mimeType: validated.mimeType,
         byteSize: validated.byteSize,
@@ -447,7 +449,7 @@ export class CatalogAdminService {
       replaced = result.replaced;
     } catch (err) {
       await this.safeRemoveStorageObject(
-        CATALOG_MEDIA_BUCKET,
+        PLACE_COVER_BUCKET,
         storagePath,
         'compensating_cleanup_after_db_failure',
       );
@@ -541,7 +543,18 @@ export class CatalogAdminService {
     const row = await this.repo.getPlaceById(id);
     if (!row) throw AppException.notFound('Place not found');
     const media = await this.repo.listPlaceMedia(id);
-    return { ...row, media };
+    const cover = media.find((item) => item.isCover && item.storageBucket === PLACE_COVER_BUCKET);
+    let coverPreviewUrl: string | undefined;
+    if (cover && typeof cover.storagePath === 'string' && this.storage) {
+      try {
+        coverPreviewUrl = await this.storage.createSignedDownloadUrl(
+          cover.storagePath, PLACE_COVER_URL_TTL_SECONDS, PLACE_COVER_BUCKET,
+        );
+      } catch {
+        // Keep staff metadata and cover controls available during storage outages.
+      }
+    }
+    return { ...row, media, coverPreviewUrl };
   }
 
   private async retireUnreferencedMediaAsset(asset: {

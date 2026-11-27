@@ -43,4 +43,18 @@ describe("activePlaceCover / placeCoverViewFromMedia", () => {
       null,
     );
   });
+
+  it("uses the staff signed preview for a private cover", () => {
+    const media = [{
+      id: "22222222-2222-4222-8222-222222222222",
+      storageBucket: "catalog-place-covers",
+      storagePath: "places/private-cover.jpg",
+      altTextEn: "Cafe terrace",
+      isCover: true,
+    }];
+    const origin = "https://example.supabase.co";
+    const signed = `${origin}/storage/v1/object/sign/catalog-place-covers/places/private-cover.jpg?token=test`;
+    assert.equal(placeCoverViewFromMedia(media, origin, signed)?.url, signed);
+    assert.equal(placeCoverViewFromMedia(media, origin)?.url, null);
+  });
 });

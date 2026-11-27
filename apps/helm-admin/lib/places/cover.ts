@@ -21,11 +21,12 @@ export function activePlaceCover(
 export function placeCoverViewFromMedia(
   media: PlaceAdmin["media"] | undefined | null,
   supabaseUrl: string,
+  coverPreviewUrl?: string,
 ): PlaceCoverView | null {
   const cover = activePlaceCover(media);
   if (!cover) return null;
   return {
-    url: catalogMediaPublicUrl(
+    url: coverPreviewUrl ?? catalogMediaPublicUrl(
       supabaseUrl,
       cover.storageBucket,
       cover.storagePath,

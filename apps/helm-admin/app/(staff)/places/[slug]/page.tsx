@@ -50,7 +50,7 @@ export default async function PlaceDetailPage({ params }: PageProps) {
   }
 
   const cover = hydrated
-    ? placeCoverViewFromMedia(hydrated.media, supabaseUrl)
+    ? placeCoverViewFromMedia(hydrated.media, supabaseUrl, hydrated.coverPreviewUrl)
     : null;
 
   return (

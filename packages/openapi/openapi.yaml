@@ -3141,6 +3141,10 @@ components:
           description: Active media references for staff hydrate (bucket/path allowed)
           items:
             $ref: "#/components/schemas/PublicMediaRef"
+        coverPreviewUrl:
+          type: string
+          format: uri
+          description: Short-lived signed URL for the active place cover in staff views.
     LifecycleTransitionRequest:
       type: object
       required: [to]

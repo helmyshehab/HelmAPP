@@ -140,6 +140,7 @@ jobs:
           out="$(mktemp)"
           ./scripts/apply-migrations.sh | tee "$out"
           grep -F 'SKIP supabase-only migration: 20261126160000_catalog_media_storage_bucket.sql' "$out"
+          grep -F 'SKIP supabase-only migration: 20261128120000_private_place_cover_storage.sql' "$out"
       - name: Assert seed destinations exist and no fake storage tables
         env:
           PGPASSWORD: postgres
@@ -195,6 +196,16 @@ jobs:
           grep -E '^# tests 1$' "$out"
           grep -E '^# pass 1$' "$out"
           grep -E '^# fail 0$' "$out"
+          grep -E '^# skipped 0$' "$out"
+      - name: Public catalog place details and cover visibility (must not skip)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+        run: |
+          set -euo pipefail
+          out="$(mktemp)"
+          pnpm --filter @helm/helm-backend exec node --import tsx --test \
+            test/catalog-public-details.test.ts | tee "$out"
+          grep -E '^# pass 1$' "$out"
           grep -E '^# skipped 0$' "$out"
       - name: Customer profile bootstrap Nest HTTP (must not skip)
         env:

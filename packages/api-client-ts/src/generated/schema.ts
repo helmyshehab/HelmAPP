@@ -1611,6 +1611,11 @@ export interface components {
             updatedAt?: string;
             /** @description Active media references for staff hydrate (bucket/path allowed) */
             media?: components["schemas"]["PublicMediaRef"][];
+            /**
+             * Format: uri
+             * @description Short-lived signed URL for the active place cover in staff views.
+             */
+            coverPreviewUrl?: string;
         };
         LifecycleTransitionRequest: {
             to: components["schemas"]["LifecycleStatus"];

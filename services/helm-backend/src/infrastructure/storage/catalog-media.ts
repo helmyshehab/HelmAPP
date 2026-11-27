@@ -4,6 +4,7 @@ import {
   CATALOG_COVER_MAX_BYTES,
   CATALOG_COVER_MIME_TYPES,
   CATALOG_MEDIA_BUCKET,
+  PLACE_COVER_BUCKET,
   type CatalogCoverMimeType,
 } from '../ports/storage.port';
 
@@ -181,9 +182,9 @@ export function buildPlaceCoverObjectPath(input: {
 
 export function assertCatalogMediaBucket(bucket: string): string {
   const trimmed = bucket.trim();
-  if (trimmed !== CATALOG_MEDIA_BUCKET) {
+  if (trimmed !== CATALOG_MEDIA_BUCKET && trimmed !== PLACE_COVER_BUCKET) {
     throw AppException.validation(
-      `Unsupported storage bucket: ${bucket} (expected ${CATALOG_MEDIA_BUCKET})`,
+      `Unsupported catalog storage bucket: ${bucket}`,
     );
   }
   return trimmed;

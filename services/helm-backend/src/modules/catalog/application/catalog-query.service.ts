@@ -2,14 +2,13 @@ import { Inject, Injectable, Optional } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
 import {
   STORAGE_PORT,
+  PLACE_COVER_BUCKET,
+  PLACE_COVER_URL_TTL_SECONDS,
   type StoragePort,
 } from '../../../infrastructure/ports/storage.port';
 import { CATEGORY_GROUPS, isPlaceCategory } from '../domain/categories';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
-import {
-  toPublicCatalogCover,
-  toPublicDestinationCover,
-} from './destination-cover.mapper';
+import { toPublicDestinationCover, type PlaceCoverRow } from './destination-cover.mapper';
 import {
   assertNoInternalLeak,
   toPublicDestination,
@@ -124,14 +123,13 @@ export class CatalogQueryService {
     const coverById = await this.repo.listPublicPlaceCovers(
       result.items.map((row) => String(row.id)),
     );
-    const items = result.items.map((row) => {
+    const items = await Promise.all(result.items.map(async (row) => {
       const place = toPublicPlace(row) as Record<string, unknown>;
       const coverRow = coverById.get(String(row.id));
-      if (coverRow && this.storage) {
-        place.cover = toPublicCatalogCover(coverRow, this.storage);
-      }
+      const cover = await this.resolvePlaceCover(coverRow);
+      if (cover) place.cover = cover;
       return place;
-    });
+    }));
     const body = { ...result, items };
     assertNoInternalLeak(body);
     return body;
@@ -156,11 +154,25 @@ export class CatalogQueryService {
       media,
       details: details ?? null,
     };
-    if (coverRow && this.storage) {
-      body.cover = toPublicCatalogCover(coverRow, this.storage);
-    }
+    const cover = await this.resolvePlaceCover(coverRow);
+    if (cover) body.cover = cover;
     assertNoInternalLeak(body);
     return body;
+  }
+
+  private async resolvePlaceCover(row?: PlaceCoverRow | null) {
+    if (!row || !this.storage || row.storageBucket !== PLACE_COVER_BUCKET) return;
+    try {
+      const url = await this.storage.createSignedDownloadUrl(
+        row.storagePath, PLACE_COVER_URL_TTL_SECONDS, PLACE_COVER_BUCKET,
+      );
+      const altTextEn = row.altTextEn?.trim();
+      const altTextAr = row.altTextAr?.trim();
+      return { url, ...(altTextEn && { altTextEn }), ...(altTextAr && { altTextAr }) };
+    } catch {
+      // Place discovery remains available when storage signing is unavailable.
+      return undefined;
+    }
   }
 
   listCategories() {

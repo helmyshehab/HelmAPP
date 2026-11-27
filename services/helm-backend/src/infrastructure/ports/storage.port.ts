@@ -7,6 +7,8 @@
  */
 
 export const CATALOG_MEDIA_BUCKET = 'catalog-media';
+export const PLACE_COVER_BUCKET = 'catalog-place-covers';
+export const PLACE_COVER_URL_TTL_SECONDS = 300;
 
 /** Hard app limit for destination covers (also mirrored on the storage bucket). */
 export const CATALOG_COVER_MAX_BYTES = 5 * 1024 * 1024;
@@ -37,7 +39,9 @@ export type UploadPublicObjectResult = {
 };
 
 export interface StoragePort {
-  createSignedDownloadUrl(path: string, expiresInSeconds: number): Promise<string>;
+  createSignedDownloadUrl(path: string, expiresInSeconds: number, bucket?: string): Promise<string>;
+
+  uploadPrivateObject(input: UploadPublicObjectInput): Promise<void>;
 
   /** Upload bytes to a public bucket and return the permanent public URL. */
   uploadPublicObject(input: UploadPublicObjectInput): Promise<UploadPublicObjectResult>;

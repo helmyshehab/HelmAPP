@@ -5,7 +5,7 @@ import { CatalogAdminService } from '../src/modules/catalog/application/catalog-
 import { CatalogQueryService } from '../src/modules/catalog/application/catalog-query.service.ts';
 import { toPublicCatalogCover } from '../src/modules/catalog/application/destination-cover.mapper.ts';
 import { MockStorageAdapter } from '../src/infrastructure/adapters/mock/mock-storage.adapter.ts';
-import { CATALOG_MEDIA_BUCKET } from '../src/infrastructure/ports/storage.port.ts';
+import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../src/infrastructure/ports/storage.port.ts';
 import type { AuthPrincipal } from '../src/infrastructure/ports/auth.port.ts';
 
 function principal(
@@ -148,7 +148,7 @@ test('uploadPlaceCover validates file and required EN alt', async () => {
   );
 });
 
-test('uploadPlaceCover success retires unreferenced prior cover', async () => {
+test('draft place cover uses private storage and retires the old cover', async () => {
   const storage = new MockStorageAdapter();
   const oldPath = `places/${placeId}/cover/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.jpg`;
   await storage.uploadPublicObject({
@@ -160,8 +160,9 @@ test('uploadPlaceCover success retires unreferenced prior cover', async () => {
 
   let capturedPath: string | undefined;
   const repo = {
-    getPlaceById: async () => hydrateStub(),
-    replacePlaceCover: async (input: { storagePath: string; mediaId: string }) => {
+    getPlaceById: async () => ({ ...hydrateStub(), lifecycleStatus: 'draft' }),
+    replacePlaceCover: async (input: { storagePath: string; mediaId: string; storageBucket: string }) => {
+      assert.equal(input.storageBucket, PLACE_COVER_BUCKET);
       capturedPath = input.storagePath;
       return {
         mediaId: input.mediaId,
@@ -176,7 +177,11 @@ test('uploadPlaceCover success retires unreferenced prior cover', async () => {
     },
     countActiveMediaReferences: async () => 0,
     deactivateMediaAsset: async () => undefined,
-    listPlaceMedia: async () => [],
+    listPlaceMedia: async () => [{
+      isCover: true,
+      storageBucket: PLACE_COVER_BUCKET,
+      storagePath: capturedPath,
+    }],
   };
   const audit = { record: async () => undefined };
   const admin = new CatalogAdminService(
@@ -193,10 +198,13 @@ test('uploadPlaceCover success retires unreferenced prior cover', async () => {
     'Cafe cover',
   );
 
-  assert.equal(result.lifecycleStatus, 'published');
+  assert.equal(result.lifecycleStatus, 'draft');
+  assert.match(result.coverPreviewUrl ?? '', /^mock:\/\/storage\/signed/);
   assert.ok(capturedPath?.startsWith(`places/${placeId}/cover/`));
   assert.equal(storage.objects.has(`${CATALOG_MEDIA_BUCKET}:${oldPath}`), false);
-  assert.equal(storage.objects.has(`${CATALOG_MEDIA_BUCKET}:${capturedPath}`), true);
+  assert.equal(storage.objects.has(`${CATALOG_MEDIA_BUCKET}:${capturedPath}`), false);
+  assert.equal(storage.objects.has(`${PLACE_COVER_BUCKET}:${capturedPath}`), true);
+  assert.throws(() => storage.publicObjectUrl(PLACE_COVER_BUCKET, capturedPath!));
 });
 
 test('deletePlaceCover removes unreferenced storage', async () => {
@@ -235,6 +243,8 @@ test('deletePlaceCover removes unreferenced storage', async () => {
 test('public place list and detail attach resolved cover; legacy media remains', async () => {
   const storage = new MockStorageAdapter();
   const coverPath = `places/${placeId}/cover/eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee.jpg`;
+  const legacyPath = `places/${placeId}/gallery.jpg`;
+  const signedUrl = `mock://storage/signed?path=${encodeURIComponent(coverPath)}&exp=300`;
   const repo = {
     listPlaces: async () => ({
       items: [hydrateStub()],
@@ -248,7 +258,7 @@ test('public place list and detail attach resolved cover; legacy media remains',
           placeId,
           {
             placeId,
-            storageBucket: CATALOG_MEDIA_BUCKET,
+            storageBucket: PLACE_COVER_BUCKET,
             storagePath: coverPath,
             altTextEn: 'Cafe terrace',
             altTextAr: null,
@@ -258,7 +268,7 @@ test('public place list and detail attach resolved cover; legacy media remains',
     getPlaceBySlug: async () => hydrateStub(),
     getActivePlaceCover: async () => ({
       placeId,
-      storageBucket: CATALOG_MEDIA_BUCKET,
+      storageBucket: PLACE_COVER_BUCKET,
       storagePath: coverPath,
       altTextEn: 'Cafe terrace',
       altTextAr: null,
@@ -267,9 +277,9 @@ test('public place list and detail attach resolved cover; legacy media remains',
       {
         id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
         storageBucket: CATALOG_MEDIA_BUCKET,
-        storagePath: coverPath,
-        altTextEn: 'Cafe terrace',
-        isCover: true,
+        storagePath: legacyPath,
+        altTextEn: 'Gallery view',
+        isCover: false,
         sortOrder: 0,
       },
     ],
@@ -284,7 +294,7 @@ test('public place list and detail attach resolved cover; legacy media remains',
   const listCover = listed.cover as Record<string, unknown>;
   assert.equal(
     listCover.url,
-    `mock://storage/public/catalog-media/${coverPath}`,
+    signedUrl,
   );
   assert.equal(listCover.altTextEn, 'Cafe terrace');
   assert.equal('storageBucket' in listCover, false);
@@ -297,11 +307,11 @@ test('public place list and detail attach resolved cover; legacy media remains',
   const detailCover = detail.cover as Record<string, unknown>;
   assert.equal(
     detailCover.url,
-    `mock://storage/public/catalog-media/${coverPath}`,
+    signedUrl,
   );
   assert.equal('storageBucket' in detailCover, false);
   const media = detail.media as Array<Record<string, unknown>>;
   assert.equal(media.length, 1);
   assert.equal(media[0]?.storageBucket, CATALOG_MEDIA_BUCKET);
-  assert.equal(media[0]?.storagePath, coverPath);
+  assert.equal(media[0]?.storagePath, legacyPath);
 });

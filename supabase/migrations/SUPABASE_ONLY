@@ -5,3 +5,4 @@
 #   MIGRATION_MODE=supabase (default) — must APPLY; fails if Storage is absent
 # Never stub storage.* tables on plain Postgres.
 20261126160000_catalog_media_storage_bucket.sql
+20261128120000_private_place_cover_storage.sql
