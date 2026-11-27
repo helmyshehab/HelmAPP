@@ -784,6 +784,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/catalog/places/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff hydrate of a catalog place (includes media) */
+        get: operations["adminGetCatalogPlace"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/catalog/places/{id}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload or replace a place cover image
+         * @description Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+         *     optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+         *     before an atomic DB cover replacement. Does not change lifecycle or published_at.
+         *     Concurrent uploads are serialized per place; conflicts return 409.
+         */
+        post: operations["adminUploadPlaceCover"];
+        /**
+         * Remove the active place cover
+         * @description Administrator / super-administrator only. Deactivates the active cover link.
+         *     Storage objects are removed only when the media asset has no remaining active
+         *     references. Does not change lifecycle or published_at.
+         */
+        delete: operations["adminDeletePlaceCover"];
+        options?: never;
+        head?: never;
+        /**
+         * Update place cover alt text
+         * @description Administrator / super-administrator only. Updates EN/AR alt text on the active
+         *     cover media asset. Does not change lifecycle or published_at.
+         */
+        patch: operations["adminUpdatePlaceCoverAlt"];
+        trace?: never;
+    };
     "/v1/admin/catalog/places/{id}/transition": {
         parameters: {
             query?: never;
@@ -1115,15 +1166,19 @@ export interface components {
         /** @enum {string} */
         PlaceCategory: "accommodation" | "restaurant" | "cafe" | "bar" | "beach_club" | "attraction" | "activity" | "nightlife" | "transport";
         /**
-         * @description Traveler-facing destination cover. URL is server-resolved for a public
+         * @description Traveler-facing catalog cover. URL is server-resolved for a public
          *     catalog-media object. Never includes storage bucket/path or credentials.
          */
-        DestinationCoverPublic: {
+        CatalogCoverPublic: {
             /** Format: uri */
             url: string;
             altTextEn?: string;
             altTextAr?: string;
         };
+        /** @description Traveler-facing destination cover. Alias of CatalogCoverPublic. */
+        DestinationCoverPublic: components["schemas"]["CatalogCoverPublic"];
+        /** @description Traveler-facing place cover. Alias of CatalogCoverPublic. */
+        PlaceCoverPublic: components["schemas"]["CatalogCoverPublic"];
         UpdateDestinationCoverAltRequest: {
             altTextEn: string;
             altTextAr?: string | null;
@@ -1152,6 +1207,10 @@ export interface components {
             publishedAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+        };
+        UpdatePlaceCoverAltRequest: {
+            altTextEn: string;
+            altTextAr?: string | null;
         };
         DestinationListResponse: {
             items: components["schemas"]["DestinationPublic"][];
@@ -1193,9 +1252,17 @@ export interface components {
             isFeatured?: boolean;
             /** @enum {string} */
             status: "published";
+            /**
+             * @description Present only when an active public cover exists. Resolved URL + alt
+             *     text only — never storage bucket/path.
+             */
+            cover?: components["schemas"]["PlaceCoverPublic"];
             /** @description Active public tag slugs (detail responses only; list may omit) */
             tags?: string[];
-            /** @description Present on place detail responses only */
+            /**
+             * @description Present on place detail responses only. Legacy staff-oriented refs
+             *     (bucket/path). Traveler UIs should prefer `cover`.
+             */
             media?: components["schemas"]["PublicMediaRef"][];
             /**
              * @description Category-specific public detail object for the place detail route only.
@@ -1522,6 +1589,28 @@ export interface components {
             id: string;
             slug: string;
             lifecycleStatus: components["schemas"]["LifecycleStatus"];
+        };
+        PlaceAdmin: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            nameEn: string;
+            nameAr: string;
+            category: components["schemas"]["PlaceCategory"];
+            subcategory?: string;
+            shortDescriptionEn?: string;
+            shortDescriptionAr?: string;
+            /** Format: uuid */
+            destinationId?: string;
+            destinationSlug?: string;
+            countryCode?: string;
+            lifecycleStatus: components["schemas"]["LifecycleStatus"];
+            /** Format: date-time */
+            publishedAt?: string | null;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** @description Active media references for staff hydrate (bucket/path allowed) */
+            media?: components["schemas"]["PublicMediaRef"][];
         };
         LifecycleTransitionRequest: {
             to: components["schemas"]["LifecycleStatus"];
@@ -3165,6 +3254,125 @@ export interface operations {
             400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+        };
+    };
+    adminGetCatalogPlace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place with media references */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUploadPlaceCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                     */
+                    file: string;
+                    altTextEn: string;
+                    altTextAr?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Place with updated cover media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminDeletePlaceCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place with cover removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdatePlaceCoverAlt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlaceCoverAltRequest"];
+            };
+        };
+        responses: {
+            /** @description Place with updated cover alt text */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlaceAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     adminTransitionCatalogPlace: {

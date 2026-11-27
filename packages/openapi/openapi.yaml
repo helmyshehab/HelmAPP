@@ -1389,6 +1389,155 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+  /v1/admin/catalog/places/{id}:
+    get:
+      operationId: adminGetCatalogPlace
+      summary: Staff hydrate of a catalog place (includes media)
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Place with media references
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/admin/catalog/places/{id}/cover:
+    post:
+      operationId: adminUploadPlaceCover
+      summary: Upload or replace a place cover image
+      description: |
+        Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+        optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+        before an atomic DB cover replacement. Does not change lifecycle or published_at.
+        Concurrent uploads are serialized per place; conflicts return 409.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, altTextEn]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                altTextEn:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                altTextAr:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Place with updated cover media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    patch:
+      operationId: adminUpdatePlaceCoverAlt
+      summary: Update place cover alt text
+      description: |
+        Administrator / super-administrator only. Updates EN/AR alt text on the active
+        cover media asset. Does not change lifecycle or published_at.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePlaceCoverAltRequest"
+      responses:
+        "200":
+          description: Place with updated cover alt text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: adminDeletePlaceCover
+      summary: Remove the active place cover
+      description: |
+        Administrator / super-administrator only. Deactivates the active cover link.
+        Storage objects are removed only when the media asset has no remaining active
+        references. Does not change lifecycle or published_at.
+      tags: [catalog-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Place with cover removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/admin/catalog/places/{id}/transition:
     post:
       operationId: adminTransitionCatalogPlace
@@ -2028,11 +2177,11 @@ components:
         - activity
         - nightlife
         - transport
-    DestinationCoverPublic:
+    CatalogCoverPublic:
       type: object
       required: [url]
       description: |
-        Traveler-facing destination cover. URL is server-resolved for a public
+        Traveler-facing catalog cover. URL is server-resolved for a public
         catalog-media object. Never includes storage bucket/path or credentials.
       properties:
         url:
@@ -2042,6 +2191,16 @@ components:
           type: string
         altTextAr:
           type: string
+    DestinationCoverPublic:
+      allOf:
+        - $ref: "#/components/schemas/CatalogCoverPublic"
+      description: |
+        Traveler-facing destination cover. Alias of CatalogCoverPublic.
+    PlaceCoverPublic:
+      allOf:
+        - $ref: "#/components/schemas/CatalogCoverPublic"
+      description: |
+        Traveler-facing place cover. Alias of CatalogCoverPublic.
     UpdateDestinationCoverAltRequest:
       type: object
       required: [altTextEn]
@@ -2101,6 +2260,19 @@ components:
         updatedAt:
           type: string
           format: date-time
+    UpdatePlaceCoverAltRequest:
+      type: object
+      required: [altTextEn]
+      additionalProperties: false
+      properties:
+        altTextEn:
+          type: string
+          minLength: 1
+          maxLength: 500
+        altTextAr:
+          type: string
+          nullable: true
+          maxLength: 500
     DestinationListResponse:
       type: object
       required: [items, total, limit, offset]
@@ -2179,6 +2351,11 @@ components:
         status:
           type: string
           enum: [published]
+        cover:
+          $ref: "#/components/schemas/PlaceCoverPublic"
+          description: |
+            Present only when an active public cover exists. Resolved URL + alt
+            text only — never storage bucket/path.
         tags:
           type: array
           items:
@@ -2188,7 +2365,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PublicMediaRef"
-          description: Present on place detail responses only
+          description: |
+            Present on place detail responses only. Legacy staff-oriented refs
+            (bucket/path). Traveler UIs should prefer `cover`.
         details:
           nullable: true
           description: |
@@ -2920,6 +3099,48 @@ components:
           type: string
         lifecycleStatus:
           $ref: "#/components/schemas/LifecycleStatus"
+    PlaceAdmin:
+      type: object
+      required: [id, slug, nameEn, nameAr, category, lifecycleStatus]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        nameEn:
+          type: string
+        nameAr:
+          type: string
+        category:
+          $ref: "#/components/schemas/PlaceCategory"
+        subcategory:
+          type: string
+        shortDescriptionEn:
+          type: string
+        shortDescriptionAr:
+          type: string
+        destinationId:
+          type: string
+          format: uuid
+        destinationSlug:
+          type: string
+        countryCode:
+          type: string
+        lifecycleStatus:
+          $ref: "#/components/schemas/LifecycleStatus"
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        media:
+          type: array
+          description: Active media references for staff hydrate (bucket/path allowed)
+          items:
+            $ref: "#/components/schemas/PublicMediaRef"
     LifecycleTransitionRequest:
       type: object
       required: [to]

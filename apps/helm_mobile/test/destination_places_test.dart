@@ -82,7 +82,28 @@ void main() {
     expect(page.items.first.nameEn, 'Tirta Empul');
     expect(page.items.first.categoryLabel, 'cultural site');
     expect(page.items.first.availableShortDescription, 'Holy spring temple');
+    expect(page.items.first.coverImageUrl, isNull);
     expect(page.hasMore, isFalse);
+  });
+
+  test('PlaceListItem parses cover url and alts without storage internals', () {
+    final item = PlaceListItem.fromJson({
+      ..._place(
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        slug: 'ivy-cafe',
+        nameEn: 'Ivy Cafe',
+        category: 'cafe',
+      ),
+      'cover': {
+        'url': 'https://cdn.example.com/places/ivy.jpg',
+        'altTextEn': 'Cafe terrace',
+        'altTextAr': 'تراس',
+        'storageBucket': 'should-not-matter',
+      },
+    });
+    expect(item.coverImageUrl, 'https://cdn.example.com/places/ivy.jpg');
+    expect(item.coverAltEn, 'Cafe terrace');
+    expect(item.coverAltForLanguage('ar'), 'تراس');
   });
 
   testWidgets('Places request is scoped to destination slug with limit/offset',

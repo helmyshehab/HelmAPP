@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { PlaceAdmin } from "@helm/api-client-ts";
+import { PlaceCoverPanel } from "../../../../components/places/PlaceCoverPanel";
 import { PlaceLifecycleActions } from "../../../../components/places/PlaceLifecycleActions";
 import { LifecycleBadge } from "../../../../components/destinations/LifecycleBadge";
 import styles from "../../../../components/destinations/destinations.module.css";
 import { createAuthedHelmClient } from "../../../../lib/api/helm-client";
 import { isAdminPrincipal } from "../../../../lib/auth/staff";
 import { requireStaff } from "../../../../lib/auth/require-staff";
+import { getPublicAdminEnv } from "../../../../lib/env";
+import { placeCoverViewFromMedia } from "../../../../lib/places/cover";
 import { parsePlaceApiError } from "../../../../lib/places/errors";
 import type { StaffPlaceListItem } from "../../../../lib/places/list-item";
 import { resolveStaffPlaceBySlug } from "../../../../lib/places/resolve-by-slug";
@@ -26,12 +30,17 @@ export default async function PlaceDetailPage({ params }: PageProps) {
   const { me, accessToken } = await requireStaff();
   const client = createAuthedHelmClient(accessToken);
   const isAdmin = isAdminPrincipal(me);
+  const { supabaseUrl } = getPublicAdminEnv();
 
   let loadError: string | null = null;
   let place: StaffPlaceListItem | null = null;
+  let hydrated: PlaceAdmin | null = null;
 
   try {
     place = await resolveStaffPlaceBySlug(client, slug);
+    if (place) {
+      hydrated = await client.adminGetCatalogPlace(place.id);
+    }
   } catch (error) {
     loadError = parsePlaceApiError(error).message;
   }
@@ -39,6 +48,10 @@ export default async function PlaceDetailPage({ params }: PageProps) {
   if (!place && !loadError) {
     notFound();
   }
+
+  const cover = hydrated
+    ? placeCoverViewFromMedia(hydrated.media, supabaseUrl)
+    : null;
 
   return (
     <div className={styles.stack}>
@@ -98,9 +111,17 @@ export default async function PlaceDetailPage({ params }: PageProps) {
               ) : null}
             </ul>
             <p className={styles.muted}>
-              Full place editing, media, and provenance are out of scope for
-              this slice.
+              Full place field editing and provenance remain out of scope for
+              this slice. Cover photos use the shared catalog-media workflow.
             </p>
+          </section>
+
+          <section className={styles.panel}>
+            <PlaceCoverPanel
+              placeId={place.id}
+              isAdmin={isAdmin}
+              initialCover={cover}
+            />
           </section>
 
           <section className={styles.panel}>

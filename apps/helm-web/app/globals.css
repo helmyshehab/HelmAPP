@@ -484,6 +484,26 @@ input:focus-visible {
   border-bottom: 0;
 }
 
+.place-item-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.place-item-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.place-cover {
+  width: 5.5rem;
+  height: 6.75rem;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
 .place-name {
   margin: 0;
   color: var(--helm-ivory);

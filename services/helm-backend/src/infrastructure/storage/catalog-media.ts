@@ -123,19 +123,14 @@ export function assertSafeStorageSegment(value: string, label: string): string {
   return trimmed.toLowerCase();
 }
 
-/**
- * Safe object path for a destination cover.
- * Shape: destinations/{destinationId}/cover/{objectId}.{ext}
- */
-export function buildDestinationCoverObjectPath(input: {
-  destinationId: string;
+function buildEntityCoverObjectPath(input: {
+  entityFolder: 'destinations' | 'places';
+  entityId: string;
+  entityLabel: string;
   objectId?: string;
   extension: string;
 }): string {
-  const destinationId = assertSafeStorageSegment(
-    input.destinationId,
-    'destinationId',
-  );
+  const entityId = assertSafeStorageSegment(input.entityId, input.entityLabel);
   const objectId = assertSafeStorageSegment(
     input.objectId ?? randomUUID(),
     'objectId',
@@ -145,7 +140,43 @@ export function buildDestinationCoverObjectPath(input: {
     throw AppException.validation('Cover file extension must be jpg, jpeg, png, or webp');
   }
   const normalizedExt = ext === 'jpeg' ? 'jpg' : ext;
-  return `destinations/${destinationId}/cover/${objectId}.${normalizedExt}`;
+  return `${input.entityFolder}/${entityId}/cover/${objectId}.${normalizedExt}`;
+}
+
+/**
+ * Safe object path for a destination cover.
+ * Shape: destinations/{destinationId}/cover/{objectId}.{ext}
+ */
+export function buildDestinationCoverObjectPath(input: {
+  destinationId: string;
+  objectId?: string;
+  extension: string;
+}): string {
+  return buildEntityCoverObjectPath({
+    entityFolder: 'destinations',
+    entityId: input.destinationId,
+    entityLabel: 'destinationId',
+    objectId: input.objectId,
+    extension: input.extension,
+  });
+}
+
+/**
+ * Safe object path for a place cover.
+ * Shape: places/{placeId}/cover/{objectId}.{ext}
+ */
+export function buildPlaceCoverObjectPath(input: {
+  placeId: string;
+  objectId?: string;
+  extension: string;
+}): string {
+  return buildEntityCoverObjectPath({
+    entityFolder: 'places',
+    entityId: input.placeId,
+    entityLabel: 'placeId',
+    objectId: input.objectId,
+    extension: input.extension,
+  });
 }
 
 export function assertCatalogMediaBucket(bucket: string): string {

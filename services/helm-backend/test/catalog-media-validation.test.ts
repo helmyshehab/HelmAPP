@@ -8,6 +8,7 @@ import {
 import {
   assertSafeObjectPath,
   buildDestinationCoverObjectPath,
+  buildPlaceCoverObjectPath,
   detectCatalogCoverMime,
   validateCatalogCoverImage,
 } from '../src/infrastructure/storage/catalog-media';
@@ -100,6 +101,42 @@ test('buildDestinationCoverObjectPath uses UUID segments only', () => {
     () =>
       buildDestinationCoverObjectPath({
         destinationId,
+        objectId: 'not-a-uuid',
+        extension: 'png',
+      }),
+    (err: unknown) => err instanceof AppException,
+  );
+});
+
+test('buildPlaceCoverObjectPath uses UUID segments only', () => {
+  const placeId = 'a1027529-5744-4486-a36d-56d2a2170a0c';
+  const objectId = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+  assert.equal(
+    buildPlaceCoverObjectPath({ placeId, objectId, extension: 'jpg' }),
+    `places/${placeId}/cover/${objectId}.jpg`,
+  );
+  assert.equal(
+    buildPlaceCoverObjectPath({
+      placeId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      objectId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      extension: 'webp',
+    }),
+    'places/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/cover/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.webp',
+  );
+
+  assert.throws(
+    () =>
+      buildPlaceCoverObjectPath({
+        placeId: '../etc',
+        extension: 'png',
+      }),
+    (err: unknown) => err instanceof AppException,
+  );
+
+  assert.throws(
+    () =>
+      buildPlaceCoverObjectPath({
+        placeId,
         objectId: 'not-a-uuid',
         extension: 'png',
       }),

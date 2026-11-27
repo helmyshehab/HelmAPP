@@ -6,7 +6,10 @@ import {
 } from '../../../infrastructure/ports/storage.port';
 import { CATEGORY_GROUPS, isPlaceCategory } from '../domain/categories';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
-import { toPublicDestinationCover } from './destination-cover.mapper';
+import {
+  toPublicCatalogCover,
+  toPublicDestinationCover,
+} from './destination-cover.mapper';
 import {
   assertNoInternalLeak,
   toPublicDestination,
@@ -118,7 +121,17 @@ export class CatalogQueryService {
       offset: query.offset ?? 0,
       publicOnly: true,
     });
-    const items = result.items.map((row) => toPublicPlace(row));
+    const coverById = await this.repo.listPublicPlaceCovers(
+      result.items.map((row) => String(row.id)),
+    );
+    const items = result.items.map((row) => {
+      const place = toPublicPlace(row) as Record<string, unknown>;
+      const coverRow = coverById.get(String(row.id));
+      if (coverRow && this.storage) {
+        place.cover = toPublicCatalogCover(coverRow, this.storage);
+      }
+      return place;
+    });
     const body = { ...result, items };
     assertNoInternalLeak(body);
     return body;
@@ -129,18 +142,23 @@ export class CatalogQueryService {
     if (!row) throw AppException.notFound(`Place not found: ${slug}`);
     const placeId = String(row.id);
     const category = String(row.category);
-    const [media, tags, details] = await Promise.all([
+    const [media, tags, details, coverRow] = await Promise.all([
       this.repo.listPublicMediaForPlace(placeId),
       this.repo.listPublicTagsForPlace(placeId),
       this.repo.getPublicPlaceDetails(placeId, category),
+      this.repo.getActivePlaceCover(placeId),
     ]);
     // List endpoints stay lean — category details only on the detail route.
-    const body = {
+    // Keep legacy media[] (PublicMediaRef) for detail; traveler-safe cover is separate.
+    const body: Record<string, unknown> = {
       ...toPublicPlace(row),
       tags,
       media,
       details: details ?? null,
     };
+    if (coverRow && this.storage) {
+      body.cover = toPublicCatalogCover(coverRow, this.storage);
+    }
     assertNoInternalLeak(body);
     return body;
   }
