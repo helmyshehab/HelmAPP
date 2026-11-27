@@ -10,28 +10,43 @@ import 'package:helm_mobile/build/trip_gen/ubud_demo_catalog.dart';
 import 'package:helm_mobile/main.dart' show HelmShell;
 import 'package:helm_mobile/packages/ubud_package_fixture.dart';
 import 'package:helm_mobile/theme/helm_theme.dart';
+import 'package:helm_mobile/theme/helm_theme_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final themeController = await HelmThemeController.load();
   final auth = FakeTravelerAuth();
   final api = HelmApiClient(
     baseUrl: 'https://helm-demo.invalid',
     httpClient: MockClient(_DemoApi(auth).handle),
   );
-  runApp(MaterialApp(
-    title: 'HELM local demo',
-    theme: HelmTheme.light(),
-    darkTheme: HelmTheme.dark(),
-    builder: kIsWeb
-        ? (context, child) => ColoredBox(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: Center(child: SizedBox(width: 440, child: child)),
-            )
-        : null,
-    home:
-        HelmShell(auth: auth, apiClient: api, allowDemoStaffConfirmation: true),
-  ));
+  final shellKey = GlobalKey();
+  runApp(
+    ListenableBuilder(
+      listenable: themeController,
+      builder: (context, _) => MaterialApp(
+        title: 'HELM local demo',
+        theme: HelmTheme.light(),
+        darkTheme: HelmTheme.dark(),
+        themeMode: themeController.mode,
+        builder: kIsWeb
+            ? (context, child) => ColoredBox(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Center(child: SizedBox(width: 440, child: child)),
+                )
+            : null,
+        home: HelmShell(
+          key: shellKey,
+          auth: auth,
+          themeController: themeController,
+          apiClient: api,
+          allowDemoStaffConfirmation: true,
+        ),
+      ),
+    ),
+  );
 }
 
 class _DemoApi {

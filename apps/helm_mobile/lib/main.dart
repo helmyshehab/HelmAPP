@@ -13,45 +13,73 @@ import 'tabs/discover_tab.dart';
 import 'tabs/packages_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/trips_tab.dart';
+import 'theme/helm_appearance_menu.dart';
 import 'theme/helm_theme.dart';
+import 'theme/helm_theme_controller.dart';
 import 'theme/helm_wordmark.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final themeController = await HelmThemeController.load();
   final auth = await createTravelerAuth();
-  runApp(HelmApp(auth: auth));
+  runApp(HelmApp(auth: auth, themeController: themeController));
 }
 
 /// Helm حلم — traveler shell with Discover + Build draft flow.
-class HelmApp extends StatelessWidget {
+class HelmApp extends StatefulWidget {
   HelmApp({
     super.key,
     TravelerAuth? auth,
-  }) : auth = auth ?? FakeTravelerAuth();
+    HelmThemeController? themeController,
+  })  : auth = auth ?? FakeTravelerAuth(),
+        themeController = themeController ?? HelmThemeController.memory();
 
   /// Injected auth for tests; production uses [createTravelerAuth] from [main].
   final TravelerAuth auth;
 
+  /// Restored before [runApp] in production; tests may inject a memory store.
+  final HelmThemeController themeController;
+
+  @override
+  State<HelmApp> createState() => _HelmAppState();
+}
+
+class _HelmAppState extends State<HelmApp> {
+  /// Keeps [HelmShell] state across theme-driven [MaterialApp] rebuilds.
+  final GlobalKey _shellKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: HelmWordmark.label,
-      theme: HelmTheme.light(),
-      darkTheme: HelmTheme.dark(),
-      themeMode: ThemeMode.system,
-      home: HelmShell(auth: auth),
+    return ListenableBuilder(
+      listenable: widget.themeController,
+      builder: (context, _) {
+        return MaterialApp(
+          title: HelmWordmark.label,
+          theme: HelmTheme.light(),
+          darkTheme: HelmTheme.dark(),
+          themeMode: widget.themeController.mode,
+          home: HelmShell(
+            key: _shellKey,
+            auth: widget.auth,
+            themeController: widget.themeController,
+          ),
+        );
+      },
     );
   }
 }
 
 class HelmShell extends StatefulWidget {
-  const HelmShell(
-      {super.key,
-      required this.auth,
-      this.apiClient,
-      this.allowDemoStaffConfirmation = false});
+  const HelmShell({
+    super.key,
+    required this.auth,
+    this.themeController,
+    this.apiClient,
+    this.allowDemoStaffConfirmation = false,
+  });
 
   final TravelerAuth auth;
+  final HelmThemeController? themeController;
   final HelmApiClient? apiClient;
   final bool allowDemoStaffConfirmation;
 
@@ -150,8 +178,13 @@ class _HelmShellState extends State<HelmShell> {
     final fontSize = Theme.of(context).textTheme.titleLarge?.fontSize ?? 22;
     // The title slot is the screen width minus the toolbar's middle insets.
     // One line keeps the compact bar; two lines grow it, including diacritics.
+    final themeController = widget.themeController;
+    // Appearance action occupies the trailing slot; keep the lockup math honest.
+    final trailingReserve =
+        themeController == null ? 0.0 : HelmTheme.minTapTarget.width;
     final titleSlot =
-        HelmWordmark.titleSlotWidth(MediaQuery.sizeOf(context).width);
+        HelmWordmark.titleSlotWidth(MediaQuery.sizeOf(context).width) -
+            trailingReserve;
 
     final previewLabel = BuildInfo.previewLabel;
     final previewBarHeight = previewLabel.isEmpty ? 0.0 : 22.0;
@@ -182,6 +215,10 @@ class _HelmShellState extends State<HelmShell> {
             ],
           ),
         ),
+        actions: [
+          if (themeController != null)
+            HelmAppearanceMenu(controller: themeController),
+        ],
       ),
       body: tabs[index],
       bottomNavigationBar: NavigationBar(
