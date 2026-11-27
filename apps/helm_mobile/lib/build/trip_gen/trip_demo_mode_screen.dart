@@ -8,11 +8,16 @@ class TripDemoModeScreen extends StatefulWidget {
     required this.destinationName,
     required this.days,
     this.onBack,
+    this.fromBuildPreview = false,
   });
 
   final String destinationName;
   final List<TripPreviewDay> days;
   final VoidCallback? onBack;
+
+  /// When true, copy describes a Build itinerary preview and marks Trip alerts /
+  /// Travel chat as planned. Checkout and Trips keep the demo presentation.
+  final bool fromBuildPreview;
 
   @override
   State<TripDemoModeScreen> createState() => _TripDemoModeScreenState();
@@ -26,6 +31,7 @@ class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
     final theme = Theme.of(context);
     final day = widget.days[_dayIndex];
     final dayCount = widget.days.length;
+    final fromBuild = widget.fromBuildPreview;
     return PopScope<void>(
       canPop: widget.onBack == null,
       onPopInvokedWithResult: (didPop, _) {
@@ -36,7 +42,7 @@ class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
           leading: widget.onBack == null
               ? null
               : BackButton(onPressed: widget.onBack),
-          title: const Text('Demo Trip Mode'),
+          title: Text(fromBuild ? 'Trip Mode preview' : 'Demo Trip Mode'),
         ),
         body: ListView(
           key: ValueKey(day.dayNumber),
@@ -55,7 +61,12 @@ class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
                     Text('${day.title} of $dayCount',
                         style: theme.textTheme.titleMedium),
                     const SizedBox(height: 8),
-                    const Text('Sample itinerary from demo checkout'),
+                    Text(
+                      fromBuild
+                          ? 'Preview of your current Build itinerary. Nothing '
+                              'is booked yet.'
+                          : 'Sample itinerary from demo checkout',
+                    ),
                   ],
                 ),
               ),
@@ -95,6 +106,29 @@ class _TripDemoModeScreenState extends State<TripDemoModeScreen> {
                   stop.place.shortDescriptionEn,
                 ].join(' · ')),
               ),
+            if (fromBuild) ...[
+              const SizedBox(height: 16),
+              Text('Also in Trip Mode', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 4),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.notifications_outlined),
+                title: const Text('Trip alerts'),
+                subtitle: Text(
+                  'Planned feature',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.chat_bubble_outline),
+                title: const Text('Travel chat'),
+                subtitle: Text(
+                  'Planned feature',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ],
           ],
         ),
       ),
