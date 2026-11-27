@@ -353,7 +353,8 @@ test('public place details map every category; hide drafts, internals, and list 
       await publish(FIXTURE.draft);
       const withCover = await svc.getPublicPlace(draftSlug);
       assert.match(String(asRecord(withCover.cover)?.url), /^mock:\/\/storage\/signed/);
-      assert.deepEqual(withCover.media, []);
+      assert.ok(Array.isArray(withCover.media));
+      assert.equal(withCover.media.length, 0);
       await db.execute(sql`update catalog.places set lifecycle_status = 'archived' where id = ${FIXTURE.draft}::uuid`);
       assert.equal(await repo.getActivePlaceCover(FIXTURE.draft), null);
       await assert.rejects(() => svc.getPublicPlace(draftSlug));
