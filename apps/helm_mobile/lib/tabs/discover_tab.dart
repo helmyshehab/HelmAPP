@@ -383,6 +383,9 @@ class _DiscoverTabState extends State<DiscoverTab> {
   }
 
   /// Centers Explore chrome and rows within [DiscoverTab.contentMaxWidth].
+  ///
+  /// Each child stays a separate [ListView] child so off-screen rows (and the
+  /// load-more spinner) remain lazy and do not keep tickers alive after scroll.
   Widget _exploreList({
     Key? key,
     required List<Widget> children,
@@ -392,20 +395,20 @@ class _DiscoverTabState extends State<DiscoverTab> {
       primary: true,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       children: [
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: DiscoverTab.contentMaxWidth,
-            ),
-            child: Column(
-              key: const Key('explore-content-column'),
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: children,
+        for (var index = 0; index < children.length; index++)
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              key: index == 0 ? const Key('explore-content-column') : null,
+              constraints: const BoxConstraints(
+                maxWidth: DiscoverTab.contentMaxWidth,
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                child: children[index],
+              ),
             ),
           ),
-        ),
       ],
     );
   }
