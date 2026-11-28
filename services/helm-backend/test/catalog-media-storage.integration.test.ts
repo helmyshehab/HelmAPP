@@ -22,7 +22,7 @@ function jpegBytes(): Uint8Array {
   return Uint8Array.from([0xff, 0xd8, 0xff, 0xd9, 0x00, 0x01, 0x02, 0x03]);
 }
 
-test('catalog-media storage: upload, public GET, delete (opt-in)', async (t) => {
+test('catalog-media storage: private upload, signed GET, delete (opt-in)', async (t) => {
   if (!enabled) {
     t.skip('RUN_STORAGE_INTEGRATION is not 1');
     return;
@@ -52,29 +52,26 @@ test('catalog-media storage: upload, public GET, delete (opt-in)', async (t) => 
   let uploadedUrl: string | undefined;
 
   try {
-    const uploaded = await storage.uploadPublicObject({
+    await storage.uploadPrivateObject({
       bucket: CATALOG_MEDIA_BUCKET,
       path: objectPath,
       body,
       contentType: 'image/jpeg',
       upsert: false,
     });
-    uploadedUrl = uploaded.publicUrl;
-    assert.equal(uploaded.bucket, CATALOG_MEDIA_BUCKET);
-    assert.equal(uploaded.path, objectPath);
-    assert.equal(uploaded.byteSize, body.byteLength);
-    assert.match(uploaded.publicUrl, /\/storage\/v1\/object\/public\/catalog-media\//);
-    assert.equal(storage.publicObjectUrl(CATALOG_MEDIA_BUCKET, objectPath), uploaded.publicUrl);
+    uploadedUrl = await storage.createSignedDownloadUrl(objectPath, 60, CATALOG_MEDIA_BUCKET);
+    const unsigned = await fetch(storage.publicObjectUrl(CATALOG_MEDIA_BUCKET, objectPath));
+    assert.equal(unsigned.ok, false, 'unsigned object URL must be blocked');
 
-    const getRes = await fetch(uploaded.publicUrl);
-    assert.equal(getRes.ok, true, `public GET failed: ${getRes.status}`);
+    const getRes = await fetch(uploadedUrl);
+    assert.equal(getRes.ok, true, `signed GET failed: ${getRes.status}`);
     const got = new Uint8Array(await getRes.arrayBuffer());
     assert.equal(got.byteLength, body.byteLength);
     assert.equal(got[0], 0xff);
     assert.equal(got[1], 0xd8);
 
     await storage.removeObject(CATALOG_MEDIA_BUCKET, objectPath);
-    const afterDelete = await fetch(uploaded.publicUrl);
+    const afterDelete = await fetch(uploadedUrl, { cache: 'no-store' });
     assert.equal(
       afterDelete.ok,
       false,

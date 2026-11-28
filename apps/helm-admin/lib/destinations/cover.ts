@@ -57,11 +57,12 @@ export function catalogMediaPublicUrl(
 export function coverViewFromMedia(
   media: DestinationAdmin["media"] | undefined | null,
   supabaseUrl: string,
+  coverPreviewUrl?: string,
 ): DestinationCoverView | null {
   const cover = activeDestinationCover(media);
   if (!cover) return null;
   return {
-    url: catalogMediaPublicUrl(
+    url: coverPreviewUrl ?? catalogMediaPublicUrl(
       supabaseUrl,
       cover.storageBucket,
       cover.storagePath,

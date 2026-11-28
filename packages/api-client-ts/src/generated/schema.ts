@@ -1167,7 +1167,8 @@ export interface components {
         PlaceCategory: "accommodation" | "restaurant" | "cafe" | "bar" | "beach_club" | "attraction" | "activity" | "nightlife" | "transport";
         /**
          * @description Traveler-facing catalog cover. URL is server-resolved for a public
-         *     catalog-media object. Never includes storage bucket/path or credentials.
+         *     cover that is eligible for traveler display. The URL expires and can be
+         *     refreshed by fetching the catalog again. Never includes service credentials.
          */
         CatalogCoverPublic: {
             /** Format: uri */
@@ -1517,8 +1518,13 @@ export interface components {
                 nameAr: string;
             }[];
             sources?: components["schemas"]["DestinationProvenance"][];
-            /** @description Existing media references only (no upload in Step 6) */
+            /** @description Active media references for staff views. */
             media?: components["schemas"]["PublicMediaRef"][];
+            /**
+             * Format: uri
+             * @description Short-lived signed URL for the active destination cover in staff views.
+             */
+            coverPreviewUrl?: string;
         };
         DestinationAdminListResponse: {
             items: components["schemas"]["DestinationAdmin"][];

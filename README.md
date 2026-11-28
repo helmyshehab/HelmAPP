@@ -2,17 +2,19 @@
 
 Monorepo for **Helm حلم** (GitHub: `helmyshehab/HelmAPP`). Egypt-outbound travel MVP foundation: Flutter mobile, Next.js web + admin, NestJS modular monolith, OpenAPI `/v1`, Supabase Auth/Postgres/Storage.
 
-> **Platform foundation in progress.** Steps 2–4 are on `main`. Step 5 adds travel catalog lifecycle, discovery APIs, admin curation/import, media/provenance, and RLS. No booking/AI/payments product features yet.
+The traveler can explore published destinations, customize Ubud and Istanbul trips, save private drafts, submit requests, and preview Trip Mode. Staff can curate the catalog, upload covers, and review trip requests. Ubud quote and checkout are demo flows. Trip Mode alerts and chat are planned.
+
+[Shared traveler staging](https://helmyshehab.github.io/HelmAPP/) · [Local development and staging checks](docs/LOCAL_DEVELOPMENT.md)
 
 ## Layout
 
 ```
 apps/
-  helm_mobile/          Flutter shell (five empty tabs)
-  helm-web/             Next.js customer shell
-  helm-admin/           Next.js admin shell
+  helm_mobile/          Flutter traveler app
+  helm-web/             Next.js traveler web app
+  helm-admin/           Next.js staff catalog and trip request tools
 services/
-  helm-backend/         NestJS modular monolith (health/meta only)
+  helm-backend/         NestJS API for catalog, packages, identity, and trips
 packages/
   openapi/              OpenAPI 3 SoT (/v1)
   api-client-ts/        Generated TS client — DO NOT EDIT

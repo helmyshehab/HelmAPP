@@ -119,6 +119,10 @@ RUN_STORAGE_INTEGRATION=1 STORAGE_PROVIDER=supabase \
   test/catalog-media-storage.integration.test.ts
 ```
 
-## Step 2 scope reminder
+## Staging checks
 
-Skeleton only: health/meta API, empty app shells, mocks, seed. **No product features.**
+For the private destination cover rollout, deploy the backend that issues signed destination cover URLs first. Verify both existing covers still load through the catalog, then apply `20261128130000_private_destination_cover_storage.sql` to staging. This switches the existing bucket to private in place. Recheck the catalog and confirm the old unsigned URLs no longer work. Use the updated Admin for staff previews.
+
+- In Traveler staging, submit a test Ubud draft and Istanbul draft. Review each request in Admin, then refresh Trips as the traveler and check the updated status.
+- On a dedicated test place, upload, replace, and remove a cover in Admin. Refresh Explore after each change, and check a hotel and activity in Build. Use a draft test record to confirm staff can preview the cover before publication.
+- Signed covers expire after five minutes. Reopen the catalog to fetch a fresh URL when checking an expired link.

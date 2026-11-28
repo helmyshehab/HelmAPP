@@ -58,7 +58,7 @@ function hydrateStub() {
 }
 
 test('toPublicDestinationCover resolves URL without bucket/path leak', () => {
-  const storage = new MockStorageAdapter();
+  const url = 'https://example.test/signed-cover';
   const cover = toPublicDestinationCover(
     {
       storageBucket: CATALOG_MEDIA_BUCKET,
@@ -66,11 +66,11 @@ test('toPublicDestinationCover resolves URL without bucket/path leak', () => {
       altTextEn: 'Rice terraces',
       altTextAr: 'مدرجات الأرز',
     },
-    storage,
+    url,
   );
   assert.equal(
     cover.url,
-    'mock://storage/public/catalog-media/destinations/df027529-5744-4486-a36d-56d2a2170a0c/cover/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee.jpg',
+    url,
   );
   assert.equal(cover.altTextEn, 'Rice terraces');
   assert.equal(cover.altTextAr, 'مدرجات الأرز');
@@ -468,7 +468,7 @@ test('public list/detail attach cover without N+1 and omit when missing', async 
   const list = await queries.listPublicDestinations({});
   assert.equal(coverBatchCalls, 1);
   assert.equal(list.items.length, 2);
-  assert.ok((list.items[0] as { cover?: { url: string } }).cover?.url.includes('catalog-media'));
+  assert.match((list.items[0] as { cover?: { url: string } }).cover?.url ?? '', /^mock:\/\/storage\/signed/);
   assert.equal('cover' in (list.items[1] as object), false);
   assert.equal('storageBucket' in (list.items[0] as object), false);
 

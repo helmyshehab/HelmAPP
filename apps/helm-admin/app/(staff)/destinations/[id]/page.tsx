@@ -150,7 +150,7 @@ export default async function DestinationDetailPage({
             <DestinationCoverPanel
               destinationId={destination.id}
               isAdmin={isAdmin}
-              initialCover={coverViewFromMedia(destination.media, supabaseUrl)}
+              initialCover={coverViewFromMedia(destination.media, supabaseUrl, destination.coverPreviewUrl)}
             />
           </section>
           <section className={styles.panel}>

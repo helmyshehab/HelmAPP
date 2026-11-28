@@ -1,5 +1,3 @@
-import type { StoragePort } from '../../../infrastructure/ports/storage.port';
-
 export type CatalogCoverRow = {
   storageBucket: string;
   storagePath: string;
@@ -29,13 +27,11 @@ export type DestinationCoverPublic = CatalogCoverPublic;
  */
 export function toPublicCatalogCover(
   row: Pick<CatalogCoverRow, 'storageBucket' | 'storagePath' | 'altTextEn' | 'altTextAr'>,
-  storage: Pick<StoragePort, 'publicObjectUrl'>,
+  url: string,
 ): CatalogCoverPublic {
   const altTextEn = row.altTextEn?.trim();
   const altTextAr = row.altTextAr?.trim();
-  const cover: CatalogCoverPublic = {
-    url: storage.publicObjectUrl(row.storageBucket, row.storagePath),
-  };
+  const cover: CatalogCoverPublic = { url };
   if (altTextEn) cover.altTextEn = altTextEn;
   if (altTextAr) cover.altTextAr = altTextAr;
   return cover;

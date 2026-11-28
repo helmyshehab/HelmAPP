@@ -4,7 +4,7 @@ import { DRIZZLE, type DrizzleClient } from '../../../infrastructure/adapters/dr
 import { AppException } from '../../../common/errors/app.exception';
 import type { LifecycleStatus } from '../domain/lifecycle';
 import type { PlaceCategory } from '../domain/categories';
-import { PLACE_COVER_BUCKET } from '../../../infrastructure/ports/storage.port';
+import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../../../infrastructure/ports/storage.port';
 
 /**
  * Must match `hashtext(...)` key in `catalog.enforce_destination_parent_acyclic`
@@ -1437,6 +1437,7 @@ export class CatalogRepository {
         m.alt_text_en as "altTextEn",
         m.alt_text_ar as "altTextAr"
       from catalog.destination_media dm
+      join catalog.destinations d on d.id = dm.destination_id and d.lifecycle_status = 'published'
       join catalog.media_assets m on m.id = dm.media_id
       where dm.destination_id in (${sql.join(
         ids.map((id) => sql`${id}::uuid`),
@@ -1446,6 +1447,7 @@ export class CatalogRepository {
         and dm.is_cover = true
         and m.is_active = true
         and m.is_public = true
+        and m.storage_bucket = ${CATALOG_MEDIA_BUCKET}
     `);
     const map = new Map<
       string,

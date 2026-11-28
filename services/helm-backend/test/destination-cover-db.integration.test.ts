@@ -129,6 +129,11 @@ test('destination cover DB: concurrency, uniqueness, failure, shared refs, publi
         countryCode: 'EG',
       });
       const destId = String(created.id);
+      const draft = await admin.uploadDestinationCover(
+        adminActor, destId, { buffer: jpegBytes(0), mimetype: 'image/jpeg' }, 'Draft cover',
+      );
+      assert.match(draft.coverPreviewUrl ?? '', /^mock:\/\/storage\/signed/);
+      assert.equal(await repo.getActiveDestinationCover(destId), null);
       await admin.transitionDestination(adminActor, destId, 'pending_verification');
       await admin.transitionDestination(adminActor, destId, 'verified');
       await admin.transitionDestination(adminActor, destId, 'approved');
@@ -153,6 +158,7 @@ test('destination cover DB: concurrency, uniqueness, failure, shared refs, publi
       const firstMediaId = coversAfterFirst[0]!.mediaId;
       const firstPath = coversAfterFirst[0]!.storagePath;
       assert.equal(storage.objects.has(`${CATALOG_MEDIA_BUCKET}:${firstPath}`), true);
+      assert.equal((await repo.getActiveDestinationCover(destId))?.storagePath, firstPath);
 
       // --- concurrent replacements: exactly one active cover ---
       const concurrent = await Promise.allSettled([
@@ -294,6 +300,9 @@ test('destination cover DB: concurrency, uniqueness, failure, shared refs, publi
           and is_cover = true
       `;
       assert.equal(Number(activeCoverCount[0]!.n), 1);
+
+      await admin.transitionDestination(adminActor, destId, 'archived');
+      assert.equal(await repo.getActiveDestinationCover(destId), null);
 
       // silence unused firstMediaId lint-style retention
       assert.ok(firstMediaId);

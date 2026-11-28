@@ -2182,7 +2182,8 @@ components:
       required: [url]
       description: |
         Traveler-facing catalog cover. URL is server-resolved for a public
-        catalog-media object. Never includes storage bucket/path or credentials.
+        cover that is eligible for traveler display. The URL expires and can be
+        refreshed by fetching the catalog again. Never includes service credentials.
       properties:
         url:
           type: string
@@ -2945,9 +2946,13 @@ components:
             $ref: "#/components/schemas/DestinationProvenance"
         media:
           type: array
-          description: Existing media references only (no upload in Step 6)
+          description: Active media references for staff views.
           items:
             $ref: "#/components/schemas/PublicMediaRef"
+        coverPreviewUrl:
+          type: string
+          format: uri
+          description: Short-lived signed URL for the active destination cover in staff views.
     DestinationAdminListResponse:
       type: object
       required: [items, total, limit, offset]
