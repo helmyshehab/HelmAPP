@@ -144,6 +144,7 @@ jobs:
           grep -F 'SKIP supabase-only migration: 20261126160000_catalog_media_storage_bucket.sql' "$out"
           grep -F 'SKIP supabase-only migration: 20261128120000_private_place_cover_storage.sql' "$out"
           grep -F 'SKIP supabase-only migration: 20261128130000_private_destination_cover_storage.sql' "$out"
+          grep -F 'SKIP supabase-only migration: 20261128140000_package_cover_storage.sql' "$out"
       - name: Assert seed destinations exist and no fake storage tables
         env:
           PGPASSWORD: postgres
@@ -154,6 +155,9 @@ jobs:
           test "$count" -ge 1
           markets=$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select count(*) from markets.markets where code='EG_OUTBOUND'")
           test "$markets" -eq 1
+          # Plain Postgres must get packages.package_media from the foundation migration.
+          package_media="$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select coalesce(to_regclass('packages.package_media')::text, '')")"
+          test "$package_media" = "packages.package_media"
           # Plain Postgres must not invent storage.* stubs.
           buckets="$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select coalesce(to_regclass('storage.buckets')::text, '')")"
           objects="$(psql -h 127.0.0.1 -U postgres -d postgres -Atc "select coalesce(to_regclass('storage.objects')::text, '')")"
