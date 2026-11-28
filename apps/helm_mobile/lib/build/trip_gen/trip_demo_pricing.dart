@@ -174,6 +174,3 @@ TripDemoEstimate calculateTripDemoEstimate({
 }
 
 String formatDemoEgp(int amount) => '$amount EGP';
-
-String formatAirportTransfersEstimate(int? amount) =>
-    amount == null ? 'City pricing pending' : formatDemoEgp(amount);

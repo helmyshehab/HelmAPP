@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
 import { APP_ENV, type AppEnv } from '../../config/env';
-import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../../ports/storage.port';
+import { CATALOG_MEDIA_BUCKET } from '../../ports/storage.port';
 import type {
   StoragePort,
   UploadPublicObjectInput,
@@ -96,9 +96,6 @@ export class SupabaseStorageAdapter implements StoragePort {
   }
 
   async uploadPrivateObject(input: UploadPublicObjectInput): Promise<void> {
-    if (input.bucket !== PLACE_COVER_BUCKET) {
-      throw AppException.validation('Expected private place cover bucket');
-    }
     await this.uploadObject(input);
   }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
-import { CATALOG_MEDIA_BUCKET, PLACE_COVER_BUCKET } from '../../ports/storage.port';
+import { CATALOG_MEDIA_BUCKET } from '../../ports/storage.port';
 import type {
   StoragePort,
   UploadPublicObjectInput,
@@ -39,9 +39,6 @@ export class MockStorageAdapter implements StoragePort {
   }
 
   async uploadPrivateObject(input: UploadPublicObjectInput): Promise<void> {
-    if (input.bucket !== PLACE_COVER_BUCKET) {
-      throw AppException.validation('Expected private place cover bucket');
-    }
     this.uploadObject(input);
   }
 

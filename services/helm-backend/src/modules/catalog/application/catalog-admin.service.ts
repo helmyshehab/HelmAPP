@@ -6,7 +6,7 @@ import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
 import {
   CATALOG_MEDIA_BUCKET,
   PLACE_COVER_BUCKET,
-  PLACE_COVER_URL_TTL_SECONDS,
+  CATALOG_COVER_URL_TTL_SECONDS,
   STORAGE_PORT,
   type StoragePort,
 } from '../../../infrastructure/ports/storage.port';
@@ -255,7 +255,7 @@ export class CatalogAdminService {
     });
     const storage = this.requireStorage();
 
-    await storage.uploadPublicObject({
+    await storage.uploadPrivateObject({
       bucket: CATALOG_MEDIA_BUCKET,
       path: storagePath,
       body: validated.body,
@@ -543,18 +543,21 @@ export class CatalogAdminService {
     const row = await this.repo.getPlaceById(id);
     if (!row) throw AppException.notFound('Place not found');
     const media = await this.repo.listPlaceMedia(id);
-    const cover = media.find((item) => item.isCover && item.storageBucket === PLACE_COVER_BUCKET);
-    let coverPreviewUrl: string | undefined;
+    const coverPreviewUrl = await this.resolveStaffCoverPreview(media, PLACE_COVER_BUCKET);
+    return { ...row, media, coverPreviewUrl };
+  }
+
+  private async resolveStaffCoverPreview(media: Record<string, unknown>[], bucket: string) {
+    const cover = media.find((item) => item.isCover && item.storageBucket === bucket);
     if (cover && typeof cover.storagePath === 'string' && this.storage) {
       try {
-        coverPreviewUrl = await this.storage.createSignedDownloadUrl(
-          cover.storagePath, PLACE_COVER_URL_TTL_SECONDS, PLACE_COVER_BUCKET,
+        return await this.storage.createSignedDownloadUrl(
+          cover.storagePath, CATALOG_COVER_URL_TTL_SECONDS, bucket,
         );
       } catch {
         // Keep staff metadata and cover controls available during storage outages.
       }
     }
-    return { ...row, media, coverPreviewUrl };
   }
 
   private async retireUnreferencedMediaAsset(asset: {
@@ -827,7 +830,8 @@ export class CatalogAdminService {
       this.repo.listDestinationSources(id),
       this.repo.listDestinationMedia(id),
     ]);
-    return { ...row, tags, sources, media };
+    const coverPreviewUrl = await this.resolveStaffCoverPreview(media, CATALOG_MEDIA_BUCKET);
+    return { ...row, tags, sources, media, coverPreviewUrl };
   }
 
   private async validateGeoAndParent(input: {

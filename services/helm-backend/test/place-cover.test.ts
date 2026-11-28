@@ -54,7 +54,7 @@ function hydrateStub() {
 }
 
 test('toPublicCatalogCover resolves place cover URL without bucket/path leak', () => {
-  const storage = new MockStorageAdapter();
+  const url = 'https://example.test/signed-cover';
   const cover = toPublicCatalogCover(
     {
       storageBucket: CATALOG_MEDIA_BUCKET,
@@ -62,11 +62,11 @@ test('toPublicCatalogCover resolves place cover URL without bucket/path leak', (
       altTextEn: 'Cafe terrace',
       altTextAr: 'تراس المقهى',
     },
-    storage,
+    url,
   );
   assert.equal(
     cover.url,
-    `mock://storage/public/catalog-media/places/${placeId}/cover/cccccccc-cccc-4ccc-8ccc-cccccccccccc.jpg`,
+    url,
   );
   assert.equal(cover.altTextEn, 'Cafe terrace');
   assert.equal(cover.altTextAr, 'تراس المقهى');

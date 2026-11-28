@@ -6,3 +6,4 @@
 # Never stub storage.* tables on plain Postgres.
 20261126160000_catalog_media_storage_bucket.sql
 20261128120000_private_place_cover_storage.sql
+20261128130000_private_destination_cover_storage.sql

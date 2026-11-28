@@ -904,7 +904,7 @@ class _TripPreviewScreenState extends State<TripPreviewScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Place details below come from the Ubud catalog. '
+              'Place details below come from the ${_plan.destinationName} catalog. '
               'Demo prices are separate from catalog facts and are not '
               'confirmed rates or amenity inventory.',
               style: theme.textTheme.bodySmall,
@@ -1104,9 +1104,11 @@ class _TripReview extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Stay', style: textTheme.titleSmall),
           Text('${stay.nameEn} · ${formatDemoEgp(estimate.lodgingTotalEgp)}'),
-          const SizedBox(height: 8),
-          Text('Airport transfers', style: textTheme.titleSmall),
-          Text(formatAirportTransfersEstimate(estimate.airportTransfersTotalEgp)),
+          if (estimate.airportTransfersTotalEgp case final transferTotal?) ...[
+            const SizedBox(height: 8),
+            Text('Airport transfers', style: textTheme.titleSmall),
+            Text(formatDemoEgp(transferTotal)),
+          ],
           const SizedBox(height: 12),
           Text('Activity estimate', style: textTheme.titleSmall),
           Text(formatDemoEgp(estimate.activitiesTotalEgp)),
@@ -1219,14 +1221,10 @@ class _EstimateCard extends StatelessWidget {
               'Activities: ${formatDemoEgp(estimate.activitiesTotalEgp)}',
               key: const Key('trip-preview-estimate-activities'),
             ),
-            Text(
-              'Airport transfers: ${formatAirportTransfersEstimate(estimate.airportTransfersTotalEgp)}',
-              key: const Key('trip-preview-estimate-airport-transfers'),
-            ),
-            if (estimate.airportTransfersTotalEgp == null)
+            if (estimate.airportTransfersTotalEgp case final transferTotal?)
               Text(
-                'The current total covers priced items only.',
-                style: theme.textTheme.bodySmall,
+                'Airport transfers: ${formatDemoEgp(transferTotal)}',
+                key: const Key('trip-preview-estimate-airport-transfers'),
               ),
             const SizedBox(height: 8),
             Text(

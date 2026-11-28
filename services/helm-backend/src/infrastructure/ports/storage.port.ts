@@ -2,13 +2,12 @@
  * StoragePort — object storage abstraction.
  * No Supabase SDK in domain; adapters implement this port (REST or mock).
  *
- * Public catalog covers use a public bucket + permanent public URLs.
- * Signed download remains available for future private objects.
+ * Catalog covers use signed download URLs from private buckets.
  */
 
 export const CATALOG_MEDIA_BUCKET = 'catalog-media';
 export const PLACE_COVER_BUCKET = 'catalog-place-covers';
-export const PLACE_COVER_URL_TTL_SECONDS = 300;
+export const CATALOG_COVER_URL_TTL_SECONDS = 300;
 
 /** Hard app limit for destination covers (also mirrored on the storage bucket). */
 export const CATALOG_COVER_MAX_BYTES = 5 * 1024 * 1024;

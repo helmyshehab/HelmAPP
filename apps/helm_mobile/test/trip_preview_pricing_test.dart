@@ -74,8 +74,9 @@ void main() {
     final transferEstimate = find.byKey(
       const Key('trip-preview-estimate-airport-transfers'),
     );
-    expect(tester.widget<Text>(transferEstimate).data,
-        'Airport transfers: City pricing pending');
+    expect(transferEstimate, findsNothing);
+    expect(find.text('Airport transfers'), findsNothing);
+    expect(find.text('• Airport transfers'), findsOneWidget);
     expect(coverage, findsOneWidget);
     expect(find.descendant(of: coverage, matching: find.text('Trip Mode')),
         findsOneWidget);

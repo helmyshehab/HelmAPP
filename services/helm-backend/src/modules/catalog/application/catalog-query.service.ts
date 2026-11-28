@@ -2,13 +2,14 @@ import { Inject, Injectable, Optional } from '@nestjs/common';
 import { AppException } from '../../../common/errors/app.exception';
 import {
   STORAGE_PORT,
+  CATALOG_MEDIA_BUCKET,
   PLACE_COVER_BUCKET,
-  PLACE_COVER_URL_TTL_SECONDS,
+  CATALOG_COVER_URL_TTL_SECONDS,
   type StoragePort,
 } from '../../../infrastructure/ports/storage.port';
 import { CATEGORY_GROUPS, isPlaceCategory } from '../domain/categories';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
-import { toPublicDestinationCover, type PlaceCoverRow } from './destination-cover.mapper';
+import { toPublicCatalogCover, type CatalogCoverRow } from './destination-cover.mapper';
 import {
   assertNoInternalLeak,
   toPublicDestination,
@@ -40,14 +41,13 @@ export class CatalogQueryService {
     const coverById = await this.repo.listPublicDestinationCovers(
       result.items.map((row) => String(row.id)),
     );
-    const items = result.items.map((row) => {
+    const items = await Promise.all(result.items.map(async (row) => {
       const body = toPublicDestination(row) as Record<string, unknown>;
       const coverRow = coverById.get(String(row.id));
-      if (coverRow && this.storage) {
-        body.cover = toPublicDestinationCover(coverRow, this.storage);
-      }
+      const cover = await this.resolveCover(coverRow, CATALOG_MEDIA_BUCKET);
+      if (cover) body.cover = cover;
       return body;
-    });
+    }));
     const response = { ...result, items };
     assertNoInternalLeak(response);
     return response;
@@ -58,9 +58,8 @@ export class CatalogQueryService {
     if (!row) throw AppException.notFound(`Destination not found: ${slug}`);
     const body = toPublicDestination(row) as Record<string, unknown>;
     const coverRow = await this.repo.getActiveDestinationCover(String(row.id));
-    if (coverRow && this.storage) {
-      body.cover = toPublicDestinationCover(coverRow, this.storage);
-    }
+    const cover = await this.resolveCover(coverRow, CATALOG_MEDIA_BUCKET);
+    if (cover) body.cover = cover;
     assertNoInternalLeak(body);
     return body;
   }
@@ -126,7 +125,7 @@ export class CatalogQueryService {
     const items = await Promise.all(result.items.map(async (row) => {
       const place = toPublicPlace(row) as Record<string, unknown>;
       const coverRow = coverById.get(String(row.id));
-      const cover = await this.resolvePlaceCover(coverRow);
+      const cover = await this.resolveCover(coverRow, PLACE_COVER_BUCKET);
       if (cover) place.cover = cover;
       return place;
     }));
@@ -154,21 +153,19 @@ export class CatalogQueryService {
       media,
       details: details ?? null,
     };
-    const cover = await this.resolvePlaceCover(coverRow);
+    const cover = await this.resolveCover(coverRow, PLACE_COVER_BUCKET);
     if (cover) body.cover = cover;
     assertNoInternalLeak(body);
     return body;
   }
 
-  private async resolvePlaceCover(row?: PlaceCoverRow | null) {
-    if (!row || !this.storage || row.storageBucket !== PLACE_COVER_BUCKET) return;
+  private async resolveCover(row: CatalogCoverRow | null | undefined, bucket: string) {
+    if (!row || !this.storage || row.storageBucket !== bucket) return;
     try {
       const url = await this.storage.createSignedDownloadUrl(
-        row.storagePath, PLACE_COVER_URL_TTL_SECONDS, PLACE_COVER_BUCKET,
+        row.storagePath, CATALOG_COVER_URL_TTL_SECONDS, bucket,
       );
-      const altTextEn = row.altTextEn?.trim();
-      const altTextAr = row.altTextAr?.trim();
-      return { url, ...(altTextEn && { altTextEn }), ...(altTextAr && { altTextAr }) };
+      return toPublicCatalogCover(row, url);
     } catch {
       // Place discovery remains available when storage signing is unavailable.
       return undefined;
