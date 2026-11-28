@@ -462,6 +462,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/packages/{id}/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload or replace a package cover image
+         * @description Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+         *     optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+         *     before an atomic DB cover replacement. Does not change publish_status.
+         *     Concurrent uploads are serialized per package; conflicts return 409.
+         */
+        post: operations["adminUploadPackageCover"];
+        /**
+         * Remove the active package cover
+         * @description Administrator / super-administrator only. Deactivates the active cover link.
+         *     Storage objects are removed only when the media asset has no remaining active
+         *     references. Does not change publish_status.
+         */
+        delete: operations["adminDeletePackageCover"];
+        options?: never;
+        head?: never;
+        /**
+         * Update package cover alt text
+         * @description Administrator / super-administrator only. Updates EN/AR alt text on the active
+         *     cover media asset. Does not change publish_status.
+         */
+        patch: operations["adminUpdatePackageCoverAlt"];
+        trace?: never;
+    };
     "/v1/destinations": {
         parameters: {
             query?: never;
@@ -1180,6 +1214,8 @@ export interface components {
         DestinationCoverPublic: components["schemas"]["CatalogCoverPublic"];
         /** @description Traveler-facing place cover. Alias of CatalogCoverPublic. */
         PlaceCoverPublic: components["schemas"]["CatalogCoverPublic"];
+        /** @description Traveler-facing package cover. Alias of CatalogCoverPublic. */
+        PackageCoverPublic: components["schemas"]["CatalogCoverPublic"];
         UpdateDestinationCoverAltRequest: {
             altTextEn: string;
             altTextAr?: string | null;
@@ -1210,6 +1246,10 @@ export interface components {
             updatedAt?: string;
         };
         UpdatePlaceCoverAltRequest: {
+            altTextEn: string;
+            altTextAr?: string | null;
+        };
+        UpdatePackageCoverAltRequest: {
             altTextEn: string;
             altTextAr?: string | null;
         };
@@ -1743,6 +1783,8 @@ export interface components {
             content: {
                 [key: string]: unknown;
             };
+            /** @description Present only when an active public cover exists for a published package */
+            cover?: components["schemas"]["PackageCoverPublic"];
         };
         PackagePublicListResponse: {
             items: components["schemas"]["PackagePublic"][];
@@ -1768,6 +1810,13 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** @description Active media references for staff hydrate (bucket/path allowed) */
+            media?: components["schemas"]["PublicMediaRef"][];
+            /**
+             * Format: uri
+             * @description Short-lived signed URL for the active package cover in staff views.
+             */
+            coverPreviewUrl?: string;
         };
         PackageAdminListResponse: {
             items: components["schemas"]["PackageAdmin"][];
@@ -2709,6 +2758,100 @@ export interface operations {
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
+        };
+    };
+    adminUploadPackageCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                     */
+                    file: string;
+                    altTextEn: string;
+                    altTextAr?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Package with updated cover media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    adminDeletePackageCover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package after cover removal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    adminUpdatePackageCoverAlt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: components["parameters"]["PackageId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePackageCoverAltRequest"];
+            };
+        };
+        responses: {
+            /** @description Package with updated cover alt text */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PackageAdmin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
         };
     };
     listDestinations: {

@@ -42,6 +42,8 @@ export type UpdateDestinationCoverAltRequest =
   components["schemas"]["UpdateDestinationCoverAltRequest"];
 export type UpdatePlaceCoverAltRequest =
   components["schemas"]["UpdatePlaceCoverAltRequest"];
+export type UpdatePackageCoverAltRequest =
+  components["schemas"]["UpdatePackageCoverAltRequest"];
 export type PlaceListResponse = components["schemas"]["PlaceListResponse"];
 export type PlacePublic = components["schemas"]["PlacePublic"];
 export type CategoryListResponse = components["schemas"]["CategoryListResponse"];
@@ -516,6 +518,53 @@ export function createHelmClient(options: HelmClientOptions) {
         },
       );
       if (!res.ok) throw new Error(`adminPublishPackage failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminUploadPackageCover(
+      id: string,
+      input: {
+        file: Blob;
+        altTextEn: string;
+        altTextAr?: string;
+        fileName?: string;
+      },
+    ): Promise<PackageAdmin> {
+      const form = new FormData();
+      form.append("file", input.file, input.fileName ?? "cover");
+      form.append("altTextEn", input.altTextEn);
+      if (input.altTextAr !== undefined) {
+        form.append("altTextAr", input.altTextAr);
+      }
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/packages/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, {
+        method: "POST",
+        headers,
+        body: form,
+      });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+      return (await res.json()) as PackageAdmin;
+    },
+    async adminUpdatePackageCoverAlt(
+      id: string,
+      body: UpdatePackageCoverAltRequest,
+    ): Promise<PackageAdmin> {
+      return sendJson<PackageAdmin>(
+        `/v1/admin/packages/${encodeURIComponent(id)}/cover`,
+        { method: "PATCH", body: JSON.stringify(body) },
+      );
+    },
+    async adminDeletePackageCover(id: string): Promise<PackageAdmin> {
+      const headers = new Headers();
+      if (options.accessToken) {
+        headers.set("Authorization", `Bearer ${options.accessToken}`);
+      }
+      const path = `/v1/admin/packages/${encodeURIComponent(id)}/cover`;
+      const res = await fetchImpl(`${base}${path}`, { method: "DELETE", headers });
+      if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
       return (await res.json()) as PackageAdmin;
     },
     async adminListCatalogDestinations(params?: {

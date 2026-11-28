@@ -782,6 +782,113 @@ paths:
           $ref: "#/components/responses/NotFound"
         "409":
           $ref: "#/components/responses/Conflict"
+  /v1/admin/packages/{id}/cover:
+    post:
+      operationId: adminUploadPackageCover
+      summary: Upload or replace a package cover image
+      description: |
+        Administrator / super-administrator only. Multipart upload (`file` + `altTextEn`,
+        optional `altTextAr`). JPEG/PNG/WebP, max 5 MiB. Uploads the new storage object
+        before an atomic DB cover replacement. Does not change publish_status.
+        Concurrent uploads are serialized per package; conflicts return 409.
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, altTextEn]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Cover image (JPEG, PNG, or WebP; max 5 MiB)
+                altTextEn:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                altTextAr:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Package with updated cover media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    patch:
+      operationId: adminUpdatePackageCoverAlt
+      summary: Update package cover alt text
+      description: |
+        Administrator / super-administrator only. Updates EN/AR alt text on the active
+        cover media asset. Does not change publish_status.
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePackageCoverAltRequest"
+      responses:
+        "200":
+          description: Package with updated cover alt text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: adminDeletePackageCover
+      summary: Remove the active package cover
+      description: |
+        Administrator / super-administrator only. Deactivates the active cover link.
+        Storage objects are removed only when the media asset has no remaining active
+        references. Does not change publish_status.
+      tags: [packages-admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PackageId"
+      responses:
+        "200":
+          description: Package after cover removal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackageAdmin"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /v1/destinations:
     get:
       operationId: listDestinations
@@ -2202,6 +2309,11 @@ components:
         - $ref: "#/components/schemas/CatalogCoverPublic"
       description: |
         Traveler-facing place cover. Alias of CatalogCoverPublic.
+    PackageCoverPublic:
+      allOf:
+        - $ref: "#/components/schemas/CatalogCoverPublic"
+      description: |
+        Traveler-facing package cover. Alias of CatalogCoverPublic.
     UpdateDestinationCoverAltRequest:
       type: object
       required: [altTextEn]
@@ -2262,6 +2374,19 @@ components:
           type: string
           format: date-time
     UpdatePlaceCoverAltRequest:
+      type: object
+      required: [altTextEn]
+      additionalProperties: false
+      properties:
+        altTextEn:
+          type: string
+          minLength: 1
+          maxLength: 500
+        altTextAr:
+          type: string
+          nullable: true
+          maxLength: 500
+    UpdatePackageCoverAltRequest:
       type: object
       required: [altTextEn]
       additionalProperties: false
@@ -3379,6 +3504,10 @@ components:
           type: object
           additionalProperties: true
           description: Validated trip_preview v1 or legacy ubud_trip_preview v1 JSON for Customize in Build
+        cover:
+          allOf:
+            - $ref: "#/components/schemas/PackageCoverPublic"
+          description: Present only when an active public cover exists for a published package
     PackagePublicListResponse:
       type: object
       required: [items]
@@ -3441,6 +3570,15 @@ components:
         updatedAt:
           type: string
           format: date-time
+        media:
+          type: array
+          description: Active media references for staff hydrate (bucket/path allowed)
+          items:
+            $ref: "#/components/schemas/PublicMediaRef"
+        coverPreviewUrl:
+          type: string
+          format: uri
+          description: Short-lived signed URL for the active package cover in staff views.
     PackageAdminListResponse:
       type: object
       required: [items]

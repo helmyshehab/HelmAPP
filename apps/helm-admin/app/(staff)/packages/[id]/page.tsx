@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PackageCoverPanel } from "../../../../components/packages/PackageCoverPanel";
 import { PackageEditor } from "../../../../components/packages/PackageEditor";
 import styles from "../../../../components/destinations/destinations.module.css";
 import { createAuthedHelmClient } from "../../../../lib/api/helm-client";
+import { isAdminPrincipal } from "../../../../lib/auth/staff";
 import { requireStaff } from "../../../../lib/auth/require-staff";
+import { getPublicAdminEnv } from "../../../../lib/env";
+import { packageCoverViewFromMedia } from "../../../../lib/packages/cover";
 
 export const metadata = { title: "Edit package — Helm Admin" };
 
@@ -17,8 +21,10 @@ export default async function PackageDetailPage({
   const { id } = await params;
   if (!uuid.test(id)) notFound();
 
-  const { accessToken } = await requireStaff();
+  const { me, accessToken } = await requireStaff();
   const client = createAuthedHelmClient(accessToken);
+  const isAdmin = isAdminPrincipal(me);
+  const { supabaseUrl } = getPublicAdminEnv();
   let pkg: Awaited<ReturnType<typeof client.adminGetPackage>>;
   try {
     pkg = await client.adminGetPackage(id);
@@ -55,6 +61,17 @@ export default async function PackageDetailPage({
           </p>
         </div>
       </header>
+      <section className={styles.panel}>
+        <PackageCoverPanel
+          packageId={pkg.id}
+          isAdmin={isAdmin}
+          initialCover={packageCoverViewFromMedia(
+            pkg.media,
+            supabaseUrl,
+            pkg.coverPreviewUrl,
+          )}
+        />
+      </section>
       <PackageEditor pkg={pkg} places={places} />
     </>
   );
