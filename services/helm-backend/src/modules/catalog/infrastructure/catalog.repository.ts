@@ -1506,6 +1506,9 @@ export class CatalogRepository {
         +
         (select count(*)::int from catalog.place_media
           where media_id = ${mediaId}::uuid and is_active = true)
+        +
+        (select count(*)::int from packages.package_media
+          where media_id = ${mediaId}::uuid and is_active = true)
       ) as c
     `);
     return Number((rows as unknown as { c: number }[])[0]?.c ?? 0);

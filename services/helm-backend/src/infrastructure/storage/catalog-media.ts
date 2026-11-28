@@ -5,6 +5,7 @@ import {
   CATALOG_COVER_MIME_TYPES,
   CATALOG_MEDIA_BUCKET,
   PLACE_COVER_BUCKET,
+  PACKAGE_COVER_BUCKET,
   type CatalogCoverMimeType,
 } from '../ports/storage.port';
 
@@ -125,7 +126,7 @@ export function assertSafeStorageSegment(value: string, label: string): string {
 }
 
 function buildEntityCoverObjectPath(input: {
-  entityFolder: 'destinations' | 'places';
+  entityFolder: 'destinations' | 'places' | 'packages';
   entityId: string;
   entityLabel: string;
   objectId?: string;
@@ -180,9 +181,31 @@ export function buildPlaceCoverObjectPath(input: {
   });
 }
 
+/**
+ * Safe object path for a package cover.
+ * Shape: packages/{packageId}/cover/{objectId}.{ext}
+ */
+export function buildPackageCoverObjectPath(input: {
+  packageId: string;
+  objectId?: string;
+  extension: string;
+}): string {
+  return buildEntityCoverObjectPath({
+    entityFolder: 'packages',
+    entityId: input.packageId,
+    entityLabel: 'packageId',
+    objectId: input.objectId,
+    extension: input.extension,
+  });
+}
+
 export function assertCatalogMediaBucket(bucket: string): string {
   const trimmed = bucket.trim();
-  if (trimmed !== CATALOG_MEDIA_BUCKET && trimmed !== PLACE_COVER_BUCKET) {
+  if (
+    trimmed !== CATALOG_MEDIA_BUCKET
+    && trimmed !== PLACE_COVER_BUCKET
+    && trimmed !== PACKAGE_COVER_BUCKET
+  ) {
     throw AppException.validation(
       `Unsupported catalog storage bucket: ${bucket}`,
     );

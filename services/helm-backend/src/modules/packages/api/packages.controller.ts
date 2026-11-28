@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -8,12 +9,23 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { z } from 'zod';
+import { CurrentUser } from '../../../common/auth/current-user.decorator';
 import { Public } from '../../../common/auth/public.decorator';
 import { Roles } from '../../../common/auth/roles.decorator';
 import { ZodValidationPipe } from '../../../common/http/zod-validation.pipe';
+import type { AuthPrincipal } from '../../../infrastructure/ports/auth.port';
+import { CatalogCoverUploadInterceptor } from '../../catalog/api/catalog-cover-upload.interceptor';
 import { PackagesService } from '../application/packages.service';
+
+type UploadedCoverFile = {
+  buffer?: Buffer;
+  mimetype?: string;
+  size?: number;
+};
 
 const contentSchema = z.record(z.unknown()).nullable().optional();
 
@@ -42,6 +54,13 @@ const updateBody = z
   .refine((body) => Object.keys(body).length > 0, {
     message: 'At least one field is required',
   });
+
+const updateCoverAltBody = z
+  .object({
+    altTextEn: z.string().min(1).max(500),
+    altTextAr: z.string().max(500).nullable().optional(),
+  })
+  .strict();
 
 @Controller()
 export class PackagesPublicController {
@@ -89,6 +108,46 @@ export class PackagesAdminController {
     @Body(new ZodValidationPipe(updateBody)) body: z.infer<typeof updateBody>,
   ) {
     return this.packages.update(id, body);
+  }
+
+  @Post(':id/cover')
+  @Roles('administrator', 'super-administrator')
+  @UseInterceptors(CatalogCoverUploadInterceptor('file'))
+  uploadPackageCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @UploadedFile() file: UploadedCoverFile | undefined,
+    @Body() body: { altTextEn?: string; altTextAr?: string },
+  ) {
+    return this.packages.uploadPackageCover(
+      user,
+      id,
+      file?.buffer
+        ? { buffer: file.buffer, mimetype: file.mimetype, size: file.size }
+        : undefined,
+      body?.altTextEn,
+      body?.altTextAr,
+    );
+  }
+
+  @Patch(':id/cover')
+  @Roles('administrator', 'super-administrator')
+  updatePackageCoverAlt(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(updateCoverAltBody))
+    body: z.infer<typeof updateCoverAltBody>,
+  ) {
+    return this.packages.updatePackageCoverAlt(user, id, body);
+  }
+
+  @Delete(':id/cover')
+  @Roles('administrator', 'super-administrator')
+  deletePackageCover(
+    @CurrentUser() user: AuthPrincipal,
+    @Param('id') id: string,
+  ) {
+    return this.packages.deletePackageCover(user, id);
   }
 
   @Post(':id/unpublish')

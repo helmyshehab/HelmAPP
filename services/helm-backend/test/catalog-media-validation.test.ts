@@ -9,6 +9,7 @@ import {
   assertSafeObjectPath,
   buildDestinationCoverObjectPath,
   buildPlaceCoverObjectPath,
+  buildPackageCoverObjectPath,
   detectCatalogCoverMime,
   validateCatalogCoverImage,
 } from '../src/infrastructure/storage/catalog-media';
@@ -141,6 +142,15 @@ test('buildPlaceCoverObjectPath uses UUID segments only', () => {
         extension: 'png',
       }),
     (err: unknown) => err instanceof AppException,
+  );
+});
+
+test('buildPackageCoverObjectPath uses UUID segments only', () => {
+  const packageId = 'a1027529-5744-4486-a36d-56d2a2170a0c';
+  const objectId = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+  assert.equal(
+    buildPackageCoverObjectPath({ packageId, objectId, extension: 'jpg' }),
+    `packages/${packageId}/cover/${objectId}.jpg`,
   );
 });
 

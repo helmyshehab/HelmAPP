@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../build/trip_gen/trip_preview_draft.dart';
 import '../config/api_config.dart';
+import '../widgets/helm_editorial_row.dart';
 
 /// Packages tab — published Build-compatible trip ideas from the API.
 class PackagesTab extends StatefulWidget {
@@ -157,6 +158,8 @@ class _PackageIdea {
     required this.summary,
     required this.demoDefaultsLabel,
     required this.snapshot,
+    this.coverUrl,
+    this.coverAltEn,
   });
 
   final String id;
@@ -164,6 +167,8 @@ class _PackageIdea {
   final String summary;
   final String demoDefaultsLabel;
   final TripPreviewDraftSnapshot snapshot;
+  final String? coverUrl;
+  final String? coverAltEn;
 
   static _PackageIdea? tryParse(Map<String, dynamic> json) {
     final snapshot = tryParseTripPreviewDraft(
@@ -175,6 +180,18 @@ class _PackageIdea {
     if (id == null || title == null) return null;
     final summary = (json['summaryEn'] as String?)?.trim();
     final answers = snapshot.answers;
+    String? coverUrl;
+    String? coverAltEn;
+    final coverRaw = json['cover'];
+    if (coverRaw is Map) {
+      final cover = Map<String, dynamic>.from(coverRaw);
+      final url = (cover['url'] as String?)?.trim();
+      final altEn = (cover['altTextEn'] as String?)?.trim();
+      if (helmResolvableMediaUrl(url) && altEn != null && altEn.isNotEmpty) {
+        coverUrl = url;
+        coverAltEn = altEn;
+      }
+    }
     return _PackageIdea(
       id: id,
       title: title,
@@ -185,9 +202,20 @@ class _PackageIdea {
           'Demo defaults: ${answers.budgetEgp} EGP · ${answers.travelerCount} travelers · '
           '${answers.nights} nights · ${snapshot.hotelSlug}',
       snapshot: snapshot,
+      coverUrl: coverUrl,
+      coverAltEn: coverAltEn,
     );
   }
 
+}
+
+@visibleForTesting
+({String? coverUrl, String? coverAltEn})? debugTryParsePackageIdea(
+  Map<String, dynamic> json,
+) {
+  final idea = _PackageIdea.tryParse(json);
+  if (idea == null) return null;
+  return (coverUrl: idea.coverUrl, coverAltEn: idea.coverAltEn);
 }
 
 class _PackageIdeaCard extends StatelessWidget {
@@ -203,6 +231,8 @@ class _PackageIdeaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
+    final showCover = helmResolvableMediaUrl(idea.coverUrl) &&
+        (idea.coverAltEn?.trim().isNotEmpty ?? false);
     return Material(
       key: Key('package-idea-${idea.id}'),
       color: scheme.surfaceContainerLow,
@@ -212,6 +242,23 @@ class _PackageIdeaCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (showCover) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    idea.coverUrl!.trim(),
+                    key: Key('package-cover-${idea.id}'),
+                    fit: BoxFit.cover,
+                    semanticLabel: idea.coverAltEn,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             Text(idea.title, style: textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(idea.summary, style: textTheme.bodyMedium),

@@ -7,6 +7,7 @@
 
 export const CATALOG_MEDIA_BUCKET = 'catalog-media';
 export const PLACE_COVER_BUCKET = 'catalog-place-covers';
+export const PACKAGE_COVER_BUCKET = 'catalog-package-covers';
 export const CATALOG_COVER_URL_TTL_SECONDS = 300;
 
 /** Hard app limit for destination covers (also mirrored on the storage bucket). */

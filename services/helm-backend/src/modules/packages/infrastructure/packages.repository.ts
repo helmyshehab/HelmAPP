@@ -2,6 +2,7 @@ import { Inject, Injectable, Optional } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
 import { AppException } from '../../../common/errors/app.exception';
 import { DRIZZLE, type DrizzleClient } from '../../../infrastructure/adapters/drizzle/drizzle.client';
+import { PACKAGE_COVER_BUCKET } from '../../../infrastructure/ports/storage.port';
 
 export type PackageRow = {
   id: string;
@@ -218,4 +219,300 @@ export class PackagesRepository {
     `);
     return rows.map((row) => row.slug);
   }
+
+  async listPackageMedia(packageId: string) {
+    const rows = await this.requireDb().execute(sql`
+      select
+        m.id, m.storage_bucket as "storageBucket", m.storage_path as "storagePath",
+        m.alt_text_en as "altTextEn", m.alt_text_ar as "altTextAr",
+        m.attribution, pm.sort_order as "sortOrder", pm.is_cover as "isCover"
+      from packages.package_media pm
+      join catalog.media_assets m on m.id = pm.media_id
+      where pm.package_id = ${packageId}::uuid
+        and pm.is_active = true
+        and m.is_active = true
+      order by pm.is_cover desc, pm.sort_order asc, m.created_at asc
+    `);
+    return rows as unknown as Record<string, unknown>[];
+  }
+
+  async listPublicPackageCovers(packageIds: string[]) {
+    if (packageIds.length === 0) {
+      return new Map<
+        string,
+        {
+          packageId: string;
+          storageBucket: string;
+          storagePath: string;
+          altTextEn: string | null;
+          altTextAr: string | null;
+        }
+      >();
+    }
+    const db = this.requireDb();
+    const rows = await db.execute(sql`
+      select
+        pm.package_id as "packageId",
+        m.storage_bucket as "storageBucket",
+        m.storage_path as "storagePath",
+        m.alt_text_en as "altTextEn",
+        m.alt_text_ar as "altTextAr"
+      from packages.package_media pm
+      join packages.packages p on p.id = pm.package_id and p.publish_status = 'published'
+      join catalog.media_assets m on m.id = pm.media_id
+      where pm.package_id in (${sql.join(
+        packageIds.map((id) => sql`${id}::uuid`),
+        sql`, `,
+      )})
+        and pm.is_active = true
+        and pm.is_cover = true
+        and m.is_active = true
+        and m.is_public = true
+        and m.storage_bucket = ${PACKAGE_COVER_BUCKET}
+    `);
+    const map = new Map<
+      string,
+      {
+        packageId: string;
+        storageBucket: string;
+        storagePath: string;
+        altTextEn: string | null;
+        altTextAr: string | null;
+      }
+    >();
+    for (const row of rows as unknown as {
+      packageId: string;
+      storageBucket: string;
+      storagePath: string;
+      altTextEn: string | null;
+      altTextAr: string | null;
+    }[]) {
+      map.set(String(row.packageId), row);
+    }
+    return map;
+  }
+
+  async getActivePackageCover(packageId: string) {
+    const map = await this.listPublicPackageCovers([packageId]);
+    return map.get(packageId) ?? null;
+  }
+
+  async countActiveMediaReferences(mediaId: string): Promise<number> {
+    const rows = await this.requireDb().execute(sql`
+      select (
+        (select count(*)::int from catalog.destination_media
+          where media_id = ${mediaId}::uuid and is_active = true)
+        +
+        (select count(*)::int from catalog.place_media
+          where media_id = ${mediaId}::uuid and is_active = true)
+        +
+        (select count(*)::int from packages.package_media
+          where media_id = ${mediaId}::uuid and is_active = true)
+      ) as c
+    `);
+    return Number((rows as unknown as { c: number }[])[0]?.c ?? 0);
+  }
+
+  async deactivateMediaAsset(mediaId: string): Promise<void> {
+    await this.requireDb().execute(sql`
+      update catalog.media_assets
+      set is_active = false, is_public = false, updated_at = now()
+      where id = ${mediaId}::uuid
+    `);
+  }
+
+  async replacePackageCover(input: {
+    packageId: string;
+    mediaId: string;
+    storageBucket: string;
+    storagePath: string;
+    mimeType: string;
+    byteSize: number;
+    altTextEn: string;
+    altTextAr: string | null;
+  }): Promise<{
+    mediaId: string;
+    replaced: Array<{
+      mediaId: string;
+      storageBucket: string;
+      storagePath: string;
+    }>;
+  }> {
+    const db = this.requireDb();
+    try {
+      return await db.transaction(async (tx) => {
+        const locked = await tx.execute(sql`
+          select id
+          from packages.packages
+          where id = ${input.packageId}::uuid
+          for update
+        `);
+        if ((locked as unknown as unknown[]).length === 0) {
+          throw AppException.notFound('Package not found');
+        }
+
+        await tx.execute(sql`
+          insert into catalog.media_assets (
+            id, storage_bucket, storage_path, mime_type, byte_size,
+            alt_text_en, alt_text_ar, is_public, is_active
+          ) values (
+            ${input.mediaId}::uuid,
+            ${input.storageBucket},
+            ${input.storagePath},
+            ${input.mimeType},
+            ${input.byteSize},
+            ${input.altTextEn},
+            ${input.altTextAr},
+            true,
+            true
+          )
+        `);
+
+        const deactivated = await tx.execute(sql`
+          update packages.package_media pm
+          set is_active = false, is_cover = false
+          where pm.package_id = ${input.packageId}::uuid
+            and pm.is_active = true
+            and pm.is_cover = true
+          returning pm.media_id as "mediaId"
+        `);
+
+        const replacedIds = (deactivated as unknown as { mediaId: string }[]).map((r) =>
+          String(r.mediaId),
+        );
+
+        await tx.execute(sql`
+          insert into packages.package_media (
+            package_id, media_id, sort_order, is_cover, is_active
+          ) values (
+            ${input.packageId}::uuid,
+            ${input.mediaId}::uuid,
+            0,
+            true,
+            true
+          )
+        `);
+
+        const replaced: Array<{
+          mediaId: string;
+          storageBucket: string;
+          storagePath: string;
+        }> = [];
+        for (const mediaId of replacedIds) {
+          if (mediaId === input.mediaId) continue;
+          const assetRows = await tx.execute(sql`
+            select
+              id as "mediaId",
+              storage_bucket as "storageBucket",
+              storage_path as "storagePath"
+            from catalog.media_assets
+            where id = ${mediaId}::uuid
+            limit 1
+          `);
+          const asset = (assetRows as unknown as {
+            mediaId: string;
+            storageBucket: string;
+            storagePath: string;
+          }[])[0];
+          if (asset) replaced.push(asset);
+        }
+
+        return { mediaId: input.mediaId, replaced };
+      });
+    } catch (err) {
+      if (err instanceof AppException) throw err;
+      const blob = collectPackageRepoErrorText(err);
+      const code = collectPackageRepoErrorCode(err);
+      if (code === '23505' || /uq_package_media_cover|unique/i.test(blob)) {
+        throw AppException.conflict(
+          'Another cover update is in progress; retry the upload',
+        );
+      }
+      throw err instanceof Error ? err : new Error(blob);
+    }
+  }
+
+  async updatePackageCoverAltTexts(
+    packageId: string,
+    input: { altTextEn: string; altTextAr: string | null },
+  ): Promise<{ mediaId: string } | null> {
+    return this.requireDb().transaction(async (tx) => {
+      const rows = await tx.execute(sql`
+        select pm.media_id as "mediaId"
+        from packages.package_media pm
+        join catalog.media_assets m on m.id = pm.media_id
+        where pm.package_id = ${packageId}::uuid
+          and pm.is_active = true
+          and pm.is_cover = true
+          and m.is_active = true
+        for update of pm
+        limit 1
+      `);
+      const current = (rows as unknown as { mediaId: string }[])[0];
+      if (!current) return null;
+
+      await tx.execute(sql`
+        update catalog.media_assets
+        set
+          alt_text_en = ${input.altTextEn},
+          alt_text_ar = ${input.altTextAr},
+          updated_at = now()
+        where id = ${current.mediaId}::uuid
+      `);
+      return { mediaId: String(current.mediaId) };
+    });
+  }
+
+  async deactivatePackageCover(packageId: string): Promise<{
+    mediaId: string;
+    storageBucket: string;
+    storagePath: string;
+  } | null> {
+    return this.requireDb().transaction(async (tx) => {
+      await tx.execute(sql`
+        select id from packages.packages
+        where id = ${packageId}::uuid
+        for update
+      `);
+
+      const rows = await tx.execute(sql`
+        update packages.package_media pm
+        set is_active = false, is_cover = false
+        where pm.package_id = ${packageId}::uuid
+          and pm.is_active = true
+          and pm.is_cover = true
+        returning pm.media_id as "mediaId"
+      `);
+      const deactivated = (rows as unknown as { mediaId: string }[])[0];
+      if (!deactivated) return null;
+
+      const assetRows = await tx.execute(sql`
+        select
+          id as "mediaId",
+          storage_bucket as "storageBucket",
+          storage_path as "storagePath"
+        from catalog.media_assets
+        where id = ${deactivated.mediaId}::uuid
+        limit 1
+      `);
+      const asset = (assetRows as unknown as {
+        mediaId: string;
+        storageBucket: string;
+        storagePath: string;
+      }[])[0];
+      return asset ?? null;
+    });
+  }
+}
+
+function collectPackageRepoErrorText(err: unknown): string {
+  if (err instanceof Error) return `${err.message} ${err.cause ?? ''}`;
+  return String(err);
+}
+
+function collectPackageRepoErrorCode(err: unknown): string | undefined {
+  if (err && typeof err === 'object' && 'code' in err) {
+    return String((err as { code: unknown }).code);
+  }
+  return undefined;
 }
