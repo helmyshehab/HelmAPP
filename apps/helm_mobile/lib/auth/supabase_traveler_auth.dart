@@ -38,12 +38,23 @@ class SupabaseTravelerAuth implements TravelerAuth {
   }
 
   static TravelerSession? _sessionFrom(Session? session) {
-    final userId = session?.user.id.trim() ?? '';
+    final user = session?.user;
+    final userId = user?.id.trim() ?? '';
     final accessToken = session?.accessToken.trim() ?? '';
     if (userId.isEmpty || accessToken.isEmpty) {
       return null;
     }
-    return TravelerSession(userId: userId, accessToken: accessToken);
+    final email = user?.email?.trim().toLowerCase();
+    final meta = user?.userMetadata;
+    final rawName = meta?['full_name'] ?? meta?['name'];
+    final displayName = rawName is String ? rawName.trim() : null;
+    return TravelerSession(
+      userId: userId,
+      accessToken: accessToken,
+      email: (email == null || email.isEmpty) ? null : email,
+      displayName:
+          (displayName == null || displayName.isEmpty) ? null : displayName,
+    );
   }
 
   void _applySession(TravelerSession? next) {
@@ -70,6 +81,18 @@ class SupabaseTravelerAuth implements TravelerAuth {
     required String password,
   }) async {
     final response = await _client.auth.signInWithPassword(
+      email: email.trim().toLowerCase(),
+      password: password,
+    );
+    _applySession(_sessionFrom(response.session));
+  }
+
+  @override
+  Future<void> signUpWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    final response = await _client.auth.signUp(
       email: email.trim().toLowerCase(),
       password: password,
     );
@@ -112,6 +135,17 @@ class _UnconfiguredTravelerAuth implements TravelerAuth {
 
   @override
   Future<void> signInWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    throw StateError(
+      'Supabase is not configured. Pass HELM_SUPABASE_URL and '
+      'HELM_SUPABASE_ANON_KEY via --dart-define.',
+    );
+  }
+
+  @override
+  Future<void> signUpWithPassword({
     required String email,
     required String password,
   }) async {

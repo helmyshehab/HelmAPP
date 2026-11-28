@@ -127,10 +127,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Build my trip'));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('build-signed-out')), findsOneWidget);
+    expect(find.byKey(const Key('profile-pending-handoff')), findsOneWidget);
 
     auth.setSession(
-      const TravelerSession(userId: 'traveler', accessToken: 'token'),
+      const TravelerSession(
+        userId: 'traveler',
+        accessToken: 'token',
+        email: 'traveler@example.com',
+      ),
     );
     await tester.pumpAndSettle();
     final ubud = tester.widget<RadioListTile<TripDestinationChoice>>(
