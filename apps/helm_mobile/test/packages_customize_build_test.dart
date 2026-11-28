@@ -195,16 +195,16 @@ void main() {
       await tester.pumpAndSettle();
       await _openCustomize(tester);
 
-      expect(find.byKey(const Key('build-signed-out')), findsOneWidget);
+      expect(find.byKey(const Key('profile-pending-handoff')), findsOneWidget);
       await tester.enterText(
-        find.byKey(const Key('build-sign-in-email')),
+        find.byKey(const Key('profile-sign-in-email')),
         'traveler@example.com',
       );
       await tester.enterText(
-        find.byKey(const Key('build-sign-in-password')),
+        find.byKey(const Key('profile-sign-in-password')),
         'password123',
       );
-      await tester.tap(find.byKey(const Key('build-sign-in-submit')));
+      await tester.tap(find.byKey(const Key('profile-sign-in-submit')));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('trip-preview')), findsOneWidget);

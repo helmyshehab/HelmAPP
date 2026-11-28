@@ -4,9 +4,11 @@ Flutter app for **Helm حلم**.
 
 Five-tab shell (Discover / Build / Packages / Trips / Profile). Discover loads
 published destinations via the generated `helm_api_client` (`listDestinations`),
-with search, pagination, and an interactive globe. Build lists and edits private
-trip drafts after traveler sign-in (questionnaire, planner, preview, and demo
-checkout for Ubud).
+with search, pagination, and an interactive globe. Profile handles traveler
+sign-in, create account, appearance, and sign-out. Build lists and edits private
+trip drafts after sign-in (questionnaire, planner, preview, and demo checkout
+for Ubud). Guests can browse Explore and Packages; Build my trip / Customize
+handoff through Profile and resume after sign-in.
 
 Uses `helm_api_client` from `packages/api-client-dart` (generated — do not hand-edit).
 
@@ -35,9 +37,10 @@ flutter run --dart-define=HELM_API_BASE_URL=https://helm-staging-api-ujqa.onrend
 
 Default (when unset): `https://helm-staging-api-ujqa.onrender.com`.
 
-## Traveler Build auth
+## Traveler auth
 
-Build uses Supabase email/password (anon key only). Pass:
+Profile uses Supabase email/password (anon key only). Build and Trips read the
+same restored session. Pass:
 
 ```bash
 flutter run \

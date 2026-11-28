@@ -4,6 +4,7 @@ import 'package:helm_api_client/helm_api_client.dart';
 import 'auth/fake_traveler_auth.dart';
 import 'auth/supabase_traveler_auth.dart';
 import 'auth/traveler_session.dart';
+import 'build/pending_build_handoff.dart';
 import 'build/trip_gen/trip_answers.dart';
 import 'build/trip_gen/trip_demo_mode_screen.dart';
 import 'build/trip_gen/trip_preview_draft.dart';
@@ -88,17 +89,25 @@ class HelmShell extends StatefulWidget {
 }
 
 class _HelmShellState extends State<HelmShell> {
+  static const int _exploreIndex = 0;
+  static const int _buildIndex = 1;
+  static const int _tripsIndex = 3;
+  static const int _profileIndex = 4;
+
   int index = 0;
   TripDestinationChoice? _buildDestination;
   TripPreviewDraftSnapshot? _buildPackageSnapshot;
+  PendingBuildHandoff? _pendingHandoff;
   final GlobalKey _buildTabKey = GlobalKey();
   Route<void>? _tripModeRoute;
   late int _authGeneration;
+  TravelerSession? _lastSession;
 
   @override
   void initState() {
     super.initState();
     _authGeneration = widget.auth.authGeneration;
+    _lastSession = widget.auth.session;
     widget.auth.sessionListenable.addListener(_onAuthChanged);
   }
 
@@ -109,13 +118,76 @@ class _HelmShellState extends State<HelmShell> {
   }
 
   void _onAuthChanged() {
-    if (_authGeneration == widget.auth.authGeneration) return;
-    _authGeneration = widget.auth.authGeneration;
-    final route = _tripModeRoute;
-    if (route != null && route.isActive) {
-      Navigator.of(context).removeRoute(route);
+    if (_authGeneration != widget.auth.authGeneration) {
+      _authGeneration = widget.auth.authGeneration;
+      final route = _tripModeRoute;
+      if (route != null && route.isActive) {
+        Navigator.of(context).removeRoute(route);
+      }
+      _tripModeRoute = null;
     }
-    _tripModeRoute = null;
+
+    final session = widget.auth.session;
+    final wasSignedOut = _lastSession == null;
+    _lastSession = session;
+    if (session != null && wasSignedOut) {
+      final handoff = _pendingHandoff;
+      if (handoff != null) {
+        setState(() {
+          _pendingHandoff = null;
+          _buildDestination = handoff.destination;
+          _buildPackageSnapshot = handoff.packageSnapshot;
+          index = _buildIndex;
+        });
+      }
+    }
+  }
+
+  void _requestBuildDestination(TripDestinationChoice destination) {
+    if (widget.auth.session != null) {
+      setState(() {
+        _pendingHandoff = null;
+        _buildPackageSnapshot = null;
+        _buildDestination = destination;
+        index = _buildIndex;
+      });
+      return;
+    }
+    setState(() {
+      _buildDestination = null;
+      _buildPackageSnapshot = null;
+      _pendingHandoff = PendingBuildHandoff.destination(destination);
+      index = _profileIndex;
+    });
+  }
+
+  void _requestCustomizePackage(TripPreviewDraftSnapshot snapshot) {
+    if (widget.auth.session != null) {
+      setState(() {
+        _pendingHandoff = null;
+        _buildDestination = null;
+        _buildPackageSnapshot = snapshot;
+        index = _buildIndex;
+      });
+      return;
+    }
+    setState(() {
+      _buildDestination = null;
+      _buildPackageSnapshot = null;
+      _pendingHandoff = PendingBuildHandoff.package(snapshot);
+      index = _profileIndex;
+    });
+  }
+
+  void _openProfileForSignIn() {
+    setState(() => index = _profileIndex);
+  }
+
+  void _cancelBuildHandoff() {
+    setState(() {
+      _pendingHandoff = null;
+      index = _exploreIndex;
+    });
   }
 
   Future<void> _openTripMode(TripPreviewDraftSnapshot snapshot) async {
@@ -140,11 +212,7 @@ class _HelmShellState extends State<HelmShell> {
     final tabs = <Widget>[
       DiscoverTab(
         apiClient: widget.apiClient,
-        onBuildTrip: (destination) => setState(() {
-          _buildPackageSnapshot = null;
-          _buildDestination = destination;
-          index = 1;
-        }),
+        onBuildTrip: _requestBuildDestination,
       ),
       BuildTab(
         key: _buildTabKey,
@@ -156,22 +224,25 @@ class _HelmShellState extends State<HelmShell> {
           // Avoid setState during the handoff push so BuildTab is not disposed.
           _buildPackageSnapshot = null;
         },
+        onRequestSignIn: _openProfileForSignIn,
         allowDemoStaffConfirmation: widget.allowDemoStaffConfirmation,
       ),
       PackagesTab(
         apiClient: widget.apiClient,
-        onCustomizeInBuild: (snapshot) => setState(() {
-          _buildDestination = null;
-          _buildPackageSnapshot = snapshot;
-          index = 1;
-        }),
+        onCustomizeInBuild: _requestCustomizePackage,
       ),
       TripsTab(
         auth: widget.auth,
         apiClient: widget.apiClient,
         onOpenTrip: _openTripMode,
       ),
-      const ProfileTab(),
+      ProfileTab(
+        auth: widget.auth,
+        themeController: widget.themeController,
+        hasPendingBuildHandoff: _pendingHandoff != null,
+        onOpenTrips: () => setState(() => index = _tripsIndex),
+        onCancelBuildHandoff: _cancelBuildHandoff,
+      ),
     ];
 
     final scaler = MediaQuery.textScalerOf(context);
@@ -227,6 +298,13 @@ class _HelmShellState extends State<HelmShell> {
           if (value != index) {
             _buildDestination = null;
             _buildPackageSnapshot = null;
+            // Leaving Profile/Build without signing in cancels a guest handoff.
+            if (_pendingHandoff != null &&
+                widget.auth.session == null &&
+                value != _profileIndex &&
+                value != _buildIndex) {
+              _pendingHandoff = null;
+            }
           }
           index = value;
         }),

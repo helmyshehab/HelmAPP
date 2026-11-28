@@ -5,13 +5,13 @@ import 'package:http/http.dart' as http;
 import '../auth/traveler_session.dart';
 import '../build/draft_editor_screen.dart';
 import '../build/draft_title_patch.dart';
-import '../build/sign_in_panel.dart';
 import '../build/trip_gen/trip_answers.dart';
 import '../build/trip_gen/trip_flow_routes.dart';
 import '../build/trip_gen/trip_preview_draft.dart';
 import '../build/trip_gen/trip_preview_screen.dart';
 import '../build/trip_gen/trip_questionnaire_screen.dart';
 import '../config/api_config.dart';
+import '../theme/helm_tokens.dart';
 
 /// Build tab — private trip drafts for the signed-in traveler.
 class BuildTab extends StatefulWidget {
@@ -22,6 +22,7 @@ class BuildTab extends StatefulWidget {
     this.initialDestination,
     this.initialPackageSnapshot,
     this.onInitialPackageConsumed,
+    this.onRequestSignIn,
     this.allowDemoStaffConfirmation = false,
   });
 
@@ -33,6 +34,9 @@ class BuildTab extends StatefulWidget {
 
   /// Cleared in the parent so shell rebuilds do not reopen the same package.
   final VoidCallback? onInitialPackageConsumed;
+
+  /// Opens Profile so guests can sign in without an embedded Build form.
+  final VoidCallback? onRequestSignIn;
 
   final bool allowDemoStaffConfirmation;
 
@@ -333,15 +337,11 @@ class _BuildTabState extends State<BuildTab> {
     }
   }
 
-  Future<void> _signOut() async {
-    await widget.auth.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     switch (_state) {
       case _BuildLoadState.signedOut:
-        return SignInPanel(auth: widget.auth);
+        return _signedOutPrompt(context);
       case _BuildLoadState.loading:
         return const Center(
           child: CircularProgressIndicator(key: Key('build-loading')),
@@ -463,6 +463,36 @@ class _BuildTabState extends State<BuildTab> {
     );
   }
 
+  Widget _signedOutPrompt(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(HelmSpacing.screen),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Sign in to build',
+            key: const Key('build-signed-out'),
+            style: theme.textTheme.titleMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: HelmSpacing.sm),
+          Text(
+            'Private trip drafts are saved to your traveler account.',
+            style: theme.textTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: HelmSpacing.xl),
+          FilledButton(
+            key: const Key('build-open-profile'),
+            onPressed: widget.onRequestSignIn,
+            child: const Text('Sign in'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _toolbar({Widget? trailing}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -470,11 +500,6 @@ class _BuildTabState extends State<BuildTab> {
         children: [
           if (trailing != null) trailing,
           const Spacer(),
-          TextButton(
-            key: const Key('build-sign-out'),
-            onPressed: _signOut,
-            child: const Text('Sign out'),
-          ),
         ],
       ),
     );

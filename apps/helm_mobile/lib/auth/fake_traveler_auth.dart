@@ -12,8 +12,9 @@ class FakeTravelerAuth implements TravelerAuth {
   String? _identityUserId;
   int _authGeneration = 0;
 
-  /// Controllable failure for sign-in / sign-out tests.
+  /// Controllable failure for sign-in / sign-up / sign-out tests.
   Object? nextSignInError;
+  Object? nextSignUpError;
 
   @override
   ValueListenable<TravelerSession?> get sessionListenable => _session;
@@ -38,6 +39,15 @@ class FakeTravelerAuth implements TravelerAuth {
     _applySession(next);
   }
 
+  TravelerSession _sessionForEmail(String email) {
+    final normalized = email.trim().toLowerCase();
+    return TravelerSession(
+      userId: 'user-$normalized',
+      accessToken: 'token-$normalized',
+      email: normalized,
+    );
+  }
+
   @override
   Future<void> signInWithPassword({
     required String email,
@@ -48,13 +58,20 @@ class FakeTravelerAuth implements TravelerAuth {
       nextSignInError = null;
       throw error;
     }
-    final normalized = email.trim().toLowerCase();
-    _applySession(
-      TravelerSession(
-        userId: 'user-$normalized',
-        accessToken: 'token-$normalized',
-      ),
-    );
+    _applySession(_sessionForEmail(email));
+  }
+
+  @override
+  Future<void> signUpWithPassword({
+    required String email,
+    required String password,
+  }) async {
+    final error = nextSignUpError;
+    if (error != null) {
+      nextSignUpError = null;
+      throw error;
+    }
+    _applySession(_sessionForEmail(email));
   }
 
   @override
